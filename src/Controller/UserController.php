@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 $session = new Session();
 $session->start();
+
 class UserController extends AbstractController
 {
 
@@ -83,11 +84,14 @@ class UserController extends AbstractController
     {
             return $request->cookies->get("PHPSESSID") ;
     }
+
+
     public function sendMailToUser(MailerInterface $mailer,UserDTO $userDTO,Request $request):void
     {
         if($userDTO->isCreated()){
-            $request->getSession()->set("session_id",$this->getCookie($request));
-            $request->getSession()->set("username",$userDTO->getName());
+            $session = $request->getSession();
+            $session->set("session_id",$this->getCookie($request));
+            $session->set("username",$userDTO->getName());
             $email = (new Email())
                 ->from("snowtricks@gmail.com")
                 ->to('mdembelepro@gmail.com')
@@ -109,18 +113,17 @@ L'équipe Snowtricks
     #[Route(path:'/signup/account-validation',methods: ["GET"])]
     public function token(Request $request):?Response
     {
-
-        if($this->getCookie($request) == $request->getSession()->get('session_id')){
+        $session = $request->getSession();
+        if($this->getCookie($request) == $session->get('session_id')){
             $userStatusUpdated = $this->userRepository->updateUserStatus($request);
             if ($userStatusUpdated){
                 $this->template ="account_validation.twig";
+                $session->remove('session_id');
             return new Response($this->render($this
             ->template));
             }
         }
-
         return null;
-
     }
 
 }

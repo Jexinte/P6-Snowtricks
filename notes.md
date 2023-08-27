@@ -8,3 +8,6 @@ La création d'utilisateur fonctionne mais il manque certaines choses comme :
 - Rendre le code plus lisible là ou il ne l'est pas
 - Il faudra ajouter le champ "status" dans le diagramme de classe pour la classe "user"
 - Vérifier pourquoi la partie from() ne met pas l'adresse souhaité
+
+
+
