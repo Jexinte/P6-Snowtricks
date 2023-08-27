@@ -22,14 +22,14 @@ class UserController extends AbstractController
     public string $template = "sign_up.twig";
 
     public  function __construct(private readonly UserRepository $userRepository){}
-    #[Route('/signup')]
+    #[Route(path:'/signup',methods: ["GET"])]
     public function signUpPage():Response
     {
         return new Response($this->render($this->template));
     }
 
 
-    #[Route('/signup/registration')]
+    #[Route(path:'/signup/registration', methods : ['POST'])]
     public function signUpValidator(ValidatorInterface $validator,Request $request,UserRepository $userRepository,EntityManagerInterface $entityManager,MailerInterface $mailer):?Response
     {
         $userDto = new UserDTO();
@@ -63,7 +63,7 @@ class UserController extends AbstractController
         if($numberOfErrors == 0)
        {
             $userDto->setPassword(password_hash($request->request->get('password'),PASSWORD_DEFAULT));
-            $result = $userRepository->createUser($userDto,$entityManager);
+            $result = $userRepository->createUser($userDto);
             if(is_array($result)){
                 return new Response($this->render($this->template,[
                     "message_db" => $result
@@ -86,7 +86,7 @@ class UserController extends AbstractController
     public function sendMailToUser(MailerInterface $mailer,UserDTO $userDTO,Request $request):void
     {
         if($userDTO->isCreated()){
-            $request->getSession()->set("PHPSESSID",$this->getCookie($request));
+            $request->getSession()->set("session_id",$this->getCookie($request));
             $request->getSession()->set("username",$userDTO->getName());
             $email = (new Email())
                 ->from("snowtricks@gmail.com")
@@ -106,11 +106,11 @@ L'équipe Snowtricks
 
     }
 
-    #[Route('/signup/account-validation')]
+    #[Route(path:'/signup/account-validation',methods: ["GET"])]
     public function token(Request $request):?Response
     {
 
-        if($this->getCookie($request) == $request->getSession()->get('PHPSESSID')){
+        if($this->getCookie($request) == $request->getSession()->get('session_id')){
             $userStatusUpdated = $this->userRepository->updateUserStatus($request);
             if ($userStatusUpdated){
                 $this->template ="account_validation.twig";

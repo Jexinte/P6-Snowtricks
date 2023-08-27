@@ -5,7 +5,6 @@ namespace App\Repository;
 use App\Controller\DTO\UserDTO;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -28,13 +27,12 @@ class UserRepository extends ServiceEntityRepository
 
     /**
      * @param UserDTO $userDto
-     * @param EntityManagerInterface $entityManager
      * @return string[]|null
      */
-    public function createUser(UserDTO $userDto,EntityManagerInterface $entityManager):?array
+    public function createUser(UserDTO $userDto):?array
 {
 $user = new User();
-
+$entityManager = $this->getEntityManager();
 $usernameNotAvailable = $this->findOneBy(["name" => $userDto->getName()]);
 $emailNotAvailable = $this->findOneBy(["email" => $userDto->getEmail()]);
 switch (true){
@@ -55,7 +53,7 @@ switch (true){
         $user->setProfileImage($imgPath);
         $user->setEmail($userDto->getEmail());
         $user->setPassword($userDto->getPassword());
-        $user->setStatus(0);
+        $user->setStatus(false);
         $tmp = $userDto->getFile()->getPathname();
         $dir = "../public/assets/img";
         move_uploaded_file($tmp,"$dir/$filename");
@@ -73,10 +71,10 @@ public function updateUserStatus(Request $request): bool
     $entityManager = $this->getEntityManager();
     $dataToUpdate = $entityManager->getRepository(User::class)->findBy(["name" => $usernameInSession]);
     foreach ($dataToUpdate as $record){
-        $record->setStatus(1);
-
-        $entityManager->flush();
+        $record->setStatus(true);
     }
+    $entityManager->flush();
+
     return true;
 }
 }
