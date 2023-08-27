@@ -3,7 +3,6 @@ namespace App\Controller;
 
 use App\Controller\DTO\UserDTO;
 use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,7 +30,7 @@ class UserController extends AbstractController
 
 
     #[Route(path:'/signup/registration', methods : ['POST'])]
-    public function signUpValidator(ValidatorInterface $validator,Request $request,UserRepository $userRepository,EntityManagerInterface $entityManager,MailerInterface $mailer):?Response
+    public function signUpValidator(ValidatorInterface $validator,Request $request,UserRepository $userRepository,MailerInterface $mailer):?Response
     {
         $userDto = new UserDTO();
         $numberOfErrors = 0;
