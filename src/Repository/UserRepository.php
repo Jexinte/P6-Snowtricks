@@ -1,0 +1,82 @@
+<?php
+
+namespace App\Repository;
+
+use App\Controller\DTO\UserDTO;
+use App\Entity\User;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Doctrine\Persistence\ManagerRegistry;
+
+/**
+ * @extends ServiceEntityRepository<User>
+ *
+ * @method User|null find($id, $lockMode = null, $lockVersion = null)
+ * @method User|null findOneBy(array $criteria, array $orderBy = null)
+ * @method User[]    findAll()
+ * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ */
+class UserRepository extends ServiceEntityRepository
+{
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, User::class);
+    }
+
+
+
+    /**
+     * @param UserDTO $userDto
+     * @param EntityManagerInterface $entityManager
+     * @return string[]|null
+     */
+    public function createUser(UserDTO $userDto,EntityManagerInterface $entityManager):?array
+{
+$user = new User();
+
+$usernameNotAvailable = $this->findOneBy(["name" => $userDto->getName()]);
+$emailNotAvailable = $this->findOneBy(["email" => $userDto->getEmail()]);
+switch (true){
+    case $usernameNotAvailable:
+        return [
+            'username_unavailable' => 'Le nom utilisateur '.$usernameNotAvailable->getName().' n\'est pas disponible',
+        ];
+
+    case $emailNotAvailable:
+        return [
+            'email_unavailable' => "L'adresse email ". $emailNotAvailable->getEmail() ." n'est pas disponible"
+        ];
+    default:
+        $fileExt = explode('.',$userDto->getFile()->getClientOriginalName());
+        $filename = str_replace("/", "", base64_encode(random_bytes(9))).'.'.$fileExt[1];
+        $imgPath = "http://localhost:8000/Snowtricks/public/assets/img/$filename";
+        $user->setName($userDto->getName());
+        $user->setProfileImage($imgPath);
+        $user->setEmail($userDto->getEmail());
+        $user->setPassword($userDto->getPassword());
+        $user->setStatus(0);
+        $tmp = $userDto->getFile()->getPathname();
+        $dir = "../public/assets/img";
+        move_uploaded_file($tmp,"$dir/$filename");
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+}
+
+return null;
+}
+
+public function updateUserStatus(Request $request): bool
+{
+    $usernameInSession = $request->getSession()->get('username');
+    $entityManager = $this->getEntityManager();
+    $dataToUpdate = $entityManager->getRepository(User::class)->findBy(["name" => $usernameInSession]);
+    foreach ($dataToUpdate as $record){
+        $record->setStatus(1);
+
+        $entityManager->flush();
+    }
+    return true;
+}
+}

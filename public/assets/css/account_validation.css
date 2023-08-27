@@ -1,0 +1,13 @@
+#validation{
+    padding-top: 5em;
+}
+
+#validation .box {
+    padding: 2em;
+    color: white;
+    font-size: 1.9em;
+}
+
+#validation a {
+    color:var(--white);
+}

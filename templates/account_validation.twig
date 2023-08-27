@@ -1,0 +1,22 @@
+{% extends 'layout.twig' %}
+
+{% block title %}
+    <title>Validation de compte | {{ parent ()}}  </title>
+{% endblock %}
+
+{% block css_page %}
+    <link rel="stylesheet" href='/assets/css/account_validation.css'>
+{% endblock %}
+{% block content %}
+    <header>
+        <nav>
+            <a href="/"><img src="/assets/img/logo/logo.jpg" alt="main logo" height="60"></a>
+        </nav>
+    </header>
+
+    <div class="container-fluid" id="validation">
+        <div class="bg-success box">
+            <p>Votre compte a été validé avec succès , vous pouvez dès à présent vous <a href="#">connectez !</a> </p>
+        </div>
+    </div>
+{% endblock %}
