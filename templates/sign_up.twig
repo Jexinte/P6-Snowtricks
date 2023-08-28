@@ -11,21 +11,10 @@
 {% endblock %}
 
 {% block content %}
-<header>
-    <nav>
-        <a href="/"><img src="/assets/img/logo/logo.jpg" alt="main logo" height="60"></a>
+    {% include 'menu.twig' %}
 
-        <ul>
-            <li><a href=".">Home</a></li>
-            <li><a href="#">Tricks</a></li>
-            <li><a href="#">Connexion</a></li>
-            <li><a href="#">Inscription</a></li>
 
-        </ul>
-    </nav>
-</header>
-
-    <div class="container-fluid" id="registration">
+    <div class="container-fluid" id="login">
         <h1 class="text-center" >Inscription</h1>
       <div class="row">
           <form class="pt-5" action="/signup/registration" enctype="multipart/form-data" method="post" >

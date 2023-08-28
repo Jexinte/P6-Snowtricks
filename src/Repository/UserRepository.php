@@ -24,10 +24,10 @@ class UserRepository extends ServiceEntityRepository
     }
 
 
-
     /**
      * @param UserDTO $userDto
      * @return string[]|null
+     * @throws \Exception
      */
     public function createUser(UserDTO $userDto):?array
 {
@@ -76,5 +76,26 @@ public function updateUserStatus(Request $request): bool
     $entityManager->flush();
 
     return true;
+}
+
+public function login(UserDTO $userDTO,Request $request):array|null|bool
+{
+    $usernameFromForm = $userDTO->getName();
+    $passwordFromForm = $userDTO->getPassword();
+
+    $userInDb = current($this->findBy(["name" => $usernameFromForm]));
+    switch (true){
+        case !$userInDb:
+            return ["username_failed" => "Oops ! Il semblerait que le nom d'utilisateur $usernameFromForm n'existe pas !"];
+
+        case $userInDb->getName() == $usernameFromForm && password_verify($passwordFromForm,$userInDb->getPassword()):
+                return true;
+
+        default:
+            return ["password_failed" => "Oops ! Il semblerait que le mot de passe saisi est incorrect !"];
+    }
+
+
+
 }
 }

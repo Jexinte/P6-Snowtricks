@@ -10,7 +10,7 @@ class UserDTO
 {
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
-        groups: ['username_exception']
+        groups: ['username_exception',"username_exception_sign_in"]
     )]
     #[Assert\Regex(
         pattern: '/^(?=[A-Z])([A-Za-z0-9]{1,10})$/',
@@ -45,7 +45,7 @@ class UserDTO
     protected string $email;
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
-        groups: ['password_exception']
+        groups: ['password_exception',"password_exception_sign_in"]
     )]
     #[Assert\Regex(
         pattern: '/^(?=.*[A-Z])(?=.*\d).{8,}$/',

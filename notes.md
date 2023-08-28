@@ -10,4 +10,7 @@ La création d'utilisateur fonctionne mais il manque certaines choses comme :
 - Vérifier pourquoi la partie from() ne met pas l'adresse souhaité
 
 
+# Urgent
+
+- Suite à une petite vérification je vais devoir faire une petite modification pour le token pour la partie inscription à faire sur la branche signUp puis ensuite je repasserai sur la fonctionnalité login
 

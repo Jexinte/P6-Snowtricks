@@ -1,0 +1,52 @@
+{% extends 'layout.twig' %}
+
+{% block icon_img %}
+    <link rel="icon" type="image/png" href="/favicon.ico"/>
+{% endblock %}
+{% block title %}
+    <title>Connexion | {{ parent ()}}  </title>
+{% endblock %}
+
+{% block css_page %}
+    <link rel="stylesheet" href='/assets/css/sign_in.css'>
+{% endblock %}
+
+{% block content %}
+    {% include 'menu.twig' %}
+<div class="container-fluid" id="login">
+    <h1 class="text-center" >Connexion</h1>
+    <div class="row">
+        <form class="pt-5" action="/signin/validation" enctype="multipart/form-data" method="post" >
+
+            {# USER #}
+            <div class="col-sm-12 col-md-12">
+                <div class="mb-3 user-box">
+                    <label for="username" class="form-label">Utilisateur</label>
+                    <input class="form-control" type="text" name="username" id="username" placeholder="John">
+                    <p class="text-danger" id="error-username">
+                      {{ exceptions.username_exception_sign_in is defined ? exceptions.username_exception_sign_in : '' }}
+                        {{ message_db.username_failed is defined ? message_db.username_failed : '' }}
+                    </p>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-12">
+                <div class="mb-3 password-box">
+                    <label for="password" class="form-label">Mot de passe</label>
+                    <input class="form-control" type="password" name="password" id="password" placeholder="">
+                    <p class="text-danger" id="error-password">
+                        {{ exceptions.password_exception_sign_in is defined ? exceptions.password_exception_sign_in : '' }}
+                        {{ message_db.password_failed is defined ? message_db.password_failed : '' }}
+                    </p>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-12">
+                <div class="mb-3 forgot-password-box">
+                    <a class="text-center" href="#" id="forgot-password">Forgot Password ?</a>
+                </div>
+            </div>
+            <input type="submit" class="btn text-white bg-black mb-3" name="submit" id="submit" value="Créer un compte">
+        </form>
+
+    </div>
+</div>
+{% endblock %}

@@ -2,22 +2,24 @@
 namespace App\Controller;
 
 use App\Controller\DTO\UserDTO;
+use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
 
-$session = new Session();
-$session->start();
+
 
 class UserController extends AbstractController
 {
+
 
     public string $template = "sign_up.twig";
 
@@ -25,6 +27,12 @@ class UserController extends AbstractController
     #[Route(path:'/signup',methods: ["GET"])]
     public function signUpPage():Response
     {
+        return new Response($this->render($this->template));
+    }
+    #[Route(path:'/signin',methods: ["GET"])]
+    public function signInPage():Response
+    {
+        $this->template = "sign_in.twig";
         return new Response($this->render($this->template));
     }
 
@@ -38,7 +46,6 @@ class UserController extends AbstractController
         $userDto->setEmail($request->request->get("email"));
         $userDto->setPassword($request->request->get("password"));
         $file = $request->files->all()['file'];
-
         if(!is_null($file)){
             $userDto->setFile($file);
         }
@@ -62,7 +69,8 @@ class UserController extends AbstractController
         }
         if($numberOfErrors == 0)
        {
-            $userDto->setPassword(password_hash($request->request->get('password'),PASSWORD_DEFAULT));
+           $passwordFromForm = $request->request->get('password');
+            $userDto->setPassword(password_hash($passwordFromForm,PASSWORD_DEFAULT));
             $result = $userRepository->createUser($userDto);
             if(is_array($result)){
                 return new Response($this->render($this->template,[
@@ -79,18 +87,29 @@ class UserController extends AbstractController
     }
 
 
-    public function getCookie(Request $request):string
+    public function getCookie(Request $request):?string
     {
-            return $request->cookies->get("PHPSESSID") ;
+        $cookie = $request->cookies->get("token");
+        if(!empty($cookie)){
+            return $cookie ;
+        }
+        return null;
     }
 
-
+   public function setToken():void
+    {
+        $session = new Session();
+        $session->start();
+        $response = new Response();
+        $response->headers->setCookie(new Cookie("token",bin2hex(random_bytes(20))));
+        $response->send();
+        $session->set("token",current($response->headers->getCookies())->getValue());
+    }
     public function sendMailToUser(MailerInterface $mailer,UserDTO $userDTO,Request $request):void
     {
         if($userDTO->isCreated()){
-            $session = $request->getSession();
-            $session->set("session_id",$this->getCookie($request));
-            $session->set("username",$userDTO->getName());
+         $this->setToken();
+         $request->getSession()->set("username",$userDTO->getName());
             $email = (new Email())
                 ->from("snowtricks@gmail.com")
                 ->to('mdembelepro@gmail.com')
@@ -110,19 +129,68 @@ L'équipe Snowtricks
     }
 
     #[Route(path:'/signup/account-validation',methods: ["GET"])]
-    public function token(Request $request):?Response
+    public function checkToken(Request $request):?Response
     {
         $session = $request->getSession();
-        if($this->getCookie($request) == $session->get('session_id')){
+        $cookie = $this->getCookie($request);
+        $response = new Response();
+        $this->template ="account_validation.twig";
+        if(!is_null($cookie) && $cookie == $session->get('token')){
             $userStatusUpdated = $this->userRepository->updateUserStatus($request);
             if ($userStatusUpdated){
-                $this->template ="account_validation.twig";
-                $session->remove('session_id');
+                $session->remove('token');
+                $response->headers->clearCookie("token");
+                $response->send();
             return new Response($this->render($this
-            ->template));
+            ->template,["token_authenticated" => 1]),200);
             }
         }
-        return null;
+
+        return new Response($this->render($this
+            ->template),400);
+    }
+
+    #[Route(path:'/signin/validation',methods:["POST"])]
+    public function signInValidator(ValidatorInterface $validator,Request $request,UserRepository $userRepository) :?Response
+    {
+        $this->template = "sign_in.twig";
+        $userDto = new UserDTO();
+        $numberOfErrors = 0;
+        $userDto->setName($request->request->get("username"));
+        $userDto->setPassword($request->request->get("password"));
+        $groups = [
+            "username_exception_sign_in",
+            "password_exception_sign_in"
+        ];
+        $groupsViolations = [];
+        foreach ($groups as $group) {
+            $errors = $validator->validate($userDto, null, $group);
+            if (count($errors) >= 1) {
+                $numberOfErrors++;
+            }
+            foreach ($errors as $error) {
+                $groupsViolations[$group] = $error->getMessage();
+            }
+        }
+        $result = $userRepository->login($userDto,$request);
+
+        if ($numberOfErrors == 0) {
+
+
+            if (is_array($result)) {
+                return new Response(
+                    $this->render($this->template, [
+                        "message_db" => $result
+                   ]), 400
+               );
+            }
+
+        }
+        return !is_array($result) ? new RedirectResponse("/") : new Response(
+            $this->render($this->template, [
+                "exceptions" => $groupsViolations,
+            ]), 400
+        );
     }
 
 }
