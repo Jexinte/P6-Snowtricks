@@ -84,16 +84,14 @@ public function login(UserDTO $userDTO,Request $request):array|null|bool
     $passwordFromForm = $userDTO->getPassword();
 
     $userInDb = current($this->findBy(["name" => $usernameFromForm]));
-    switch (true){
-        case !$userInDb:
-            return ["username_failed" => "Oops ! Il semblerait que le nom d'utilisateur $usernameFromForm n'existe pas !"];
-
-        case $userInDb->getName() == $usernameFromForm && password_verify($passwordFromForm,$userInDb->getPassword()):
-                return true;
-
-        default:
-            return ["password_failed" => "Oops ! Il semblerait que le mot de passe saisi est incorrect !"];
-    }
+    return match (true) {
+        !$userInDb => ["username_failed" => "Oops ! Il semblerait que le nom d'utilisateur $usernameFromForm n'existe pas !"],
+        $userInDb->getName() == $usernameFromForm && password_verify(
+            $passwordFromForm,
+            $userInDb->getPassword()
+        ) => true,
+        default => ["password_failed" => "Oops ! Il semblerait que le mot de passe saisi est incorrect !"],
+    };
 
 
 
