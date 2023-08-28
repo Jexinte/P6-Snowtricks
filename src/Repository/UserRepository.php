@@ -94,6 +94,33 @@ public function login(UserDTO $userDTO,Request $request):array|null|bool
     };
 
 
+}
+
+public function checkUser(UserDTO $userDto):?User
+{
+    $userMatch = $this->findOneBy(["name" => $userDto->getName()]);
+    if($userMatch) {
+        return $userMatch;
+    }
+    return null;
+}
+
+public function checkPasswordReset(UserDTO $userDto):?bool
+{
+    $userDataFromDb = $this->checkUser($userDto);
+    $oldPasswordFromForm = $userDto->getOldPassword();
+    $newPasswordFromForm = $userDto->getPassword();
+    if(password_verify($oldPasswordFromForm,$userDataFromDb->getPassword()))
+    {
+        $entityManager = $this->getEntityManager();
+        $dataToUpdate = $entityManager->getRepository(User::class)->findBy(["name" => $userDataFromDb->getName()]);
+        foreach ($dataToUpdate as $record){
+            $record->setPassword(password_hash($newPasswordFromForm,PASSWORD_DEFAULT));
+        }
+        $entityManager->flush();
+
+    }
+    return true;
 
 }
 }

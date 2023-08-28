@@ -10,7 +10,7 @@ class UserDTO
 {
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
-        groups: ['username_exception',"username_exception_sign_in"]
+        groups: ['username_exception',"username_exception_sign_in","username_exception_forgot_password","username_exception_reset_password"]
     )]
     #[Assert\Regex(
         pattern: '/^(?=[A-Z])([A-Za-z0-9]{1,10})$/',
@@ -45,15 +45,17 @@ class UserDTO
     protected string $email;
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
-        groups: ['password_exception',"password_exception_sign_in"]
+        groups: ['password_exception',"password_exception_sign_in","password_exception_old_reset_password","password_exception_new_reset_password"]
     )]
     #[Assert\Regex(
         pattern: '/^(?=.*[A-Z])(?=.*\d).{8,}$/',
         message: 'Oops! Le format de votre mot de passe est incorrect, il doit être composé d\'une lettre majuscule , d\'un chiffre et 8 caractères minimum !',
         match: true,
-        groups: ['password_exception']
+        groups: ['password_exception',"password_exception_forgot_password","password_exception_wrong_format"]
     )]
     protected string $password;
+
+    protected string $oldPassword;
 
     protected  ?bool $created = null;
     public function getName(): string
@@ -107,5 +109,16 @@ class UserDTO
     public function setCreated(bool $created):void
     {
         $this->created = $created;
+    }
+
+
+    public function getOldPassword():string
+    {
+        return $this->oldPassword;
+    }
+
+    public function setOldPassword(string $oldPassword):void
+    {
+        $this->oldPassword = $oldPassword;
     }
 }

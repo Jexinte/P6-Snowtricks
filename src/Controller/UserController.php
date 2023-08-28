@@ -40,7 +40,13 @@ class UserController extends AbstractController
         $this->template = "forgot_password.twig";
         return new Response($this->render($this->template));
     }
+    #[Route(path:'/reset-password/token/{id}',methods:["GET"])]
 
+    public  function resetPasswordPage(Request $request, string $id):Response
+    {
+        $this->template = "reset_password.twig";
+        return new Response($this->render($this->template,["token" => $id]));
+    }
 
     #[Route(path:'/signup/registration', methods : ['POST'])]
     public function signUpValidator(ValidatorInterface $validator,Request $request,UserRepository $userRepository,MailerInterface $mailer):?Response
@@ -197,5 +203,116 @@ L'équipe Snowtricks
             ]), 400
         );
     }
+
+    #[Route(path:'/reset-password/',methods:["POST"])]
+    public function sendPasswordResetLink(MailerInterface $mailer,Request $request,UserDTO $userDto,UserRepository $userRepository,ValidatorInterface $validator):Response
+    {
+        $this->template = "forgot_password.twig";
+        $userDto->setName($request->request->get('username'));
+        $numberOfErrors = 0;
+        $errorUsername = "";
+        $groups = [
+            "username_exception_forgot_password",
+        ];
+        $groupsViolations = [];
+        foreach ($groups as $group) {
+            $errors = $validator->validate($userDto, null, $group);
+            if (count($errors) >= 1) {
+                $numberOfErrors++;
+            }
+            foreach ($errors as $error) {
+                $groupsViolations[$group] = $error->getMessage();
+            }
+        }
+
+        if ($numberOfErrors == 0) {
+            $result = $userRepository->checkUser($userDto);
+            if($result)
+            {
+                $this->setToken();
+                $token = $request->getSession()->get("token");
+
+
+                $email = (new Email())
+                    ->from("snowtricks@gmail.com")
+                    ->to('mdembelepro@gmail.com')
+
+                    ->subject('Réinitialisation de votre mot de passe')
+                    ->text(
+                        body: "Bonjour ".$userDto->getName().",\n
+Nous avons bien reçu votre demande de réinitialisation de mot de passe pour votre compte. Voici les étapes à suivre :\n
+
+Cliquez sur le lien ci-dessous pour accéder à la page de réinitialisation : \n
+http://127.0.0.1:8000/reset-password/token/$token\n
+
+Sur la page, saisissez un nouveau mot de passe pour votre compte. \n
+
+Si vous n'avez pas demandé cette réinitialisation, veuillez ignorer ce message. N'hésitez pas à nous contacter si vous avez des questions. \n
+
+Cordialement,\n
+
+L'équipe Snowtricks
+"
+                    );
+                $mailer->send($email);
+                return new Response($this->render($this->template,[
+                    "mail_send" => 1,
+                    "token" => $token
+
+                ]),200);
+            } else{
+                $errorUsername = "Oops! Le nom d'utilisateur ".$userDto->getName()." n'existe pas !";
+            }
+
+        }
+
+
+        return new Response($this->render($this->template,[
+            "errorUsername" => $errorUsername,
+            "exceptions" => $groupsViolations
+            ]),400);
+    }
+
+
+
+#[Route(path:'/reset-password/token/{id}',methods:["POST"])]
+
+public  function resetPassword(Request $request,string $id,UserDTO $userDto,ValidatorInterface $validator,UserRepository $userRepository):Response
+{
+    $this->template = "reset_password.twig";
+    $numberOfErrors = 0;
+    $response = new Response();
+
+    $userDto->setName($request->request->get("username"));
+    $userDto->setOldPassword($request->request->get("old-password"));
+    $userDto->setPassword($request->request->get("password"));
+
+    $groups = [
+        "username_exception_reset_password",
+        "password_exception_old_reset_password",
+"password_exception_new_reset_password",
+        "password_exception_wrong_format"
+    ];
+    $groupsViolations = [];
+    foreach ($groups as $group) {
+        $errors = $validator->validate($userDto, null, $group);
+        if (count($errors) >= 1) {
+            $numberOfErrors++;
+        }
+        foreach ($errors as $error) {
+            $groupsViolations[$group] = $error->getMessage();
+        }
+    }
+
+    if ($numberOfErrors == 0) {
+        $result = $userRepository->checkPasswordReset($userDto);
+        if ($result) {
+            $response->headers->clearCookie("token");
+            $response->send();
+            return new RedirectResponse("/",302);
+        }
+    }
+    return new Response($this->render($this->template, ["token" => $id,"exceptions" => $groupsViolations]),400);
+}
 
 }
