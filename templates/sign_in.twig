@@ -12,7 +12,16 @@
 {% endblock %}
 
 {% block content %}
-    {% include 'menu.twig' %}
+    <header>
+        <nav>
+            <a href="/"><img src="/assets/img/logo/logo.jpg" alt="main logo" height="60"></a>
+            <ul>
+                <li><a href=".">Home</a></li>
+                <li><a href="#">Tricks</a></li>
+                <li><a href="/signup">Inscription</a></li>
+            </ul>
+        </nav>
+    </header>
 <div class="container-fluid" id="login">
     <h1 class="text-center" >Connexion</h1>
     <div class="row">
@@ -41,7 +50,7 @@
             </div>
             <div class="col-sm-12 col-md-12">
                 <div class="mb-3 forgot-password-box">
-                    <a class="text-center" href="#" id="forgot-password">Forgot Password ?</a>
+                    <a class="text-center" href="/forgot-password" id="forgot-password">Forgot Password ?</a>
                 </div>
             </div>
             <input type="submit" class="btn text-white bg-black mb-3" name="submit" id="submit" value="Créer un compte">

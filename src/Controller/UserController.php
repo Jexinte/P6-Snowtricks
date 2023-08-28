@@ -34,6 +34,11 @@ class UserController extends AbstractController
     {
         $this->template = "sign_in.twig";
         return new Response($this->render($this->template));
+    }   #[Route(path:'/forgot-password',methods: ["GET"])]
+    public function forgotPasswordPage():Response
+    {
+        $this->template = "forgot_password.twig";
+        return new Response($this->render($this->template));
     }
 
 

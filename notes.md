@@ -14,3 +14,9 @@ La création d'utilisateur fonctionne mais il manque certaines choses comme :
 
 - Suite à une petite vérification je vais devoir faire une petite modification pour le token pour la partie inscription à faire sur la branche signUp puis ensuite je repasserai sur la fonctionnalité login
 
+# Responsive
+- S'occuper des templates suivants :
+- [] Inscription
+- [] Connexion
+- [] Mot de passe oublié
+- [] Réinitialisation de mot de passe

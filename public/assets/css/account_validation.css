@@ -1,3 +1,18 @@
+nav {
+    display: flex;
+    justify-content: space-between;
+}
+
+nav ul {
+    display: flex;
+    gap:1.5em;
+}
+
+nav a {
+    text-decoration: none;
+    color:var(--black);
+}
+
 #validation{
     padding-top: 5em;
 }

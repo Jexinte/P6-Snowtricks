@@ -11,7 +11,17 @@
 {% endblock %}
 
 {% block content %}
-    {% include 'menu.twig' %}
+
+    <header>
+        <nav>
+            <a href="/"><img src="/assets/img/logo/logo.jpg" alt="main logo" height="60"></a>
+            <ul>
+                <li><a href=".">Home</a></li>
+                <li><a href="#">Tricks</a></li>
+                <li><a href="/signin">Connexion</a></li>
+            </ul>
+        </nav>
+    </header>
 
 
     <div class="container-fluid" id="login">
