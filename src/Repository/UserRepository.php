@@ -78,7 +78,12 @@ public function updateUserStatus(Request $request): bool
     return true;
 }
 
-public function login(UserDTO $userDTO,Request $request):array|null|bool
+    /**
+     * @param UserDTO $userDTO
+     * @param Request $request
+     * @return array<string>|bool
+     */
+    public function login(UserDTO $userDTO,Request $request):array|bool
 {
     $usernameFromForm = $userDTO->getName();
     $passwordFromForm = $userDTO->getPassword();

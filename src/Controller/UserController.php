@@ -2,7 +2,6 @@
 namespace App\Controller;
 
 use App\Controller\DTO\UserDTO;
-use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
