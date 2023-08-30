@@ -90,17 +90,28 @@ public function updateUserStatus(Request $request): bool
     $passwordFromForm = $userDTO->getPassword();
 
     $userInDb = current($this->findBy(["name" => $usernameFromForm]));
-    return match (true) {
-        !$userInDb => ["username_failed" => "Oops ! Il semblerait que le nom d'utilisateur $usernameFromForm n'existe pas !"],
-        $userInDb->getName() == $usernameFromForm && password_verify(
-            $passwordFromForm,
-            $userInDb->getPassword()
-        ) => [
-            "connected" => UserStatus::CONNECTED,
-            "user_id" => $userInDb->getId(),
-        ],
-        default => ["password_failed" => "Oops ! Il semblerait que le mot de passe saisi est incorrect !"],
-    };
+    switch (true)
+    {
+        case !$userInDb:
+            return ["username_failed" => "Oops ! Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations de connexion !"];
+        case $userInDb->getName() == $usernameFromForm &&
+            password_verify(
+                $passwordFromForm,
+                $userInDb->getPassword()
+            ):
+                if($userInDb->getStatus() == UserStatus::ACCOUNT_ACTIVATE){
+                    return [
+                        "connected" => UserStatus::CONNECTED,
+                        "user_id" => $userInDb->getId(),
+                    ];
+                }
+                return ["not_activate" => UserStatus::ACCOUNT_NOT_ACTIVATE];
+
+        default:
+            return["password_failed" => "Oops ! Il semblerait que le mot de passe saisi est incorrect !"];
+
+    }
+
 
 
 }
@@ -114,22 +125,27 @@ public function checkUser(UserDTO $userDto):?User
     return null;
 }
 
-public function checkPasswordReset(UserDTO $userDto):?bool
+public function checkPasswordReset(UserDTO $userDto):bool|array|null
 {
     $userDataFromDb = $this->checkUser($userDto);
+
     $oldPasswordFromForm = $userDto->getOldPassword();
     $newPasswordFromForm = $userDto->getPassword();
-    if(password_verify($oldPasswordFromForm,$userDataFromDb->getPassword()))
-    {
-        $entityManager = $this->getEntityManager();
-        $dataToUpdate = $entityManager->getRepository(User::class)->findBy(["name" => $userDataFromDb->getName()]);
-        foreach ($dataToUpdate as $record){
-            $record->setPassword(password_hash($newPasswordFromForm,PASSWORD_DEFAULT));
+    if(!is_null($userDataFromDb)){
+        if(password_verify($oldPasswordFromForm,$userDataFromDb->getPassword()))
+        {
+            $entityManager = $this->getEntityManager();
+            $dataToUpdate = $entityManager->getRepository(User::class)->findBy(["name" => $userDataFromDb->getName()]);
+            foreach ($dataToUpdate as $record){
+                $record->setPassword(password_hash($newPasswordFromForm,PASSWORD_DEFAULT));
+            }
+            $entityManager->flush();
+            return null;
+
         }
-        $entityManager->flush();
-
+        return ["password" => "Oops ! Il semble que le mot de passe saisi est incorrect !"];
     }
-    return true;
 
+    return ["username" => "Oops ! Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations de connexion !"];
 }
 }

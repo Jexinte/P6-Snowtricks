@@ -7,5 +7,6 @@ enum UserStatus: int
     const CONNECTED = 1;
     const ACCOUNT_NOT_ACTIVATE = 0;
     const ACCOUNT_ACTIVATE = 1;
-    const LOGOUT = 1;
+
+    const ASK_RESET_PASSWORD = 1;
 }
