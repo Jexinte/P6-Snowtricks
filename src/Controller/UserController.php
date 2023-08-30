@@ -26,25 +26,34 @@ class UserController extends AbstractController
     #[Route(path:'/signup',methods: ["GET"])]
     public function signUpPage():Response
     {
-        return new Response($this->render($this->template));
+        return new Response($this->render($this->template,[
+            "user_connected" => !empty($this->getSessionData("user_connected")) ? $this->getSessionData("user_connected") : ''
+        ]));
     }
     #[Route(path:'/signin',methods: ["GET"])]
     public function signInPage():Response
     {
         $this->template = "sign_in.twig";
-        return new Response($this->render($this->template));
+        return new Response($this->render($this->template,[
+            "user_connected" => !empty($this->getSessionData("user_connected")) ? $this->getSessionData("user_connected") : ''
+        ]));
     }   #[Route(path:'/forgot-password',methods: ["GET"])]
     public function forgotPasswordPage():Response
     {
         $this->template = "forgot_password.twig";
-        return new Response($this->render($this->template));
+        return new Response($this->render($this->template,[
+            "user_connected" => !empty($this->getSessionData("user_connected")) ? $this->getSessionData("user_connected") : ''
+        ]));
     }
     #[Route(path:'/reset-password/token/{id}',methods:["GET"])]
 
     public  function resetPasswordPage(Request $request, string $id):Response
     {
         $this->template = "reset_password.twig";
-        return new Response($this->render($this->template,["token" => $id]));
+        return new Response($this->render($this->template,[
+            "token" => $id,
+            "user_connected" => !empty($this->getSessionData("user_connected")) ? $this->getSessionData("user_connected") : ''
+        ]));
     }
 
     #[Route(path:'/signup/registration', methods : ['POST'])]
@@ -84,7 +93,8 @@ class UserController extends AbstractController
             $result = $userRepository->createUser($userDto);
             if(is_array($result)){
                 return new Response($this->render($this->template,[
-                    "message_db" => $result
+                    "message_db" => $result,
+                    !empty($this->getSessionData("user_connected")) ? $this->getSessionData("user_connected") : ''
                 ]),400);
 
             }
@@ -93,6 +103,7 @@ class UserController extends AbstractController
        }
         return $userDto->isCreated() ? new RedirectResponse("/"):new Response($this->render($this->template,[
             "exceptions" => $groupsViolations,
+            !empty($this->getSessionData("user_connected")) ? $this->getSessionData("user_connected") : ''
         ]),400);
     }
 
@@ -109,12 +120,42 @@ class UserController extends AbstractController
    public function setToken():void
     {
         $session = new Session();
-        $session->start();
-        $response = new Response();
-        $response->headers->setCookie(new Cookie("token",bin2hex(random_bytes(20))));
-        $response->send();
-        $session->set("token",current($response->headers->getCookies())->getValue());
+        if(!$session->isStarted()){
+            $response = new Response();
+            $response->headers->setCookie(new Cookie("token",bin2hex(random_bytes(20))));
+            $response->send();
+            $session->set("token",current($response->headers->getCookies())->getValue());
+        }
+
     }
+
+    public function setSessionData($name,$value):void
+    {
+        $session = new Session();
+        if(!$session->isStarted()){
+            $session->set($name,$value);
+
+        }
+    }
+
+    public function destroySessionData($name):void
+    {
+        $session = new Session();
+        if(!$session->isStarted()){
+            $session->remove($name);
+        }
+    }
+
+
+    public function getSessionData($name):string|int|null
+    {
+        $session = new Session();
+        if(!$session->isStarted()){
+            return $session->get($name);
+        }
+      return null;
+    }
+
     public function sendMailToUser(MailerInterface $mailer,UserDTO $userDTO,Request $request):void
     {
         if($userDTO->isCreated()){
@@ -157,7 +198,9 @@ L'équipe Snowtricks
         }
 
         return new Response($this->render($this
-            ->template),400);
+            ->template,[
+            "user_connected" => !empty($this->getSessionData("user_connected")) ? $this->getSessionData("user_connected") : ''
+        ]),400);
     }
 
     #[Route(path:'/signin/validation',methods:["POST"])]
@@ -185,22 +228,37 @@ L'équipe Snowtricks
         $result = $userRepository->login($userDto,$request);
 
         if ($numberOfErrors == 0) {
-
-
-            if (is_array($result)) {
-                return new Response(
-                    $this->render($this->template, [
-                        "message_db" => $result
-                   ]), 400
-               );
-            }
+                switch (true){
+                    case is_array($result) && array_key_exists("password_failed",$result) || array_key_exists("username_failed",$result):
+                        return new Response(
+                            $this->render($this->template, [
+                                "message_db" => $result,
+                            ]), 400
+                        );
+                    case is_array($result) && array_key_exists("connected",$result):
+                        $this->setSessionData("user_id",$result["user_id"]);
+                        $this->setSessionData("user_connected",$result["connected"]);
+                        return new RedirectResponse("/");
+                }
 
         }
-        return !is_array($result) ? new RedirectResponse("/") : new Response(
+        return  new Response(
             $this->render($this->template, [
                 "exceptions" => $groupsViolations,
             ]), 400
         );
+    }
+
+    #[Route(path:'/logout',methods:["GET"])]
+    public function logout():?Response
+    {
+        $this->template = "homepage.twig";
+        if(!$this->getSessionData("user_connected"))
+        {
+            return null;
+        }
+        $this->destroySessionData("user_connected");
+        return new Response($this->render($this->template));
     }
 
     #[Route(path:'/reset-password/',methods:["POST"])]
@@ -268,7 +326,8 @@ L'équipe Snowtricks
 
         return new Response($this->render($this->template,[
             "errorUsername" => $errorUsername,
-            "exceptions" => $groupsViolations
+            "exceptions" => $groupsViolations,
+            "user_connected" => !empty($this->getSessionData("user_connected")) ? $this->getSessionData("user_connected") : ''
             ]),400);
     }
 
@@ -311,7 +370,11 @@ public  function resetPassword(Request $request,string $id,UserDTO $userDto,Vali
             return new RedirectResponse("/",302);
         }
     }
-    return new Response($this->render($this->template, ["token" => $id,"exceptions" => $groupsViolations]),400);
+    return new Response($this->render($this->template, [
+        "token" => $id,
+        "exceptions" => $groupsViolations,
+        "user_connected" => !empty($this->getSessionData("user_connected")) ? $this->getSessionData("user_connected") : ''
+        ]),400);
 }
 
 }

@@ -18,7 +18,11 @@
             <ul>
                 <li><a href=".">Home</a></li>
                 <li><a href="#">Tricks</a></li>
-                <li><a href="/signup">Inscription</a></li>
+                {% if user_connected is defined and user_connected == 1 %}
+                    <li><a href="/logout">Déconnexion</a></li>
+                {% else %}
+                    <li><a href="/signup">Inscription</a></li>
+                {% endif %}
             </ul>
         </nav>
     </header>
@@ -53,7 +57,7 @@
                     <a class="text-center" href="/forgot-password" id="forgot-password">Mot de passe oublié ?</a>
                 </div>
             </div>
-            <input type="submit" class="btn text-white bg-black mb-3" name="submit" id="submit" value="Créer un compte">
+            <input type="submit" class="btn text-white bg-black mb-3" name="submit" id="submit" value="Envoyer">
         </form>
 
     </div>

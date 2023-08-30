@@ -45,3 +45,18 @@ form{
 #login .text-danger {
     padding-top:.5em;
 }
+
+#log-in{
+    display: none;
+}
+
+@media screen and (max-width: 992px){
+    #login{
+        width: 100%;
+        transition: all 300ms ease;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+}

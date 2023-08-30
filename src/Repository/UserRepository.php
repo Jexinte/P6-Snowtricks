@@ -7,6 +7,7 @@ use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Enumeration\UserStatus;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -53,7 +54,7 @@ switch (true){
         $user->setProfileImage($imgPath);
         $user->setEmail($userDto->getEmail());
         $user->setPassword($userDto->getPassword());
-        $user->setStatus(false);
+        $user->setStatus(UserStatus::ACCOUNT_NOT_ACTIVATE);
         $tmp = $userDto->getFile()->getPathname();
         $dir = "../public/assets/img";
         move_uploaded_file($tmp,"$dir/$filename");
@@ -71,7 +72,7 @@ public function updateUserStatus(Request $request): bool
     $entityManager = $this->getEntityManager();
     $dataToUpdate = $entityManager->getRepository(User::class)->findBy(["name" => $usernameInSession]);
     foreach ($dataToUpdate as $record){
-        $record->setStatus(true);
+        $record->setStatus(UserStatus::ACCOUNT_ACTIVATE);
     }
     $entityManager->flush();
 
@@ -94,7 +95,10 @@ public function updateUserStatus(Request $request): bool
         $userInDb->getName() == $usernameFromForm && password_verify(
             $passwordFromForm,
             $userInDb->getPassword()
-        ) => true,
+        ) => [
+            "connected" => UserStatus::CONNECTED,
+            "user_id" => $userInDb->getId(),
+        ],
         default => ["password_failed" => "Oops ! Il semblerait que le mot de passe saisi est incorrect !"],
     };
 

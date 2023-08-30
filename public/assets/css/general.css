@@ -24,7 +24,7 @@ a{
 }
 
 a:visited{
-    color:var(--black);
+    color: var(--black);
 }
 
 footer {
@@ -33,4 +33,29 @@ footer {
 
 footer .footer-paragraph{
     padding-top: 4em;
+}
+
+#nav-mobile {
+    display: none;
+}
+@media  screen and (max-width: 992px) {
+    header{
+        display: none;
+    }
+
+    #nav-mobile{
+        display: flex;
+        border-top:2px solid black;
+    }
+
+    #nav-mobile .mobile-link {
+        padding-top: .8em;
+    }
+
+    footer {
+        padding-block: 1.6em;
+    }
+    footer .footer-paragraph{
+        display: none;
+    }
 }
