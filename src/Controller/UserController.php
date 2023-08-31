@@ -71,12 +71,11 @@ class UserController extends AbstractController
     #[Route(path:"/error/{code}",methods: ["GET"])]
     public function errorPage(int $code = null):Response
     {
-        $this->code = $code;
+        $this->code =$code;
         $this->template = "error.twig";
         $this->parameters["code"] = $this->code;
-        if(!is_null($this->code)){
-            $this->code = $code;
-        }else {
+        $codeAvailable = [CodeStatus::SERVER,CodeStatus::RESSOURCE_NOT_FOUND,CodeStatus::UNAUTHORIZED,CodeStatus::FORBIDDEN];
+        if(is_null($this->code) || !in_array($this->code,$codeAvailable)){
             $this->code = CodeStatus::SERVER;
         }
 

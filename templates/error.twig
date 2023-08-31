@@ -23,13 +23,9 @@
         <div class="row">
             <div class="col-xs-12 col-md-12 col-lg-12" id="errors">
                 {% if code is defined %}
-
                 <div class="error-box">
-                    {% if code == 500 %}
-                        <img src="/assets/img/code_error/500.jpg" alt="500 code error">
-                        <p>Désolé, une erreur interne du serveur est survenue.Veuillez réessayer ultérieurement. Merci de votre patience !</p>
-                        </a>
-                    {% elseif code == 401 %}
+
+                    {% if code == 401 %}
                         <img src="/assets/img/code_error/401.jpg" alt="401 code error">
                         <p>Vous n'êtes pas autorisée à accéder à cette ressource !</p>
                     {% elseif code == 403 %}
@@ -38,8 +34,11 @@
                     {% elseif code == 404 %}
                         <img src="/assets/img/code_error/404.jpg" alt="404 code error">
                         <p>La page recherchée n'a pas été trouvée !</p>
-                    {% endif %}
+                    {% else %}
+                        <img src="/assets/img/code_error/500.jpg" alt="500 code error">
+                        <p>Désolé, une erreur interne du serveur est survenue.Veuillez réessayer ultérieurement. Merci de votre patience !</p>
 
+                    {% endif %}
                     {% endif %}
                     <a href="/">Retour vers la page d'accueil</a>
                 </div>
