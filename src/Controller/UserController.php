@@ -32,22 +32,25 @@ class UserController extends AbstractController
     #[Route(path:'/signup',methods: ["GET"])]
     public function signUpPage():Response
     {
+        $this->code = CodeStatus::REQUEST_SUCCEED;
         $this->template = "sign_up.twig";
         $this->parameters["user_connected"] = !empty($this->getSessionData("user_connected")) ? $this->getSessionData("user_connected") : '';
-        return new Response($this->render($this->template,$this->parameters));
+        return new Response($this->render($this->template,$this->parameters),$this->code);
     }
     #[Route(path:'/signin',methods: ["GET"])]
     public function signInPage():Response
     {
+        $this->code = CodeStatus::REQUEST_SUCCEED;
         $this->template = "sign_in.twig";
         $this->parameters["user_connected"] = !empty($this->getSessionData("user_connected")) ? $this->getSessionData("user_connected") : '';
-        return new Response($this->render($this->template,$this->parameters));
+        return new Response($this->render($this->template,$this->parameters),$this->code);
     }   #[Route(path:'/forgot-password',methods: ["GET"])]
     public function forgotPasswordPage():Response
     {
+        $this->code = CodeStatus::REQUEST_SUCCEED;
         $this->template = "forgot_password.twig";
         $this->parameters["user_connected"] = !empty($this->getSessionData("user_connected")) ? $this->getSessionData("user_connected") : '';
-        return new Response($this->render($this->template,$this->parameters));
+        return new Response($this->render($this->template,$this->parameters),$this->code);
     }
     #[Route(path:'/reset-password/token/{id}',methods:["GET"])]
 
@@ -335,19 +338,17 @@ L'équipe Snowtricks
                 $mailer->send($email);
                 $this->parameters["mail_send"] = 1;
                 $this->parameters["token"] = $token;
-                $this->code = 200;
+                $this->code = CodeStatus::REQUEST_SUCCEED;
             } else{
                 $errorUsername = "Oops! Le nom d'utilisateur ".$userDto->getName()." n'existe pas !";
+                $this->code = CodeStatus::CLIENT;
                 $this->parameters["errorUsername"] = $errorUsername;
             }
 
         } else {
             $this->parameters["exceptions"] = $groupsViolations;
-            $this->code = CodeStatus::CLIENT;
         }
-
         $this->parameters["user_connected"] = !empty($this->getSessionData("user_connected")) ? $this->getSessionData("user_connected") : '';
-
         return new Response($this->render($this->template,$this->parameters),$this->code);
     }
 
