@@ -4,9 +4,9 @@ namespace App\Enumeration;
 
 enum UserStatus: int
 {
-    const CONNECTED = 1;
-    const ACCOUNT_NOT_ACTIVATE = 0;
-    const ACCOUNT_ACTIVATE = 1;
+    const CONNECTED = true;
+    const ACCOUNT_NOT_ACTIVATE = false;
+    const ACCOUNT_ACTIVATE = true;
 
-    const ASK_RESET_PASSWORD = 1;
+    const ASK_RESET_PASSWORD = true;
 }

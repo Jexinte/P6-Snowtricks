@@ -79,12 +79,13 @@ public function updateUserStatus(Request $request): bool
     return true;
 }
 
+
     /**
      * @param UserDTO $userDTO
      * @param Request $request
-     * @return array<string>|bool
+     * @return array|string[]|bool[]|null
      */
-    public function login(UserDTO $userDTO,Request $request):array|bool
+    public function login(UserDTO $userDTO,Request $request):?array
 {
     $usernameFromForm = $userDTO->getName();
     $passwordFromForm = $userDTO->getPassword();
@@ -125,7 +126,12 @@ public function checkUser(UserDTO $userDto):?User
     return null;
 }
 
-public function checkPasswordReset(UserDTO $userDto):bool|array|null
+
+    /**
+     * @param UserDTO $userDto
+     * @return string[]|null
+     */
+    public function checkPasswordReset(UserDTO $userDto):?array
 {
     $userDataFromDb = $this->checkUser($userDto);
 

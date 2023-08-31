@@ -23,6 +23,9 @@ class UserController extends AbstractController
 
 
     public string $template = "";
+    /**
+     * @var array <string,int>
+     */
     public array $parameters = [];
     public ?int $code = null;
     public  function __construct(private readonly UserRepository $userRepository){}
@@ -63,7 +66,7 @@ class UserController extends AbstractController
     }
 
     #[Route(path:"/error/{code}",methods: ["GET"])]
-    public function errorPage($code = null):Response
+    public function errorPage(int $code = null):Response
     {
         $this->code = $code;
         $this->template = "error.twig";
@@ -149,7 +152,7 @@ class UserController extends AbstractController
 
     }
 
-    public function setSessionData($name,$value):void
+    public function setSessionData(string $name,mixed $value):void
     {
         $session = new Session();
         if(!$session->isStarted()){
@@ -157,7 +160,7 @@ class UserController extends AbstractController
         }
     }
 
-    public function destroySessionData($name):void
+    public function destroySessionData(string $name):void
     {
         $session = new Session();
         if(!$session->isStarted()){
@@ -166,7 +169,7 @@ class UserController extends AbstractController
     }
 
 
-    public function getSessionData($name):string|int|null
+    public function getSessionData(string $name):string|int|null
     {
         $session = new Session();
         if(!$session->isStarted()){
@@ -224,7 +227,7 @@ L'équipe Snowtricks
     public function signInValidator(ValidatorInterface $validator,Request $request,UserRepository $userRepository) :?Response
     {
         $this->template = "sign_in.twig";
-        $this->paramaters = [];
+        $this->parameters = [];
         $userDto = new UserDTO();
         $numberOfErrors = 0;
         $userDto->setName($request->request->get("username"));
@@ -248,7 +251,7 @@ L'équipe Snowtricks
         if ($numberOfErrors == 0) {
                 switch (true){
                     case array_key_exists("password_failed",$result) || array_key_exists("username_failed",$result):
-                        $this->paramaters["message_db"] = $result;
+                        $this->parameters["message_db"] = $result;
                         break;
                     case  array_key_exists("connected",$result):
                         $this->setSessionData("user_id",$result["user_id"]);
@@ -257,14 +260,14 @@ L'équipe Snowtricks
                         return new RedirectResponse("/",$this->code);
 
                     case array_key_exists("not_activate",$result):
-                    $this->paramaters["not_activate"] = "L'accès à votre compte est en attente d'activation. Pour toute demande, notre support est à votre disposition.";
+                    $this->parameters["not_activate"] = "L'accès à votre compte est en attente d'activation. Pour toute demande, notre support est à votre disposition.";
                     break;
                 }
 
         }
-        $this->paramaters["exceptions"] = $groupsViolations;
+        $this->parameters["exceptions"] = $groupsViolations;
         $this->code = CodeStatus::CLIENT;
-        return new Response($this->render($this->template,$this->paramaters),$this->code);
+        return new Response($this->render($this->template,$this->parameters),$this->code);
     }
 
     #[Route(path:'/logout',methods:["GET"])]

@@ -14,7 +14,7 @@ class HomepageController extends AbstractController
     return new Response($this->render($this->template,["user_connected" => !empty($this->getSessionData("user_connected")) ? $this->getSessionData("user_connected") : '']));
     }
 
-    public function getSessionData($name):string|int|null
+    public function getSessionData(string $name):string|int|null
     {
         $session = new Session();
         if(!$session->isStarted()){
