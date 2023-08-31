@@ -83,7 +83,7 @@ public function updateUserStatus(Request $request): bool
     /**
      * @param UserDTO $userDTO
      * @param Request $request
-     * @return array|string[]|bool[]|null
+     * @return array<string|int|true|false|null>
      */
     public function login(UserDTO $userDTO,Request $request):?array
 {
@@ -112,8 +112,6 @@ public function updateUserStatus(Request $request): bool
             return["password_failed" => "Oops ! Il semblerait que le mot de passe saisi est incorrect !"];
 
     }
-
-
 
 }
 
