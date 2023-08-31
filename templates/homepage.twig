@@ -24,7 +24,33 @@
     </header>
 
     <div class="container-fluid" id="homepage">
+    <div class=" container-fluid" id="banner">
+        <img src="/assets/img/banner/banner_homepage.jpg" alt="banner">
+        <h1>Découvrez l'art de la glisse aérienne </h1>
+        <a href="#"><i class="fa-solid fa-arrow-down-long"></i></a>
+    </div>
 
+    <div class="container-fluid" id="tricks">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="trick">
+                    <div class="trick-banner" >
+                        {# banniere du trick #}
+                        <img src="/assets/img/banner/banner_homepage.jpg" alt="" width="200px">
+                    </div>
+                    <div class="trick-options">
+                        <p>Nom trick</p>
+                        <i class="fa-solid fa-pencil"></i>
+                        <i class="fa-solid fa-trash"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {# Il faudra permettre la génération des tricks restants non affichés #}
+        <a href="#">Plus de tricks</a>
+    </div>
+        {# Faire apparaître ce bouton lorsque plus de 15 tricks sont affichés #}
+        <a href="#"><i class="fa-solid fa-arrow-up"></i></a>
     </div>
 
 {% endblock %}
