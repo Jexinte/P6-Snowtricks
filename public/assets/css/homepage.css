@@ -1,9 +1,11 @@
-body{
+body {
     padding-inline: 0;
 }
-header{
+
+header {
     padding-inline: 1.5em;
 }
+
 nav {
     display: flex;
     justify-content: space-between;
@@ -11,15 +13,15 @@ nav {
 
 nav ul {
     display: flex;
-    gap:1.5em;
+    gap: 1.5em;
 }
 
 nav a {
     text-decoration: none;
-    color:var(--black);
+    color: var(--black);
 }
 
-nav a:visited{
+nav a:visited {
     color: var(--black);
 }
 
@@ -27,8 +29,9 @@ header nav ul {
     position: relative;
     top: 18px;
 }
-#homepage{
-    margin-top:2em;
+
+#homepage {
+    margin-top: 2em;
     /*width:80%;*/
     padding-inline: 0;
 }
@@ -45,13 +48,13 @@ header nav ul {
     min-height: 100vh;
 }
 
-#down-button{
+#down-button {
     position: absolute;
-    right:1em;
-    bottom:1em;
+    right: 1em;
+    bottom: 1em;
     color: white;
     font-size: 2em;
-    border:none;
+    border: none;
     background: none;
 }
 
@@ -72,7 +75,7 @@ header nav ul {
     transition: all 300ms ease;
 }
 
-#tricks{
+#tricks {
     display: flex;
     flex-wrap: wrap;
     gap: 6em;
@@ -80,17 +83,18 @@ header nav ul {
 }
 
 #tricks .trick {
-    box-shadow: 5px 5px 10px rgba(0,0,0,.3);
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, .3);
 }
 
-.trick-name{
+.trick-name {
     text-decoration: none;
 }
+
 .trick-options {
     display: flex;
     justify-content: space-between;
     margin-top: 1em;
-    padding:.5em .5em 1em;
+    padding: .5em .5em 1em;
 }
 
 .trick-options .options {
@@ -98,8 +102,7 @@ header nav ul {
     gap: 1em;
 }
 
-#more-tricks
-{
+#more-tricks {
     display: block;
     width: 100px;
     padding: 0.5em;
@@ -109,36 +112,41 @@ header nav ul {
     border-radius: 10px;
 }
 
-.update-trick{
+.update-trick {
     border: none;
+    background: none;
+
 }
-.delete-trick{
+
+.delete-trick {
     border: none;
+    background: none;
 }
-#up-to-start
-{
+
+#up-to-start {
     position: absolute;
     color: black;
     right: 1em;
     font-size: 2em;
 }
 
-footer{
+footer {
     display: none;
     margin-top: 2.3em;
 }
 
-#nav-mobile{
+#nav-mobile {
     padding-inline: 1em;
 }
 
-#up-to-start{
+#up-to-start {
     display: none;
-    border:none;
+    border: none;
     background: none;
 }
-@media screen and (max-width: 992px){
-    #homepage{
+
+@media screen and (max-width: 992px) {
+    #homepage {
         width: 100%;
         transition: all 300ms ease;
         display: flex;

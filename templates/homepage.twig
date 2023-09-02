@@ -1,78 +1,83 @@
 {% extends 'layout.twig' %}
 
 {% block title %}
-    <title>Accueil | {{ parent ()}}  </title>
+    <title>Accueil | {{ parent () }}  </title>
 {% endblock %}
 {% block css_page %}
     <link rel="stylesheet" href='/assets/css/homepage.css'>
 {% endblock %}
 {% block content %}
     <header>
-    <nav>
-        <a href="/"><img src="/assets/img/logo/logo.jpg" alt="main logo" height="60"></a>
-        <ul>
-            <li><a href="#">Tricks</a></li>
-            {% if user_connected is defined and user_connected == 1 %}
-                <a href="/logout">Déconnexion</a>
-            {% else %}
-                <a href="/signin">Connexion</a>
-                <a href="/signup">Inscription</a>
-            {% endif %}
-        </ul>
-    </nav>
+        <nav>
+            <a href="/"><img src="/assets/img/logo/logo.jpg" alt="main logo" height="60"></a>
+            <ul>
+                <li><a href="#">Tricks</a></li>
+                {% if user_connected is defined and user_connected == 1 %}
+                    <a href="/logout">Déconnexion</a>
+                {% else %}
+                    <a href="/signin">Connexion</a>
+                    <a href="/signup">Inscription</a>
+                {% endif %}
+            </ul>
+        </nav>
 
     </header>
 
     <div class="container-fluid" id="homepage">
-    <div class=" container-fluid" id="banner">
-        <img src="/assets/img/banner/banner_homepage.jpg" alt="banner">
-        <h1>Découvrez l'art de la glisse aérienne </h1>
-        <button id="down-button" ><i class="fa-solid fa-arrow-down-long"></i></button>
-    </div>
-
-    <div class="container-fluid" id="tricks-container">
-        <div class="row">
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="tricks">
-                {% if tricks is defined %}
-                {% for trick in tricks %}
-                <div class="trick">
-                    <div class="trick-banner" >
-                        {# banniere du trick #}
-                        <img src="/assets/img/banner/banner_homepage.jpg" alt="" width="250px">
-                    </div>
-                    <div class="trick-options">
-                        <a href="#" class="trick-name">{{ trick.name }}</a>
-                        <div class="options">
-                            {% if user_connected is defined and user_connected == 1 %}
-                                <form action="/trick/update/{{ trick.name }}/{{ trick.id }}" method="post">
-                                            <button type="submit" name="update" class="update-trick">
-                                                <i class="fa-solid fa-pencil">
-                                                </i>
-                                            </button>
-                                </form>
-
-                                <form action="/trick/delete/{{ trick.id }}" method="post">
-                                            <button type="submit" name="delete" class="delete-trick">
-                                                <i class="fa-solid fa-trash">
-                                                </i>
-                                            </button>
-                                </form>
-                            {% endif %}
-                        </div>
-
-                    </div>
-                </div>
-                {% endfor %}
-                {% endif %}
-            </div>
+        <div class=" container-fluid" id="banner">
+            <img src="/assets/img/banner/banner_homepage.jpg" alt="banner">
+            <h1>Découvrez l'art de la glisse aérienne </h1>
+            <button id="down-button"><i class="fa-solid fa-arrow-down-long"></i></button>
         </div>
 
+        <div class="container-fluid" id="tricks-container">
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="tricks">
+                    {% if tricks is empty %}
+                        <h2 class="text-center">Aucun trick de disponible pour le moment !</h2>
+                    {% endif %}
+                    {% if tricks is defined %}
+                        {% for trick in tricks %}
+                            <div class="trick">
+                                <div class="trick-banner">
+                                    {# banniere du trick #}
+                                    <img src="/assets/img/banner/banner_homepage.jpg" alt="" width="250px">
+                                </div>
+                                <div class="trick-options">
+                                    <a href="#" class="trick-name">{{ trick.name }}</a>
+                                    <div class="options">
+                                        {% if user_connected is defined and user_connected == 1 %}
+                                            <form action="/trick/update/{{ trick.name }}/{{ trick.id }}" method="post">
+                                                <button type="submit" name="update" class="update-trick">
+                                                    <i class="fa-solid fa-pencil">
+                                                    </i>
+                                                </button>
+                                            </form>
 
-    </div>
+                                            <form action="/trick/delete/{{ trick.id }}" method="post">
+                                                <button type="submit" name="delete" class="delete-trick">
+                                                    <i class="fa-solid fa-trash">
+                                                    </i>
+                                                </button>
+                                            </form>
+
+
+                                        {% endif %}
+                                    </div>
+
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+
+        </div>
     </div>
     <button id="up-to-start"><i class="fa-solid fa-arrow-up"></i></button>
 
-    <footer id="footer" >
+    <footer id="footer">
         <p class="text-center footer-paragraph">Copyright @ 2023</p>
         <nav id="nav-mobile">
             <a href="/" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
@@ -86,8 +91,8 @@
         </nav>
     </footer>
 
-    <script src="/assets/js/watchScrollBar.js" >
+    <script src="/assets/js/watchScrollBar.js">
     </script>
-    <script src="/assets/js/deleteConfirm.js" >
+    <script src="/assets/js/deleteConfirm.js">
     </script>
 {% endblock %}

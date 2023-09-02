@@ -29,7 +29,7 @@ class TrickRepository extends ServiceEntityRepository
     public function getTricks(): array
     {
         $this->getEntityManager()->getRepository(Trick::class);
-        return  $this->findAll();
+        return $this->findAll();
     }
 
 
@@ -40,8 +40,7 @@ class TrickRepository extends ServiceEntityRepository
     public function deleteTrick(TrickDTO $trickDTO): ?array
     {
         $getTrick = $this->find(["id" => $trickDTO->getId()]);
-        if(!is_null($getTrick))
-        {
+        if (!is_null($getTrick)) {
             $this->getEntityManager()->remove($getTrick);
             $this->getEntityManager()->flush();
             return ["trick_delete" => true];

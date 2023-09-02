@@ -21,27 +21,32 @@ class TrickDTO
      */
     public ?array $videos;
 
-    public function getId():int
+    public function getId(): int
     {
         return $this->id;
     }
-    public function setId(int $id):void
+
+    public function setId(int $id): void
     {
-         $this->id = $id;
+        $this->id = $id;
     }
-    public function getName():string
+
+    public function getName(): string
     {
         return $this->name;
     }
-    public function setName(string $name):void
+
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
-    public function getTrickGroup():string
+
+    public function getTrickGroup(): string
     {
         return $this->trickGroup;
     }
-    public function setTrickGroup(string $trickGroup):void
+
+    public function setTrickGroup(string $trickGroup): void
     {
         $this->trickGroup = $trickGroup;
     }
@@ -58,7 +63,7 @@ class TrickDTO
      * @param array<string> $illustrations
      * @return void
      */
-    public function setIllustrations(array $illustrations):void
+    public function setIllustrations(array $illustrations): void
     {
         $this->illustrations = $illustrations;
     }
@@ -75,7 +80,7 @@ class TrickDTO
      * @param array<string> $videos
      * @return void
      */
-    public function setVideos(array $videos):void
+    public function setVideos(array $videos): void
     {
         $this->videos = $videos;
     }
