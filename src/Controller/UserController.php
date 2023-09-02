@@ -273,15 +273,15 @@ L'équipe Snowtricks
     }
 
     #[Route(path:'/logout',methods:["GET"])]
-    public function logout():?Response
+    public function logout():?RedirectResponse
     {
         $this->template = "homepage.twig";
         if(!$this->getSessionData("user_connected"))
         {
-            return null;
+            return new RedirectResponse("/error/404");
         }
         $this->destroySessionData("user_connected");
-        return new Response($this->render($this->template));
+        return new RedirectResponse("/");
     }
 
     #[Route(path:'/reset-password/',methods:["POST"])]

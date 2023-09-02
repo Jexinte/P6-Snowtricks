@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Controller\DTO\TrickDTO;
 use App\Entity\Trick;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -21,28 +22,32 @@ class TrickRepository extends ServiceEntityRepository
         parent::__construct($registry, Trick::class);
     }
 
-//    /**
-//     * @return Trick[] Returns an array of Trick objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('t.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
 
-//    public function findOneBySomeField($value): ?Trick
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    /**
+     * @return Trick[]
+     */
+    public function getTricks(): array
+    {
+        $this->getEntityManager()->getRepository(Trick::class);
+        return  $this->findAll();
+    }
+
+
+    /**
+     * @param TrickDTO $trickDTO
+     * @return false[]|true[]|null
+     */
+    public function deleteTrick(TrickDTO $trickDTO): ?array
+    {
+        $getTrick = $this->find(["id" => $trickDTO->getId()]);
+        if(!is_null($getTrick))
+        {
+            $this->getEntityManager()->remove($getTrick);
+            $this->getEntityManager()->flush();
+            return ["trick_delete" => true];
+        }
+        return ["trick_delete" => false];
+    }
+
+
 }

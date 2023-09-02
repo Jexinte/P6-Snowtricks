@@ -27,30 +27,67 @@
     <div class=" container-fluid" id="banner">
         <img src="/assets/img/banner/banner_homepage.jpg" alt="banner">
         <h1>Découvrez l'art de la glisse aérienne </h1>
-        <a href="#"><i class="fa-solid fa-arrow-down-long"></i></a>
+        <button id="down-button" ><i class="fa-solid fa-arrow-down-long"></i></button>
     </div>
 
-    <div class="container-fluid" id="tricks">
+    <div class="container-fluid" id="tricks-container">
         <div class="row">
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="tricks">
+                {% if tricks is defined %}
+                {% for trick in tricks %}
                 <div class="trick">
                     <div class="trick-banner" >
                         {# banniere du trick #}
-                        <img src="/assets/img/banner/banner_homepage.jpg" alt="" width="200px">
+                        <img src="/assets/img/banner/banner_homepage.jpg" alt="" width="250px">
                     </div>
                     <div class="trick-options">
-                        <p>Nom trick</p>
-                        <i class="fa-solid fa-pencil"></i>
-                        <i class="fa-solid fa-trash"></i>
+                        <a href="#" class="trick-name">{{ trick.name }}</a>
+                        <div class="options">
+                            {% if user_connected is defined and user_connected == 1 %}
+                                <form action="/trick/update/{{ trick.name }}/{{ trick.id }}" method="post">
+                                            <button type="submit" name="update" class="update-trick">
+                                                <i class="fa-solid fa-pencil">
+                                                </i>
+                                            </button>
+                                </form>
+
+                                <form action="/trick/delete/{{ trick.id }}" method="post">
+                                            <button type="submit" name="delete" class="delete-trick">
+                                                <i class="fa-solid fa-trash">
+                                                </i>
+                                            </button>
+                                </form>
+                            {% endif %}
+                        </div>
+
                     </div>
                 </div>
+                {% endfor %}
+                {% endif %}
             </div>
         </div>
-        {# Il faudra permettre la génération des tricks restants non affichés #}
-        <a href="#">Plus de tricks</a>
-    </div>
-        {# Faire apparaître ce bouton lorsque plus de 15 tricks sont affichés #}
-        <a href="#"><i class="fa-solid fa-arrow-up"></i></a>
-    </div>
 
+
+    </div>
+    </div>
+    <button id="up-to-start"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <footer id="footer" >
+        <p class="text-center footer-paragraph">Copyright @ 2023</p>
+        <nav id="nav-mobile">
+            <a href="/" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
+            <a href="#" class="mobile-link" id="bookmark"><i class="fa-solid fa-bookmark"></i></a>
+            {% if user_connected is defined and user_connected == 1 %}
+                <a href="/logout" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
+            {% else %}
+                <a href="/signin" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
+                <a href="/signup" class="mobile-link" id="sign-up"><i class="fa-solid fa-user-plus"></i></a>
+            {% endif %}
+        </nav>
+    </footer>
+
+    <script src="/assets/js/watchScrollBar.js" >
+    </script>
+    <script src="/assets/js/deleteConfirm.js" >
+    </script>
 {% endblock %}

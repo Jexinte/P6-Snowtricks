@@ -19,6 +19,10 @@ nav a {
     color:var(--black);
 }
 
+nav a:visited{
+    color: var(--black);
+}
+
 header nav ul {
     position: relative;
     top: 18px;
@@ -41,12 +45,14 @@ header nav ul {
     min-height: 100vh;
 }
 
-#banner .fa-arrow-down-long{
+#down-button{
     position: absolute;
     right:1em;
     bottom:1em;
     color: white;
     font-size: 2em;
+    border:none;
+    background: none;
 }
 
 
@@ -59,8 +65,77 @@ header nav ul {
     font-size: 3em;
 }
 
-#tricks {
-    margin-top: 3em;
+#tricks-container {
+    margin-top: 8em;
+    display: none;
+    margin-bottom: 6em;
+    transition: all 300ms ease;
+}
+
+#tricks{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6em;
+    justify-content: center;
+}
+
+#tricks .trick {
+    box-shadow: 5px 5px 10px rgba(0,0,0,.3);
+}
+
+.trick-name{
+    text-decoration: none;
+}
+.trick-options {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1em;
+    padding:.5em .5em 1em;
+}
+
+.trick-options .options {
+    display: flex;
+    gap: 1em;
+}
+
+#more-tricks
+{
+    display: block;
+    width: 100px;
+    padding: 0.5em;
+    margin: 0 auto;
+    text-decoration: none;
+    margin-top: 4em;
+    border-radius: 10px;
+}
+
+.update-trick{
+    border: none;
+}
+.delete-trick{
+    border: none;
+}
+#up-to-start
+{
+    position: absolute;
+    color: black;
+    right: 1em;
+    font-size: 2em;
+}
+
+footer{
+    display: none;
+    margin-top: 2.3em;
+}
+
+#nav-mobile{
+    padding-inline: 1em;
+}
+
+#up-to-start{
+    display: none;
+    border:none;
+    background: none;
 }
 @media screen and (max-width: 992px){
     #homepage{
@@ -70,5 +145,4 @@ header nav ul {
         flex-direction: column;
         min-height: 100vh;
     }
-
 }
