@@ -1,0 +1,39 @@
+nav {
+    display: flex;
+    justify-content: space-between;
+}
+
+nav ul {
+    display: flex;
+    gap:1.5em;
+}
+
+nav a {
+    text-decoration: none;
+    color:var(--black);
+}
+
+#validation{
+    padding-top: 5em;
+}
+
+#validation .box {
+    padding: 2em;
+    color: white;
+    font-size: 1.9em;
+}
+
+#validation a {
+    color:var(--white);
+}
+
+@media screen and (max-width: 992px){
+    #validation{
+        width: 100%;
+        transition: all 300ms ease;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+}

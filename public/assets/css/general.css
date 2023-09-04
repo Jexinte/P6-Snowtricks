@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Acme&display=swap');
+
+:root{
+    --black : black;
+    --white:white;
+}
+* {
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+    list-style-type:none;
+    font-family: 'Acme', serif;
+}
+text{
+    display: none;
+}
+body{
+    padding-inline: 1.5em;
+    padding :1.5em 1.5em 0 ;
+}
+
+a{
+    text-decoration: none;
+}
+
+a:visited{
+    color: var(--black);
+}
+
+footer {
+    padding-block: 2.6em;
+}
+
+footer .footer-paragraph{
+    padding-top: 4em;
+}
+
+#nav-mobile {
+    display: none;
+}
+@media  screen and (max-width: 992px) {
+    header{
+        display: none;
+    }
+
+    #nav-mobile{
+        display: flex;
+        border-top:2px solid black;
+    }
+
+    #nav-mobile .mobile-link {
+        padding-top: .8em;
+    }
+
+    footer {
+        padding-block: 1.6em;
+    }
+    footer .footer-paragraph{
+        display: none;
+    }
+}

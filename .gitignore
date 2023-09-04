@@ -1,4 +1,8 @@
-
+public/assets/img
+legacy_code.md
+notes.md
+.env
+.idea
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php

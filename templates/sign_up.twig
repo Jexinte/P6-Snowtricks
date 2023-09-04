@@ -1,0 +1,85 @@
+{% extends "layout.twig" %}
+{% block icon_img %}
+    <link rel="icon" type="image/png" href="/favicon.ico"/>
+{% endblock %}
+{% block title %}
+    <title>Inscription | {{ parent ()}}  </title>
+{% endblock %}
+
+{% block css_page %}
+    <link rel="stylesheet" href='/assets/css/sign_up.css'>
+{% endblock %}
+
+{% block content %}
+
+    <header>
+        <nav>
+            <a href="/"><img src="/assets/img/logo/logo.jpg" alt="main logo" height="60"></a>
+            <ul>
+                <li><a href="#">Tricks</a></li>
+                {% if user_connected is defined and user_connected == 1 %}
+                <li><a href="/logout">Déconnexion</a></li>
+                {% else %}
+                <li><a href="/signin">Connexion</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+
+    <div class="container-fluid" id="login">
+        <h1 class="text-center" >Inscription</h1>
+      <div class="row">
+          <form class="pt-5" action="/signup/registration" enctype="multipart/form-data" method="post" >
+
+{#         USER #}
+          <div class="col-sm-12 col-md-12">
+              <div class="mb-3 user-box">
+                  <label for="username" class="form-label">Utilisateur</label>
+                  <input class="form-control" type="text" name="username" id="username" placeholder="John">
+                  <p class="text-danger" id="error-username">
+                      {{ exceptions.username_exception is defined ? exceptions.username_exception : '' }}
+                      {{ message_db.username_unavailable is defined ? message_db.username_unavailable : '' }}
+                  </p>
+              </div>
+          </div>
+{#          FILE#}
+          <div class="col-sm-12 col-md-12">
+              <div class="mb-3 file-box">
+                  <label for="file" class="form-label">Image de profil
+                  </label>
+                  <input type="file" class="form-control" name="file" id="file">
+                  <p class="text-danger" id="error-file">
+                      {{ exceptions.file_exception is defined ? exceptions.file_exception : '' }}
+
+                  </p>
+              </div>
+          </div>
+{#          EMAIL  #}
+          <div class="col-sm-12 col-md-12">
+              <div class="mb-3 email-box">
+                  <label for="email" class="form-label">Email</label>
+                  <input class="form-control" type="text" name="email" id="email" placeholder="john@gmail.com">
+                  <p class="text-danger" id="error-email">
+                      {{ exceptions.email_exception is defined ? exceptions.email_exception : '' }}
+                      {{ message_db.email_unavailable is defined ? message_db.email_unavailable : '' }}
+                  </p>
+              </div>
+          </div>
+{#          PASSWORD#}
+          <div class="col-sm-12 col-md-12">
+              <div class="mb-3 password-box">
+                  <label for="password" class="form-label">Mot de passe</label>
+                  <input class="form-control" type="password" name="password" id="password" placeholder="">
+                  <p class="text-danger" id="error-password">
+                      {{ exceptions.password_exception is defined ? exceptions.password_exception : '' }}
+                  </p>
+              </div>
+          </div>
+              <input type="submit" class="btn text-white bg-black mb-3" name="submit" id="submit" value="Créer un compte">
+          </form>
+
+          </div>
+      </div>
+
+{% endblock %}
