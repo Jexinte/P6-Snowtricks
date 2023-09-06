@@ -88,6 +88,7 @@ header nav ul {
 
 .trick-name {
     text-decoration: none;
+    color: var(--black);
 }
 
 .trick-options {

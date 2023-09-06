@@ -1,5 +1,6 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
+    error_controller: 'App\Controller\ErrorController::errorExceptions'
     secret: '%env(APP_SECRET)%'
     #csrf_protection: true
     http_method_override: false
@@ -13,7 +14,6 @@ framework:
         cookie_samesite: lax
         storage_factory_id: session.storage.factory.native
         name: snowtricks
-
 
 
     #esi: true

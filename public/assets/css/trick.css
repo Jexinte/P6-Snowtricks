@@ -1,0 +1,159 @@
+body {
+    padding-inline: 0;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+}
+
+nav ul {
+    display: flex;
+    gap: 1.5em;
+}
+
+nav a {
+    text-decoration: none;
+    color: var(--black);
+    font-size: 1.5em;
+}
+
+header {
+    padding-inline: 1em;
+    margin-bottom: 5em;
+    padding-top: 1em;
+}
+
+
+#trick {
+    margin-top: 2em;
+    padding-inline: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+    width: 80%;
+}
+
+#trick-content h1 {
+    text-align: center;
+    text-decoration: underline;
+    font-weight: 800;
+}
+
+#trick-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#trick-content .medias {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2em;
+    margin-block: 4em;
+    justify-content: center;
+}
+
+#trick-content .media-box {
+    box-shadow: 5px 5px 4px rgba(0, 0, 0, .2);
+    border: 2px solid black;
+}
+
+#banner-trick {
+    position: relative;
+    width: 100%;
+    padding-inline: 0;
+    margin-bottom: 3em;
+}
+
+.about p {
+    text-align: center;
+    line-height: 4em;
+    padding-inline: 2em;
+    margin-bottom: 3em;
+}
+
+.about .trick-details {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 1em;
+}
+
+#form {
+    padding-inline: 2em;
+    margin-block: 3em;
+    display: flex;
+    flex-direction: column;
+    gap: 3em;
+    border-top: 5px solid black;
+}
+
+#form form {
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+}
+
+#form h2 {
+    font-size: 2.5em;
+    width: 100%;
+    text-align: center;
+    padding-bottom: 0.3em;
+    padding-top: 1.8em;
+}
+
+#banner-trick img {
+    width: 100%;
+    min-height: 100vh;
+}
+
+#comments {
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+    align-items: center;
+    border-top: 5px solid black;
+}
+
+.options-form {
+    display: flex;
+    gap: 1.5em;
+    justify-content: center;
+    font-size: 1.5em;
+}
+
+.options-button {
+    background: none;
+    border: none;
+}
+
+#comments h2 {
+    font-size: 2.5em;
+    width: 100%;
+    text-align: center;
+    padding-bottom: 0.3em;
+    padding-top: 0.8em;
+}
+
+.user-box {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+    flex-direction: column;
+}
+
+.user-box img {
+    border-radius: 50%;
+    width: 78px;
+    height: 79px;
+    box-shadow: 3px 5px 10px rgba(0, 0, 0, .3);
+    border: 2px solid black;
+}
+
+.user-box p {
+    text-align: center;
+}
+
+.media-box video{
+    height: 100%;
+}

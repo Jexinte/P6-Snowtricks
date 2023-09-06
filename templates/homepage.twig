@@ -11,7 +11,6 @@
         <nav>
             <a href="/"><img src="/assets/img/logo/logo.jpg" alt="main logo" height="60"></a>
             <ul>
-                <li><a href="#">Tricks</a></li>
                 {% if user_connected is defined and user_connected == 1 %}
                     <a href="/logout">Déconnexion</a>
                 {% else %}
@@ -44,7 +43,7 @@
                                     <img src="/assets/img/banner/banner_homepage.jpg" alt="" width="250px">
                                 </div>
                                 <div class="trick-options">
-                                    <a href="#" class="trick-name">{{ trick.name }}</a>
+                                    <a href="/{{ trick.slug }}/details/{{ trick.id }}" class="trick-name">{{ trick.name }}</a>
                                     <div class="options">
                                         {% if user_connected is defined and user_connected == 1 %}
                                             <form action="/trick/update/{{ trick.name }}/{{ trick.id }}" method="post">

@@ -2,16 +2,15 @@
 
 namespace App\Controller;
 
-use App\Controller\DTO\TrickDTO;
-use App\Enumeration\UserStatus;
-use App\Enumeration\CodeStatus;
 use App\Repository\TrickRepository;
-use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use IntlDateFormatter;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-
+use App\Entity\Trick;
 
 class TrickController extends AbstractController
 {
@@ -21,21 +20,39 @@ class TrickController extends AbstractController
      */
     public array $parameters = [];
 
+    #[Route('/{trickname}/details/{id}', methods: ["GET"])]
+    public function getTrick(
+        string $trickname,
+        int $id,
+        TrickRepository $trickRepository,
+        Trick $trickEntity,
+        UserController $userController,
+        Request $request
+    ): Response {
+        $userConnected = $request->getSession()->get('user_connected');
+        $trick = $trickRepository->getTrick($id);
+        $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
+        $frenchDateFormat = new IntlDateFormatter('fr_Fr', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
+        $dateTrick = $trick->getDate();
+        $date = $frenchDateFormat->format($dateTrick);
+        $this->template = "trick.twig";
+        $this->parameters["trick"] = $trick;
+        $this->parameters["trick_date"] = $date;
+        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        return new Response($this->render($this->template, $this->parameters));
+    }
 
     #[Route('/trick/delete/{id}', methods: ["POST"])]
     public function deleteTrick(
         ?int $id,
         TrickRepository $trickRepository,
-        TrickDTO $trickDTO
     ): Response|RedirectResponse {
-        $result = "";
         if (!is_null($id)) {
-            $trickDTO->setId($id);
-            $result = $trickRepository->deleteTrick($trickDTO);
+            $trick = $trickRepository->find(["id" => $id]);
+            $trickRepository->getEntityManager()->remove($trick);
+            $trickRepository->getEntityManager()->flush();
+            return $this->redirectToRoute('homepage');
         }
-        return array_key_exists("trick_delete", $result) && $result["trick_delete"] ? new RedirectResponse(
-            '/',
-            CodeStatus::REDIRECT
-        ) : new RedirectResponse('/error/' . CodeStatus::RESSOURCE_NOT_FOUND);
+        throw $this->createNotFoundException();
     }
 }

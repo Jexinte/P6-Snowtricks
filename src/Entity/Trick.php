@@ -20,13 +20,16 @@ class Trick
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $trickGroup = null;
+    private ?string $group = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $illustrations = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $videos = null;
+
+    #[ORM\Column(type:'date')]
+    private ?\DateTimeInterface $date = null;
 
     public function getId(): ?int
     {
@@ -57,14 +60,14 @@ class Trick
         return $this;
     }
 
-    public function getTrickGroup(): ?string
+    public function getGroup(): ?string
     {
-        return $this->trickGroup;
+        return $this->group;
     }
 
-    public function setTrickGroup(?string $trickGroup): static
+    public function setGroup(?string $group): static
     {
-        $this->trickGroup = $trickGroup;
+        $this->group = $group;
 
         return $this;
     }
@@ -91,5 +94,21 @@ class Trick
         $this->videos = $videos;
 
         return $this;
+    }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    /**
+     * @param \DateTimeInterface|null $date
+     */
+    public function setDate(?\DateTimeInterface $date): void
+    {
+        $this->date = $date;
     }
 }

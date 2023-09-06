@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Controller\DTO\UserDTO;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,16 +25,14 @@ class UserRepository extends ServiceEntityRepository
 
 
     /**
-     * @param UserDTO $userDto
      * @return string[]|null
      * @throws \Exception
      */
-    public function createUser(UserDTO $userDto): ?array
+    public function createUser(User $user): ?array
     {
-        $user = new User();
         $entityManager = $this->getEntityManager();
-        $usernameNotAvailable = $this->findOneBy(["name" => $userDto->getName()]);
-        $emailNotAvailable = $this->findOneBy(["email" => $userDto->getEmail()]);
+        $usernameNotAvailable = $this->findOneBy(["name" => $user->getName()]);
+        $emailNotAvailable = $this->findOneBy(["email" => $user->getEmail()]);
         switch (true) {
             case $usernameNotAvailable:
                 return [
@@ -48,15 +45,12 @@ class UserRepository extends ServiceEntityRepository
                     'email_unavailable' => "L'adresse email " . $emailNotAvailable->getEmail() . " n'est pas disponible"
                 ];
             default:
-                $fileExt = explode('.', $userDto->getFile()->getClientOriginalName());
+                $fileExt = explode('.', $user->getFile()->getClientOriginalName());
                 $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
                 $imgPath = "http://localhost:8000/Snowtricks/public/assets/img/$filename";
-                $user->setName($userDto->getName());
                 $user->setProfileImage($imgPath);
-                $user->setEmail($userDto->getEmail());
-                $user->setPassword($userDto->getPassword());
                 $user->setStatus(UserStatus::ACCOUNT_NOT_ACTIVATE);
-                $tmp = $userDto->getFile()->getPathname();
+                $tmp = $user->getFile()->getPathname();
                 $dir = "../public/assets/img";
                 move_uploaded_file($tmp, "$dir/$filename");
                 $entityManager->persist($user);
@@ -81,14 +75,15 @@ class UserRepository extends ServiceEntityRepository
 
 
     /**
-     * @param UserDTO $userDTO
+     * @param User $user
      * @param Request $request
      * @return array<string|int|true|false|null>
      */
-    public function login(UserDTO $userDTO, Request $request): ?array
+    public function login(User $user, Request $request): ?array
     {
-        $usernameFromForm = $userDTO->getName();
-        $passwordFromForm = $userDTO->getPassword();
+        $usernameFromForm = $user->getName();
+        $passwordFromForm = $user->getPassword();
+
 
         $userInDb = current($this->findBy(["name" => $usernameFromForm]));
         switch (true) {
@@ -112,9 +107,9 @@ class UserRepository extends ServiceEntityRepository
         }
     }
 
-    public function checkUser(UserDTO $userDto): ?User
+    public function checkUser(User $user): ?User
     {
-        $userMatch = $this->findOneBy(["name" => $userDto->getName()]);
+        $userMatch = $this->findOneBy(["name" => $user->getName()]);
         if ($userMatch) {
             return $userMatch;
         }
@@ -123,15 +118,15 @@ class UserRepository extends ServiceEntityRepository
 
 
     /**
-     * @param UserDTO $userDto
+     * @param User $user
      * @return string[]|null
      */
-    public function checkPasswordReset(UserDTO $userDto): ?array
+    public function checkPasswordReset(User $user): ?array
     {
-        $userDataFromDb = $this->checkUser($userDto);
+        $userDataFromDb = $this->checkUser($user);
 
-        $oldPasswordFromForm = $userDto->getOldPassword();
-        $newPasswordFromForm = $userDto->getPassword();
+        $oldPasswordFromForm = $user->getOldPassword();
+        $newPasswordFromForm = $user->getPassword();
         if (!is_null($userDataFromDb)) {
             if (password_verify($oldPasswordFromForm, $userDataFromDb->getPassword())) {
                 $entityManager = $this->getEntityManager();
