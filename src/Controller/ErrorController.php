@@ -29,20 +29,20 @@ class ErrorController extends AbstractController
 
     }
 
-    #[Route('/error/404', name: 'ressource_not_found')]
+    #[Route('/error/404', name: 'ressource_not_found',methods: ["GET"])]
     public function error404(): Response
     {
         $this->template = "/bundles/TwigBundle/Exception/error404.html.twig";
         return new Response($this->render($this->template),404);
     }
 
-    #[Route('/error/403', name: 'forbidden')]
+    #[Route('/error/403', name: 'forbidden',methods: ["GET"])]
     public function error403(): Response
     {
         $this->template = "/bundles/TwigBundle/Exception/error403.html.twig";
         return new Response($this->render($this->template),403);
     }
-    #[Route('/error/500', name: 'server_down')]
+    #[Route('/error/500', name: 'server_down',methods: ["GET"])]
     public function error500(): Response
     {
         $this->template = "/bundles/TwigBundle/Exception/error.html.twig";
