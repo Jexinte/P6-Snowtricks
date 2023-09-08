@@ -13,3 +13,10 @@ create_trick_post:
     path: '/create-trick'
     controller: App\Controller\TrickController::createTrickSubmit
     methods: ['POST']
+
+update_trick_post:
+    path: '/trick/update/{id}'
+    controller: App\Controller\TrickController::updateTrickSubmit
+    methods: ['POST']
+
+

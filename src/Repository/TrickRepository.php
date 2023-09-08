@@ -48,8 +48,20 @@ class TrickRepository extends ServiceEntityRepository
         return end($lastTrick);
     }
 
+    /**
+     * @param Trick $trick
+     * @return int
+     */
     public function createTrick(Trick $trick): int
     {
+
+        $fileExt = explode('.', $trick->getMainBannerFile()->getClientOriginalName());
+        $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
+        $imgPath = "/assets/img/$filename";
+        $trick->setMainBannerFilePath($imgPath);
+        $tmp = $trick->getMainBannerFile()->getPathname();
+        $dir = "../public/assets/img";
+        move_uploaded_file($tmp, "$dir/$filename");
         $this->getEntityManager()->persist($trick);
         $this->getEntityManager()->flush();
         $trick = $this->getLastTrickSaved();

@@ -41,18 +41,13 @@
                             <div class="trick">
                                 <div class="trick-banner">
                                     {# banniere du trick #}
-                                    <img src="/assets/img/banner/banner_homepage.jpg" alt="" width="250px">
+                                    <img src="{{trick.mainBannerFilePath is defined and trick.mainBannerFilePath is not empty ? trick.mainBannerFilePath: '/assets/img/banner/banner_homepage.jpg' }}" alt="" width="250px">
                                 </div>
                                 <div class="trick-options">
                                     <a href="/{{ trick.slug }}/details/{{ trick.id }}" class="trick-name">{{ trick.name }}</a>
                                     <div class="options">
                                         {% if user_connected is defined and user_connected == 1 %}
-                                            <form action="/trick/update/{{ trick.name }}/{{ trick.id }}" method="post">
-                                                <button type="submit" name="update" class="update-trick">
-                                                    <i class="fa-solid fa-pencil">
-                                                    </i>
-                                                </button>
-                                            </form>
+                                            <a href="/trick/update/{{ trick.id }}"><i class="fa-solid fa-pencil"></i></a>
 
                                             <form action="/trick/delete/{{ trick.id }}" method="post">
                                                 <button type="submit" name="delete" class="delete-trick">

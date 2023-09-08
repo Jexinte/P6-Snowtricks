@@ -23,14 +23,15 @@ class HomepageController extends AbstractController
     {
         $userConnected = $request->getSession()->get('user_connected');
         $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        $slug = new AsciiSlugger();
+        $slugger = new AsciiSlugger();
         $tricks = $trickRepository->getTricks();
         $result = [];
         foreach ($tricks as $k => $value) {
             $result[$k] = [
                 "name" => $value->getName(),
-                "slug" => strtolower($slug->slug($value->getName())),
-                "id" => $value->getId()
+                "slug" => $slugger->slug($value->getName())->lower(),
+                "id" => $value->getId(),
+                "mainBannerFilePath" => $value->getMainBannerFilePath()
             ];
 
         }

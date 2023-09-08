@@ -80,7 +80,11 @@ class TrickController extends AbstractController
         $trickEntity->setVideos($request->files->get("videos"));
         $trickEntity->setEmbedUrl($request->request->get("youtube-url"));
 
-
+        $mainBanner = $request->files->get("main-banner");
+        if(!is_null($mainBanner))
+        {
+            $trickEntity->setMainBannerFile($mainBanner);
+        }
         $numberOfErrors = 0;
         $groups = [
             "name_exception",
@@ -88,7 +92,8 @@ class TrickController extends AbstractController
             "illustration_exception",
             "video_exception",
             "group_exception",
-            'url_exception'
+            'url_exception',
+            'main_banner_exception'
         ];
         $groupsViolations = [];
         foreach ($groups as $group) {
@@ -122,6 +127,23 @@ class TrickController extends AbstractController
         return new Response($this->render($this->template, $this->parameters), 400);
     }
 
+    #[Route('/trick/update/{id}',methods: ["GET"])]
+    public function getUpdatePage(int $id,TrickRepository $trickRepository,MediaRepository $mediaRepository):Response
+    {
+        $this->template="update_trick.twig";
+        $trick = $trickRepository->getTrick($id);
+        $medias = $mediaRepository->getTrickMedia($id);
+        $this->parameters["trick"] = $trick;
+        $this->parameters["medias"] = $medias;
+        return new Response($this->render($this->template,$this->parameters));
+    }
+
+    #[Route('/trick/update/{id}/',name:'update_trick_post',methods: ["POST"])]
+
+    public function updateTrickSubmit(int $id,Request $request):void
+    {
+
+    }
     #[Route('/trick/delete/{id}', methods: ["POST"])]
     public function deleteTrick(
         ?int $id,

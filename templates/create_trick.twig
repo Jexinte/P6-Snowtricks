@@ -72,9 +72,20 @@
                 </div>
 
                 <div class="col-sm-12 col-md-12">
-                    {# FICHIER TRICK #}
+                    {# SINGLE IMAGE MAIN BANNER TRICK #}
                     <div class="mb-3 box">
-                        <label  for="inputGroupFile02">Sélectionner une / plusieur(s) image(s)</label>
+                        <label  for="error-file">Sélectionner une image qui servira de présentation pour votre figure (obligatoire)</label>
+                        <input type="file" name="main-banner" class="form-control" >
+                        <p class="text-danger" id="error-file">
+                            {{ exceptions.main_banner_exception is defined ?  exceptions.main_banner_exception : '' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-sm-12 col-md-12">
+                    {# MULTIPLE IMAGES TRICK #}
+                    <div class="mb-3 box">
+                        <label  for="inputGroupFile02">Sélectionner une / plusieur(s) image(s) facultatif(s)</label>
                         <input type="file" name="images[]" class="form-control" id="images" multiple>
                         <p class="text-danger" id="error-files">
                             {{ exceptions.illustration_exception is defined ?  exceptions.illustration_exception : '' }}
@@ -82,11 +93,12 @@
                     </div>
                 </div>
 
-                {# VIDEO TRICK #}
+
+                {# MULTIPLES VIDEOS TRICK #}
 
                 <div class="col-sm-12 col-md-12">
                     <div class="mb-3 box">
-                        <label  for="videos">Sélectionner une / plusieur(s) vidéo(s)</label>
+                        <label  for="videos">Sélectionner une / plusieur(s) vidéo(s) facultatif(s)</label>
                         <input type="file" name="videos[]" class="form-control" id="videos" multiple>
                         <p class="text-danger" id="error-video">
                             {{ exceptions.video_exception is defined ? exceptions.video_exception : '' }}

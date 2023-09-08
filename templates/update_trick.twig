@@ -1,0 +1,132 @@
+{% extends 'layout.twig' %}
+
+{% block icon_img %}
+    <link rel="icon" type="image/png" href="/favicon.ico"/>
+{% endblock %}
+{% block title %}
+    <title>Modification d'un trick | {{ parent () }}  </title>
+{% endblock %}
+
+{% block css_page %}
+    <link rel="stylesheet" href='/assets/css/update_trick.css'>
+{% endblock %}
+
+{% block content %}
+    <header>
+        <nav>
+            <a href="/" id="back-homepage"><i class="fa-solid fa-arrow-left-long"></i></a>
+
+        </nav>
+    </header>
+    <div class="container-fluid" id="trick">
+        <div class=" container-fluid" id="banner-trick">
+            {# Bannière du trick sélectionné #}
+            <img src="{{trick.mainBannerFilePath is defined and trick.mainBannerFilePath is not empty ? trick.mainBannerFilePath: '/assets/img/banner/banner_homepage.jpg' }}" alt="banner">
+        </div>
+
+        <div class="container-fluid" id="form">
+            <div class="row">
+{#                REPRENDRE ICI IL FAUDRA DEFINIR UNE ROUTE AVEC LE PATH ET LE SLUG#}
+                <form class="pt-5" action="{{ path('update_trick_post',{id:trick.id }) }}" enctype="multipart/form-data" method="post">
+
+                    {#         NOM TRICK #}
+                    <div class="col-sm-12 col-md-12">
+                        <div class="mb-3 box">
+                            <label for="trick-name" class="form-label">Nom du trick</label>
+                            <input class="form-control" type="text" name="trick-name" id="trick-name"
+                                   value="{{ trick.name }}" placeholder="Ollie Molie">
+                            <p class="text-danger" id="error-trick-name">
+                                {{ exceptions.name_exception is defined ? exceptions.name_exception : '' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    {#         DESCRIPTION TRICK #}
+                    <div class="col-sm-12 col-md-12">
+                        <div class="mb-3 box">
+                            <label for="description">Description :</label>
+                            <textarea class="form-control" name="description" id="description" cols="30" rows="10"
+                                      placeholder="Exprimez-vous !">{{ trick.description }}</textarea>
+                            <p class="text-danger" id="description-trick-name">
+                                {{ exceptions.description_exception is defined ? exceptions.description_exception : '' }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-12">
+                        {# GROUP TRICK #}
+                        <div class="mb-3 box">
+                            <label for="group">Sélectionner un groupe</label>
+
+                            <select class="form-select" id="group" name="selected_options">
+
+                                <option selected value="{{ trick.trickGroup }}">{{ trick.trickGroup }}</option>
+                                <option value="Grabs">Grabs</option>
+                                <option value="Rotations">Rotations</option>
+                                <option value="Flips">Flips</option>
+                                <option value="Rotation désaxées">Rotation désaxées</option>
+                                <option value="Slides">Slides</option>
+                                <option value="One Foot Tricks">One Foot Tricks</option>
+                                <option value="Old School">Old School</option>
+                            </select>
+                            <p class="text-danger" id="error-group">
+                                {{ exceptions.group_exception is defined ?  exceptions.group_exception : '' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 col-md-12">
+                        {# FICHIER TRICK #}
+                        <div class="mb-3 box">
+                            <label for="inputGroupFile02">Sélectionner une / plusieur(s) image(s)</label>
+                            <input type="file" name="images[]" class="form-control" id="images" multiple>
+                            <p class="text-danger" id="error-files">
+                                {{ exceptions.illustration_exception is defined ?  exceptions.illustration_exception : '' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    {# VIDEO TRICK #}
+
+                    <div class="col-sm-12 col-md-12">
+                        <div class="mb-3 box">
+                            <label for="videos">Sélectionner une / plusieur(s) vidéo(s)</label>
+                            <input type="file" name="videos[]" class="form-control" id="videos" multiple>
+                            <p class="text-danger" id="error-video">
+                                {{ exceptions.video_exception is defined ? exceptions.video_exception : '' }}
+                            </p>
+                        </div>
+                    </div>
+
+
+                    {#      YOUTUBE VIDEO  #}
+                    <div class="col-sm-12 col-md-12">
+                        <div class="mb-3 box">
+                            <label for="youtube-url" class="form-label">Url vidéo Youtube</label>
+
+                            <input class="form-control" type="text" name="youtube-url" id="youtube-url"
+                                   value="{{ trick.embedUrl is not null ? trick.embedUrl : '' }}"
+                                   placeholder="Insérer ici l'adresse url de votre vidéo youtube commencant par https...">
+                            <p class="text-danger" id="error-youtube-video">
+                                {{ exceptions.url_exception is defined ? exceptions.url_exception : '' }}
+                            </p>
+                        </div>
+                    </div>
+                    <input class="btn btn-dark" type="submit" value="Envoyer">
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer id="footer">
+        <p class="text-center footer-paragraph">Copyright @ 2023</p>
+        <nav id="nav-mobile">
+            <a href="/" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
+            <a href="#" class="mobile-link" id="bookmark"><i class="fa-solid fa-bookmark"></i></a>
+            {% if user_connected is defined and user_connected == 1 %}
+                <a href="/logout" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
+            {% else %}
+                <a href="/signin" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
+                <a href="/signup" class="mobile-link" id="sign-up"><i class="fa-solid fa-user-plus"></i></a>
+            {% endif %}
+        </nav>
+    </footer>
+{% endblock %}

@@ -6,7 +6,7 @@ use App\Repository\TrickRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
-
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 #[ORM\Entity(repositoryClass: TrickRepository::class)]
 #[UniqueEntity(
     fields: 'name',
@@ -31,7 +31,7 @@ class Trick
         match: true,
         groups: ['name_exception']
     )]
-    #[ORM\Column(length: 255,unique:true)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $name = null;
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
@@ -63,18 +63,18 @@ class Trick
      * @var array<string>
      */
     #[Assert\All([
-    new Assert\File(
-    maxSize: '3000K',
-    groups: ['illustration_exception'],
-    extensions: ['jpg', 'png', 'webp'],
-    extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
-    ),
+        new Assert\File(
+            maxSize: '3000K',
+            groups: ['illustration_exception'],
+            extensions: ['jpg', 'png', 'webp'],
+            extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
+        )
 
     ])]
-    #[Assert\NotBlank(
-        message: 'Veuillez sélectionner un fichier !',
-        groups: ['illustration_exception']
-    )]
+//    #[Assert\NotBlank(
+//        message: 'Veuillez sélectionner un fichier !',
+//        groups: ['illustration_exception']
+//    )]
     private array $images;
     /**
      * @var array<string>
@@ -87,7 +87,6 @@ class Trick
             extensionsMessage: 'Seuls les fichiers mp4 sont acceptés !'
         ),
     ])]
-
     private array $videos;
 
     #[Assert\Regex(
@@ -96,8 +95,24 @@ class Trick
         match: true,
         groups: ['url_exception']
     )]
-    #[ORM\Column(length: 255,nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $embedUrl;
+
+    #[ORM\Column(length: 255)]
+    private ?string $mainBannerFilePath;
+    #[Assert\NotBlank(
+        message: 'Veuillez sélectionner un fichier !',
+        groups: ['main_banner_exception']
+    )]
+    #[Assert\File(
+        maxSize: '3000K',
+        groups: ['main_banner_exception'],
+        extensions: ['jpg', 'png', 'webp'],
+        extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
+    )]
+
+    private ?UploadedFile $mainBannerFile;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -192,7 +207,6 @@ class Trick
     public function setVideos(array $videos): void
     {
         $this->videos = $videos;
-
     }
 
     /**
@@ -208,7 +222,44 @@ class Trick
      */
     public function setEmbedUrl(?string $youtubeUrl): void
     {
-
         $this->embedUrl = $youtubeUrl;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMainBannerFilePath(): ?string
+    {
+        return $this->mainBannerFilePath;
+    }
+
+
+    /**
+     * @param string|null $mainBannerFilePath
+     * @return void
+     */
+    public function setMainBannerFilePath(?string $mainBannerFilePath): void
+    {
+        $this->mainBannerFilePath = $mainBannerFilePath;
+    }
+
+
+    /**
+     * @return UploadedFile
+     */
+    public function getMainBannerFile(): UploadedFile
+    {
+        return $this->mainBannerFile;
+    }
+
+
+    /**
+     * @param UploadedFile $mainBannerFile
+     * @return $this
+     */
+    public function setMainBannerFile(UploadedFile $mainBannerFile): static
+    {
+        $this->mainBannerFile = $mainBannerFile;
+        return  $this;
     }
 }
