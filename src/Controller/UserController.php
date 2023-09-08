@@ -287,13 +287,7 @@ L'équipe Snowtricks
         $request->getSession()->clear();
 
         return $this->redirectToRoute('homepage');
-        //return $this->redirectToRoute("ressource_not_found");
 
-        //$this->destroySessionData("user_connected");
-        //$this->destroySessionData("user_id");
-        //$this->destroySessionData("profile_image");
-        //$this->destroySessionData("trick_date");
-        //$this->destroySessionData("trick");
     }
 
     #[Route(path: '/reset-password/', methods: ["POST"])]

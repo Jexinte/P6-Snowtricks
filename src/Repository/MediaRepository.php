@@ -26,7 +26,12 @@ class MediaRepository extends ServiceEntityRepository
         return parent::getEntityManager();
     }
 
-    public function saveTrickMedias(Media $media)
+    /**
+     * @param Media $media
+     * @return void
+     * @throws \Exception
+     */
+    public function saveTrickMedias(Media $media):void
     {
         $images = $media->getImages();
         $videos = $media->getVideos();

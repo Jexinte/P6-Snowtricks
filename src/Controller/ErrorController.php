@@ -21,7 +21,6 @@ class ErrorController extends AbstractController
 
     public function errorExceptions(\Throwable $exception):? RedirectResponse
     {
-      //  dd($exception->getMessage());
         return match (true) {
             $exception instanceof NotFoundHttpException => $this->redirectToRoute('ressource_not_found'),
             $exception instanceof AccessDeniedException => $this->redirectToRoute("forbidden"),
