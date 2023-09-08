@@ -16,7 +16,7 @@
     <div class="container-fluid" id="trick">
         <div class=" container-fluid" id="banner-trick">
             {# Bannière du trick sélectionné #}
-            <img src="{{ medias is defined ? medias[0].mediaPath : '' }}" alt="banner">
+            <img src="{{ medias is defined and medias is not empty ? medias[0].mediaPath : '' }}" alt="banner">
         </div>
         <div id="trick-content">
             <h1>{{ trick is defined ? trick.name : '' }}</h1>
