@@ -1,9 +1,12 @@
-const image = document.getElementById('image');
+const images = document.querySelectorAll('.image');
 
-image.addEventListener('click', () => {
-    if (!image.classList.contains('image-fullscreen')) {
-        image.classList.add('image-fullscreen');
-    } else {
-        image.classList.remove('image-fullscreen');
-    }
-});
+images.forEach(image => {
+    image.addEventListener('click', () => {
+        if (!image.classList.contains('image-fullscreen')) {
+            image.classList.add('image-fullscreen');
+        } else {
+            image.classList.remove('image-fullscreen');
+        }
+    });
+})
+

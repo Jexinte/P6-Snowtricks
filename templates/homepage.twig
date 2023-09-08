@@ -12,6 +12,7 @@
             <a href="/"><img src="/assets/img/logo/logo.jpg" alt="main logo" height="60"></a>
             <ul>
                 {% if user_connected is defined and user_connected == 1 %}
+                    <a href={{ path('create_trick_get') }}>Créer un trick</a>
                     <a href="/logout">Déconnexion</a>
                 {% else %}
                     <a href="/signin">Connexion</a>

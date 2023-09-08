@@ -4,33 +4,100 @@ namespace App\Entity;
 
 use App\Repository\TrickRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TrickRepository::class)]
+#[UniqueEntity(
+    fields: 'name',
+    message: "Le nom de votre trick existe déjà, merci d'en choisir un autre !",
+    groups: ["name_exception"]
+)]
 class Trick
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
-    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(
+        message: 'Ce champ ne peut être vide !',
+        groups: [
+            'name_exception',
+        ]
+    )]
+    #[Assert\Regex(
+        pattern: "/^[A-ZÀ-ÿ][A-Za-zÀ-ÿ, .'\-\n]*$/u",
+        message: 'Oops! Le format de votre saisie est incorrect, le nom du trick doit commencer par une lettre majuscule',
+        match: true,
+        groups: ['name_exception']
+    )]
+    #[ORM\Column(length: 255,unique:true)]
     private ?string $name = null;
-
+    #[Assert\NotBlank(
+        message: 'Ce champ ne peut être vide !',
+        groups: [
+            'description_exception',
+        ]
+    )]
+    #[Assert\Regex(
+        pattern: "/^[A-ZÀ-ÿ][A-Za-zÀ-ÿ, .'\-\n]*$/u",
+        message: 'Oops! Le format de votre saisie est incorrect, votre description doit commencer par une lettre majuscule',
+        match: true,
+        groups: ['description_exception']
+    )]
     #[ORM\Column(length: 255)]
     private ?string $description = null;
+    #[Assert\NotBlank(
+        message: 'Ce champ ne peut être vide !',
+        groups: [
+            'group_exception',
+        ]
+    )]
+    #[ORM\Column(length: 255)]
+    private ?string $trickGroup = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $group = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $illustrations = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $videos = null;
-
-    #[ORM\Column(type:'date')]
+    #[ORM\Column(type: 'date')]
     private ?\DateTimeInterface $date = null;
+    /**
+     * @var array<string>
+     */
+    #[Assert\All([
+    new Assert\File(
+    maxSize: '3000K',
+    groups: ['illustration_exception'],
+    extensions: ['jpg', 'png', 'webp'],
+    extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
+    ),
 
+    ])]
+    #[Assert\NotBlank(
+        message: 'Veuillez sélectionner un fichier !',
+        groups: ['illustration_exception']
+    )]
+    private array $images;
+    /**
+     * @var array<string>
+     */
+    #[Assert\All([
+        new Assert\File(
+            maxSize: '3000K',
+            groups: ['video_exception'],
+            extensions: ['mp4'],
+            extensionsMessage: 'Seuls les fichiers mp4 sont acceptés !'
+        ),
+    ])]
+
+    private array $videos;
+
+    #[Assert\Regex(
+        pattern: '/<iframe[^>]+src="([^"]+)"/i',
+        message: "Oops ! Il semblerait que le format de votre url n'est pas bon, merci de vérifier ce qu'il en est",
+        match: true,
+        groups: ['url_exception']
+    )]
+    #[ORM\Column(length: 255,nullable: true)]
+    private ?string $embedUrl;
     public function getId(): ?int
     {
         return $this->id;
@@ -60,41 +127,18 @@ class Trick
         return $this;
     }
 
-    public function getGroup(): ?string
+    public function getTrickGroup(): ?string
     {
-        return $this->group;
+        return $this->trickGroup;
     }
 
-    public function setGroup(?string $group): static
+    public function setTrickGroup(?string $trickGroup): static
     {
-        $this->group = $group;
+        $this->trickGroup = $trickGroup;
 
         return $this;
     }
 
-    public function getIllustrations(): ?string
-    {
-        return $this->illustrations;
-    }
-
-    public function setIllustrations(?string $illustrations): static
-    {
-        $this->illustrations = $illustrations;
-
-        return $this;
-    }
-
-    public function getVideos(): ?string
-    {
-        return $this->videos;
-    }
-
-    public function setVideos(?string $videos): static
-    {
-        $this->videos = $videos;
-
-        return $this;
-    }
 
     /**
      * @return \DateTimeInterface|null
@@ -110,5 +154,61 @@ class Trick
     public function setDate(?\DateTimeInterface $date): void
     {
         $this->date = $date;
+    }
+
+
+    /**
+     * @return string[]|null
+     */
+    public function getImages(): ?array
+    {
+        return $this->images;
+    }
+
+
+    /**
+     * @param array<string> $images
+     * @return void
+     */
+    public function setImages(array $images): void
+    {
+        $this->images = $images;
+    }
+
+
+    /**
+     * @return string[]|null
+     */
+    public function getVideos(): ?array
+    {
+        return $this->videos;
+    }
+
+
+    /**
+     * @param array<string> $videos
+     * @return void
+     */
+    public function setVideos(array $videos): void
+    {
+        $this->videos = $videos;
+
+    }
+
+    /**
+     * @return ?string
+     */
+    public function getEmbedUrl(): ?string
+    {
+        return $this->embedUrl;
+    }
+
+    /**
+     * @param ?string $youtubeUrl
+     */
+    public function setEmbedUrl(?string $youtubeUrl): void
+    {
+
+        $this->embedUrl = $youtubeUrl;
     }
 }

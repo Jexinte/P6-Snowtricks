@@ -3,3 +3,13 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+create_trick_get:
+    path: '/create-trick'
+    controller: App\Controller\TrickController::createTrickPage
+    methods: ['GET']
+
+create_trick_post:
+    path: '/create-trick'
+    controller: App\Controller\TrickController::createTrickSubmit
+    methods: ['POST']
