@@ -63,7 +63,6 @@ class TrickController extends AbstractController
     }
 
 
-
     #[Route('/create-trick', name: 'create_trick_post', methods: ["POST"])]
     public function createTrickSubmit(
         Request $request,
@@ -71,7 +70,6 @@ class TrickController extends AbstractController
         TrickRepository $trickRepository,
         MediaRepository $mediaRepository
     ): Response {
-
         $this->template = "create_trick.twig";
 
         $trickEntity = new Trick();
@@ -103,28 +101,28 @@ class TrickController extends AbstractController
             $errorMediaEntity = $validator->validate($mediaEntity, null, $group);
             if (count($errorTrickEntity) >= 1) {
                 $numberOfErrors++;
-            }  if (count($errorMediaEntity) >= 1) {
+            }
+            if (count($errorMediaEntity) >= 1) {
                 $numberOfErrors++;
             }
             foreach ($errorTrickEntity as $error) {
-               $groupsViolations[$group] = $error->getMessage();
-           }            foreach ($errorMediaEntity as $error) {
-               $groupsViolations[$group] = $error->getMessage();
-           }
+                $groupsViolations[$group] = $error->getMessage();
+            }
+            foreach ($errorMediaEntity as $error) {
+                $groupsViolations[$group] = $error->getMessage();
+            }
         }
         if ($numberOfErrors == 0) {
-
             $actualDate = new \DateTime();
-            preg_match('/<iframe[^>]+src="([^"]+)"/i',$mediaEntity->getEmbedUrl(),$matches);
+            preg_match('/<iframe[^>]+src="([^"]+)"/i', $mediaEntity->getEmbedUrl(), $matches);
 
             $urlCleaned = $matches[1];
             $mediaEntity->setEmbedUrl($urlCleaned);
             $trickEntity->setDate($actualDate);
             $trickCreated = $trickRepository->createTrick($trickEntity);
-            if(is_int($trickCreated))
-            {
-            $mediaEntity->setIdTrick($trickCreated);
-            $mediaRepository->saveTrickMedias($mediaEntity);
+            if (is_int($trickCreated)) {
+                $mediaEntity->setIdTrick($trickCreated);
+                $mediaRepository->saveTrickMedias($mediaEntity);
             }
 
 
@@ -133,7 +131,39 @@ class TrickController extends AbstractController
 
 
         $this->parameters["exceptions"] = $groupsViolations;
-       return new Response($this->render($this->template, $this->parameters), 400);
+        return new Response($this->render($this->template, $this->parameters), 400);
+    }
+
+    #[Route('/update-trick/{trickname}/{id}', name: 'update_trick_get', methods: ["GET"])]
+    public function updateTrickPage(
+        int $id,
+        string $trickname,
+        TrickRepository $trickRepository,
+        MediaRepository $mediaRepository,
+        Request $request
+    ): Response {
+        $this->template = "update_trick.twig";
+        $userConnected = $request->getSession()->get('user_connected');
+        $trick = $trickRepository->getTrick($id);
+        $medias = $mediaRepository->getTrickMedia($id);
+        $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
+        $frenchDateFormat = new IntlDateFormatter('fr_Fr', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
+        $dateTrick = $trick->getDate();
+        $date = $frenchDateFormat->format($dateTrick);
+        $this->parameters["trick"] = $trick;
+        $this->parameters["medias"] = $medias;
+        $this->parameters["trick_date"] = $date;
+        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        return new Response($this->render($this->template, $this->parameters));
+    }
+
+    #[Route('/update-trick-media/{id}', name: 'update_trick_media_get', methods: ["GET"])]
+    public function updateTrickMediaPage(int $id, MediaRepository $mediaRepository): Response
+    {
+        $media = $mediaRepository->findBy(["id" => $id]);
+        $this->template = "update_media.twig";
+        $this->parameters["media"] = $media;
+        return new Response($this->render($this->template, $this->parameters));
     }
 
     #[Route('/trick/delete/{id}', methods: ["POST"])]
