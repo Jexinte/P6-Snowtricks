@@ -42,17 +42,18 @@ class TrickRepository extends ServiceEntityRepository
         return $this->findOneBy(["id" => $id]);
     }
 
-    public function getLastTrickSaved(): Trick
-    {
-        $lastTrick = $this->findAll();
-        return end($lastTrick);
-    }
+//    public function getLastTrickSaved(): Trick
+//    {
+//        $lastTrick = $this->findAll();
+//        return end($lastTrick);
+//    }
 
     public function createTrick(Trick $trick): int
     {
         $this->getEntityManager()->persist($trick);
         $this->getEntityManager()->flush();
-        $trick = $this->getLastTrickSaved();
+        $tricks =$this->findAll();
+        $trick = end($tricks);
         return $trick->getId();
     }
 

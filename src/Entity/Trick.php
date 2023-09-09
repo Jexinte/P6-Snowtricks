@@ -31,7 +31,7 @@ class Trick
         match: true,
         groups: ['name_exception']
     )]
-    #[ORM\Column(length: 255,unique:true)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $name = null;
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
@@ -59,45 +59,8 @@ class Trick
 
     #[ORM\Column(type: 'date')]
     private ?\DateTimeInterface $date = null;
-    /**
-     * @var array<string>
-     */
-    #[Assert\All([
-    new Assert\File(
-    maxSize: '3000K',
-    groups: ['illustration_exception'],
-    extensions: ['jpg', 'png', 'webp'],
-    extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
-    ),
 
-    ])]
-    #[Assert\NotBlank(
-        message: 'Veuillez sélectionner un fichier !',
-        groups: ['illustration_exception']
-    )]
-    private array $images;
-    /**
-     * @var array<string>
-     */
-    #[Assert\All([
-        new Assert\File(
-            maxSize: '3000K',
-            groups: ['video_exception'],
-            extensions: ['mp4'],
-            extensionsMessage: 'Seuls les fichiers mp4 sont acceptés !'
-        ),
-    ])]
 
-    private array $videos;
-
-    #[Assert\Regex(
-        pattern: '/<iframe[^>]+src="([^"]+)"/i',
-        message: "Oops ! Il semblerait que le format de votre url n'est pas bon, merci de vérifier ce qu'il en est",
-        match: true,
-        groups: ['url_exception']
-    )]
-    #[ORM\Column(length: 255,nullable: true)]
-    private ?string $embedUrl;
     public function getId(): ?int
     {
         return $this->id;
@@ -157,58 +120,4 @@ class Trick
     }
 
 
-    /**
-     * @return string[]|null
-     */
-    public function getImages(): ?array
-    {
-        return $this->images;
-    }
-
-
-    /**
-     * @param array<string> $images
-     * @return void
-     */
-    public function setImages(array $images): void
-    {
-        $this->images = $images;
-    }
-
-
-    /**
-     * @return string[]|null
-     */
-    public function getVideos(): ?array
-    {
-        return $this->videos;
-    }
-
-
-    /**
-     * @param array<string> $videos
-     * @return void
-     */
-    public function setVideos(array $videos): void
-    {
-        $this->videos = $videos;
-
-    }
-
-    /**
-     * @return ?string
-     */
-    public function getEmbedUrl(): ?string
-    {
-        return $this->embedUrl;
-    }
-
-    /**
-     * @param ?string $youtubeUrl
-     */
-    public function setEmbedUrl(?string $youtubeUrl): void
-    {
-
-        $this->embedUrl = $youtubeUrl;
-    }
 }

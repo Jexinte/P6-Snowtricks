@@ -70,9 +70,19 @@
                         </p>
                     </div>
                 </div>
+                <div class="col-sm-12 col-md-12">
+                    {# ONE FILE #}
+                    <div class="mb-3 box">
+                        <label  for="inputGroupFile02">Sélectionner une image qui servira de bannière pour le trick (obligatoire)</label>
+                        <input type="file" name="image" class="form-control">
+                        <p class="text-danger" id="error-files">
+                            {{ exceptions.banner_exception is defined ?  exceptions.banner_exception : '' }}
+                        </p>
+                    </div>
+                </div>
 
                 <div class="col-sm-12 col-md-12">
-                    {# FICHIER TRICK #}
+                    {# MULTIPLE FILES #}
                     <div class="mb-3 box">
                         <label  for="inputGroupFile02">Sélectionner une / plusieur(s) image(s)</label>
                         <input type="file" name="images[]" class="form-control" id="images" multiple>
@@ -81,6 +91,7 @@
                         </p>
                     </div>
                 </div>
+
 
                 {# VIDEO TRICK #}
 
@@ -95,12 +106,13 @@
                 </div>
 
 
-                {#      YOUTUBE VIDEO  #}
+                {#      EMBED VIDEO  #}
                 <div class="col-sm-12 col-md-12">
                     <div class="mb-3 box">
-                        <label for="youtube-url" class="form-label">Url vidéo Youtube</label>
-                        <input class="form-control" type="text" name="youtube-url" id="youtube-url" placeholder="Insérer ici l'adresse url de votre vidéo youtube commencant par https...">
-                        <p class="text-danger" id="error-youtube-video">
+                        <label for="embed-url" class="form-label">Url Vidéo Dailymotion / Youtube</label>
+                        <input class="form-control" type="text" name="embed-url" id="embed-url" placeholder="Insérer ici l'adresse url de votre vidéo youtube commencant par https...">
+                        <p class="text-danger" id="error-video">
+{#                            {{ dump(exceptions is defined ? exceptions : '') }}#}
                             {{ exceptions.url_exception is defined ? exceptions.url_exception : '' }}
                         </p>
                     </div>

@@ -26,12 +26,43 @@ class MediaRepository extends ServiceEntityRepository
         return parent::getEntityManager();
     }
 
+    /**
+     * @param Media $media
+     * @return void
+     */
     public function saveTrickMedias(Media $media)
     {
-        $images = $media->getImages();
+        $images = $media->getIllustrations();
         $videos = $media->getVideos();
         $dirImages = "../public/assets/img";
+        $dirImagesBanner = "../public/assets/img/banner";
         $dirVideos = "../public/assets/videos";
+        $bannerFile = $media->getBannerFile();
+        $embedUrl = $media->getEmbedUrl();
+
+        if (!empty($bannerFile)) {
+            $fileExt = explode('.', $bannerFile->getClientOriginalName());
+            $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
+            $imgBannerPath = "/assets/img/banner/$filename";
+            $tmp = $bannerFile->getPathname();
+            move_uploaded_file($tmp, "$dirImagesBanner/$filename");
+            $media->setMediaPath($imgBannerPath);
+            $media->setMediaType($fileExt[1]);
+            $media->setIsBanner(true);
+            $this->getEntityManager()->persist($media);
+            $this->getEntityManager()->flush();
+            $this->getEntityManager()->clear();
+        }
+        if (!empty($embedUrl)) {
+            $media->setMediaPath($embedUrl);
+            $media->setMediaType("web");
+            $media->setIsBanner(null);
+            $this->getEntityManager()->persist($media);
+            $this->getEntityManager()->flush();
+            $this->getEntityManager()->clear();
+        }
+
+
         foreach ($images as $k => $image) {
             $fileExt = explode('.', $image->getClientOriginalName());
             $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
@@ -39,6 +70,7 @@ class MediaRepository extends ServiceEntityRepository
             $tmp = $image->getPathname();
             $media->setMediaPath($imgPath);
             $media->setMediaType($fileExt[1]);
+            $media->setIsBanner(null);
             move_uploaded_file($tmp, "$dirImages/$filename");
             $this->getEntityManager()->persist($media);
             $this->getEntityManager()->flush();
@@ -51,6 +83,7 @@ class MediaRepository extends ServiceEntityRepository
             $tmp = $video->getPathname();
             $media->setMediaPath($videoPath);
             $media->setMediaType($fileExt[1]);
+            $media->setIsBanner(null);
             move_uploaded_file($tmp, "$dirVideos/$filename");
             $this->getEntityManager()->persist($media);
             $this->getEntityManager()->flush();
