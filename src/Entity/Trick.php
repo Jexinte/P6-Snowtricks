@@ -60,7 +60,19 @@ class Trick
     #[ORM\Column(type: 'date')]
     private ?\DateTimeInterface $date = null;
 
-
+    #[Assert\NotBlank(
+        message: 'Ce champ ne peut être vide !',
+        groups: [
+            'name_update_exception',
+        ]
+    )]
+    #[Assert\Regex(
+        pattern: "/^[A-ZÀ-ÿ][A-Za-zÀ-ÿ, .'\-\n]*$/u",
+        message: 'Oops! Le format de votre saisie est incorrect, le nom du trick doit commencer par une lettre majuscule',
+        match: true,
+        groups: ['name_update_exception']
+    )]
+    private string $nameUpdated;
     public function getId(): ?int
     {
         return $this->id;
@@ -117,6 +129,22 @@ class Trick
     public function setDate(?\DateTimeInterface $date): void
     {
         $this->date = $date;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNameUpdated(): string
+    {
+        return $this->nameUpdated;
+    }
+
+    /**
+     * @param string $nameUpdated
+     */
+    public function setNameUpdated(string $nameUpdated): void
+    {
+        $this->nameUpdated = $nameUpdated;
     }
 
 

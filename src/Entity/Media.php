@@ -62,7 +62,7 @@ class Media
         match: true,
         groups: ['url_exception']
     )]
-    private ?string $embedUrl;
+    private ?string $embedUrl = null;
 
     #[Assert\File(
         maxSize: '3000K',
@@ -75,6 +75,14 @@ class Media
         groups: ['banner_exception']
     )]
     private ?UploadedFile $bannerFile;
+
+    #[Assert\File(
+        maxSize: '3000K',
+        groups: ['update_file_exception'],
+        extensions: ['jpg', 'png', 'webp','mp4'],
+        extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg,png,webp et mp4 sont acceptés !'
+    )]
+    private ?UploadedFile $updatedFile = null;
     public function getId(): ?int
     {
         return $this->id;
@@ -212,6 +220,22 @@ class Media
     public function setIllustrations(array $illustrations): void
     {
         $this->illustrations = $illustrations;
+    }
+
+    /**
+     * @return UploadedFile|null
+     */
+    public function getUpdatedFile(): ?UploadedFile
+    {
+        return $this->updatedFile;
+    }
+
+    /**
+     * @param UploadedFile|null $updatedFile
+     */
+    public function setUpdatedFile(?UploadedFile $updatedFile): void
+    {
+        $this->updatedFile = $updatedFile;
     }
 
 

@@ -16,7 +16,11 @@
     <div class="container-fluid" id="trick">
         <div class=" container-fluid" id="banner-trick">
             {# Bannière du trick sélectionné #}
-            <img src="{{ medias is defined and medias[0].isBanner == 1 ? medias[0].mediaPath : '' }}" alt="banner">
+            <img src="{{ medias is defined and medias[0].isBanner == 1 ? medias[0].mediaPath : '/assets/img/banner/banner_homepage.jpg' }}" alt="banner">
+            <div class="options-box">
+                <a href="{{ path('update_trick_media_get',{'id':medias[0].id}) }}" class="options-media"  id="update"><i class="fa-solid fa-pencil"></i></a>
+                <a href="#" class="options-media"  id="delete"><i class="fa-solid fa-trash"></i></a>
+            </div>
         </div>
         <div id="trick-content">
             <h1>{{ trick is defined ? trick.name : '' }}</h1>
@@ -24,7 +28,7 @@
                 {# Pour le moment on va laisser comme ça ainsi lorsque j'aurai termné les dernières grosses fonctionnalités je reviendrai en arrière au fur et à mesure pour gérer ses détails #}
                 {% for media in medias %}
 
-                    {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp" %}
+                    {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp"  %}
                         <div class="media-box">
                             <img src="{{ media is defined ? media.mediaPath : '' }}" alt="test" width="200"  class="image">
                             <div class="options-box">
@@ -46,7 +50,7 @@
 
                     {% elseif media.mediaType == "web" %}
                         <div class="media-box">
-                            <iframe width="200" src="{{ media.mediaPath }}"></iframe>
+                            <iframe autoplay ="0" width="200" src="{{ media.mediaPath }}"></iframe>
                             <div class="options-box">
                                 <a href="{{ path('update_trick_media_get',{'id':media.id}) }}" class="options-media"  id="update"><i class="fa-solid fa-pencil"></i></a>
                                 <a href="#" class="options-media"  id="delete"><i class="fa-solid fa-trash"></i></a>
@@ -57,19 +61,56 @@
 
                 {% endfor %}
 
-
             </div>
 
             <div class="about">
-                <p>
-                    {{ trick is defined ? trick.description : '' }}
-                </p>
-                <div class="trick-details">
-                    <p class="trick-date">{{ trick is defined ? trick_date : '' }} </p>
-                    <p class="trick-group">{{ trick is defined ? trick.trickGroup }}</p>
-                </div>
+                <div class="row">
+                <form class="pt-5" action="{{ path('update_trick_content_put',{'trickname':trick.name|lower,'id':trick.id}) }}"  method="post" >
                 {% if user_connected is defined and user_connected == 1 %}
+                    <div class="col-sm-12 col-md-12">
+                        <div class="mb-3 box">
+                            <label for="trick-name" class="form-label">Nom du trick</label>
+                            <input class="form-control" type="text" name="trick-name" id="trick-name" placeholder="Ollie Molie" value="{{ trick.name is defined ? trick.name : '' }}">
+                            <p class="text-danger" id="error-trick-name">
+                                {{ exceptions.name_update_exception is defined ? exceptions.name_update_exception : '' }}
+                            </p>
+                        </div>
+                    </div>
 
+                    {#         DESCRIPTION TRICK #}
+                    <div class="col-sm-12 col-md-12">
+                        <div class="mb-3 box">
+                            <label for="description">Description :</label>
+                            <textarea class="form-control" name="description" id="description" cols="30" rows="10" placeholder="Exprimez-vous !">{{ trick.description is defined ? trick.description : '' }}</textarea>
+                            <p class="text-danger" id="description-trick-name">
+                                {{ exceptions.description_exception is defined ? exceptions.description_exception : '' }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-12">
+                        {# GROUP TRICK #}
+                        <div class="mb-3 box">
+                            <label for="group">Sélectionner un groupe</label>
+
+                            <select class="form-select" id="group" name="selected_options">
+
+                                <option  selected>{{ trick.trickGroup is defined ? trick.trickGroup : '' }}</option>
+                                <option value="Grabs">Grabs</option>
+                                <option value="Rotations">Rotations</option>
+                                <option value="Flips">Flips</option>
+                                <option value="Rotation désaxées">Rotation désaxées</option>
+                                <option value="Slides">Slides</option>
+                                <option value="One Foot Tricks">One Foot Tricks</option>
+                                <option value="Old School">Old School</option>
+                            </select>
+                            <p class="text-danger" id="error-group">
+                                {{ exceptions.group_exception is defined ?  exceptions.group_exception : '' }}
+                            </p>
+                        </div>
+                    </div>
+                    <input type="hidden" name="_method" value="PUT">
+                    <input class="btn btn-dark" id="submit" type="submit" value="Envoyer">
+                </form>
 {#                    SES COMMANDES SONT POUR LA MODIFICATION DU CONTENU DE L'ARTICLE AINSI IL FAUDRA AJOUTER PLUS TARD LES CHAMPS TEXTE AVEC LEUR VALEUR PREDEFINIS ET TOUT LE TRALALA#}
 {#                    <div class="trick-options">#}
 {#                        <form action="#" method="post" class="options-form">#}
@@ -85,7 +126,7 @@
             </div>
         </div>
     </div>
-
+    </div>
 
 
     <footer id="footer">

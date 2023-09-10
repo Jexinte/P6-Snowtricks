@@ -217,3 +217,8 @@ header {
 .about{
     margin-top: 7em;
 }
+
+#submit
+{
+    width: 100%;
+}

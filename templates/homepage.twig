@@ -36,6 +36,12 @@
                     {% if tricks is empty %}
                         <h2 class="text-center">Aucun trick de disponible pour le moment !</h2>
                     {% endif %}
+                    {% for message in app.flashes('success') %}
+                        {#                        Mise en page à faire plus tard #}
+                        <div class="flash-notice">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
                     {% if tricks is defined %}
                         {% for trick in tricks %}
                             <div class="trick">
@@ -44,23 +50,22 @@
                                     <img src="/assets/img/banner/banner_homepage.jpg" alt="" width="250px">
                                 </div>
                                 <div class="trick-options">
-                                    <a href="/{{ trick.slug }}/details/{{ trick.id }}" class="trick-name">{{ trick.name }}</a>
+                                    <a href="/{{ trick.slug }}/details/{{ trick.id }}"
+                                       class="trick-name">{{ trick.name }}</a>
                                     <div class="options">
                                         {% if user_connected is defined and user_connected == 1 %}
-                                            <form action="/trick/update/{{ trick.name }}/{{ trick.id }}" method="post">
-                                                <button type="submit" name="update" class="update-trick">
-                                                    <i class="fa-solid fa-pencil">
-                                                    </i>
-                                                </button>
-                                            </form>
 
-                                            <form action="/trick/delete/{{ trick.id }}" method="post">
-                                                <button type="submit" name="delete" class="delete-trick">
-                                                    <i class="fa-solid fa-trash">
-                                                    </i>
-                                                </button>
-                                            </form>
+                                            <a href="{{ path('update_trick_get',{trickname:trick.slug,id:trick.id}) }}"
+                                               class="update-trick">
+                                                <i class="fa-solid fa-pencil">
+                                                </i>
+                                            </a>
 
+
+                                            <a href="/trick/delete/{{ trick.id }}" class="delete-trick">
+                                                <i class="fa-solid fa-trash">
+                                                </i>
+                                            </a>
 
                                         {% endif %}
                                     </div>

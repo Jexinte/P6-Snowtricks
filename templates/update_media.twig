@@ -15,9 +15,9 @@
     </header>
     <div class="container-fluid" id="trick">
         <div class="row">
-            <form class="pt-5" action="#" enctype="multipart/form-data" method="post">
+            <form class="pt-5" action="{{ path('update_trick_media_put',{'id':media.id}) }}" enctype="multipart/form-data" method="post">
                 <div id="trick-content">
-                    {% if media[0].mediaType == "png" or media[0].mediaType == "jpg" or media[0].mediaType == "webp" or media[0].mediaType == "mp4" %}
+                    {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp" or media.mediaType == "mp4" or media.isBanner == 1 %}
                         <h1 class="text-center">Modifier une image / vidéo</h1>
                         <div class="col-sm-12 col-md-12">
                             {# ONE FILE #}
@@ -25,12 +25,12 @@
                                 <label for="inputGroupFile02">Sélectionner un fichier</label>
                                 <input type="file" name="file" class="form-control">
                                 <p class="text-danger" id="error-files">
-                                    {{ exceptions.banner_exception is defined ?  exceptions.banner_exception : '' }}
+                                    {{ exceptions.update_file_exception is defined ?  exceptions.update_file_exception : '' }}
                                 </p>
                             </div>
                         </div>
 
-                    {% elseif media[0].mediaType == "web" %}
+                    {% elseif media.mediaType == "web" %}
                         <h1 class="text-center">Modifier URL Dailymotion / Youtube</h1>
                         {#      EMBED VIDEO  #}
                         <div class="col-sm-12 col-md-12">
@@ -46,6 +46,7 @@
                         </div>
                     {% endif %}
                 </div>
+                <input type="hidden" name="_method" value="PUT">
                 <input class="btn btn-dark" type="submit" value="Envoyer" id="submit">
             </form>
                 </div>

@@ -16,7 +16,7 @@
     <div class="container-fluid" id="trick">
         <div class=" container-fluid" id="banner-trick">
             {# Bannière du trick sélectionné #}
-           <img src="{{ medias is defined and medias[0].isBanner == 1 ? medias[0].mediaPath : '' }}" alt="banner">
+           <img src="{{ medias is defined and medias[0].isBanner == 1 ? medias[0].mediaPath : '/assets/img/banner/banner_homepage.jpg' }}" alt="banner">
         </div>
         <div id="trick-content">
             <h1>{{ trick is defined ? trick.name : '' }}</h1>
@@ -24,7 +24,7 @@
                 {# Pour le moment on va laisser comme ça ainsi lorsque j'aurai termné les dernières grosses fonctionnalités je reviendrai en arrière au fur et à mesure pour gérer ses détails #}
                 {% for media in medias %}
 
-                    {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp" %}
+                    {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp"   %}
                         <div class="media-box">
                             <img src="{{ media is defined ? media.mediaPath : '' }}" alt="test" width="200" height="200" class="image">
                         </div>
