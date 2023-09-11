@@ -26,10 +26,16 @@ a {
 
 #errors{
     padding:0;
+    display: flex;
+    flex-direction: column;
 }
 
+img {
+    margin: 0 auto;
+}
 p{
     font-weight: var(--700);
+    text-align: center;
 }
 @media (max-width:992px) {
     #error img{

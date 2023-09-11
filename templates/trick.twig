@@ -1,0 +1,99 @@
+{% extends 'layout.twig' %}
+
+{% block title %}
+    <title>{{ trick.name is defined ? trick.name : '' }} | {{ parent () }}  </title>
+{% endblock %}
+{% block css_page %}
+    <link rel="stylesheet" href='/assets/css/trick.css'>
+{% endblock %}
+{% block content %}
+    <header>
+        <nav>
+            <a href="/" id="back-homepage"><i class="fa-solid fa-arrow-left-long"></i></a>
+        </nav>
+
+    </header>
+    <div class="container-fluid" id="trick">
+        <div class=" container-fluid" id="banner-trick">
+            {# Bannière du trick sélectionné #}
+            <img src="/assets/img/banner/banner_homepage.jpg" alt="banner">
+        </div>
+
+        <div id="trick-content">
+            <h1>{{ trick.name }}</h1>
+            <div class="medias">
+                <div class="media-box">
+                    <img src="{{ trick.illustrations }}" alt="test" width="200">
+                </div>
+                <div class="media-box">
+                    <video controls width="200" poster="">
+                        <source src="{{ trick.videos }}" type="video/mp4">
+                        />
+                    </video>
+                </div>
+
+            </div>
+
+            <div class="about">
+                <p>
+                    {{ trick.description }}
+                </p>
+                <div class="trick-details">
+                    <p class="trick-date">{{ trick_date }} </p>
+                    <p class="trick-group">{{ trick.group }}</p>
+                </div>
+
+                <div class="trick-options">
+                    {% if user_connected is defined and user_connected == 1 %}
+                        <form action="#" method="post" class="options-form">
+                            <button type="submit" class="options-button" name="update" id="update">
+                                <i class="fa-solid fa-pencil"></i>
+                            </button>
+                            <button type="submit" class="options-button" name="delete" id="delete"><i
+                                        class="fa-solid fa-trash"></i></button>
+                        </form>
+
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+        <div id="form">
+            <h2 class="text-center">Ajouter un commentaire </h2>
+
+            <form action="#" method="post">
+                <input class="form-control" type="text" name="comment" id="comment" placeholder="John">
+                <input type="submit" class="btn text-white bg-black mb-3" name="submit" id="submit"
+                       value="Laisser un commentaire">
+                <p id="error-comment"></p>
+            </form>
+        </div>
+
+        <div id="comments">
+            <h2>Commentaires</h2>
+            <div class="user-box">
+                <img src="/assets/img/banner/banner_homepage.jpg" alt="" width="200">
+                <h2>Utilisateur X</h2>
+
+                <p class="comment">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi lorem purus, feugiat
+                    eget tellus maximus, posuere aliquam lectus. Fusce libero ligula, congue nec dignissim at, lobortis
+                    et libero. Suspendisse nec blandit mauris. Nunc condimentum scelerisque condimentum. Curabitur eget
+                    mi ut urna luctus bibendum</p>
+            </div>
+        </div>
+    </div>
+
+    <footer id="footer">
+        <p class="text-center footer-paragraph">Copyright @ 2023</p>
+        <nav id="nav-mobile">
+            <a href="/" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
+            <a href="#" class="mobile-link" id="bookmark"><i class="fa-solid fa-bookmark"></i></a>
+            {% if user_connected is defined and user_connected == 1 %}
+                <a href="/logout" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
+            {% else %}
+                <a href="/signin" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
+                <a href="/signup" class="mobile-link" id="sign-up"><i class="fa-solid fa-user-plus"></i></a>
+            {% endif %}
+        </nav>
+    </footer>
+{% endblock %}

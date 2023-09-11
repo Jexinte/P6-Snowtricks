@@ -1,3 +1,11 @@
+body {
+    padding-inline: 0;
+}
+
+header {
+    padding-inline: 1.5em;
+}
+
 nav {
     display: flex;
     justify-content: space-between;
@@ -5,25 +13,145 @@ nav {
 
 nav ul {
     display: flex;
-    gap:1.5em;
+    gap: 1.5em;
 }
 
 nav a {
     text-decoration: none;
-    color:var(--black);
+    color: var(--black);
 }
 
-#homepage{
-    margin-top:5em;
-    width:80%;
+nav a:visited {
+    color: var(--black);
 }
-@media screen and (max-width: 992px){
-    #homepage{
+
+header nav ul {
+    position: relative;
+    top: 18px;
+}
+
+#homepage {
+    margin-top: 2em;
+    /*width:80%;*/
+    padding-inline: 0;
+}
+
+#banner {
+    position: relative;
+    padding-inline: 0;
+    min-height: 100vh;
+    width: 100%;
+}
+
+#banner img {
+    width: 100%;
+    min-height: 100vh;
+}
+
+#down-button {
+    position: absolute;
+    right: 1em;
+    bottom: 1em;
+    color: white;
+    font-size: 2em;
+    border: none;
+    background: none;
+}
+
+
+#banner h1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 3em;
+}
+
+#tricks-container {
+    margin-top: 8em;
+    display: none;
+    margin-bottom: 6em;
+    transition: all 300ms ease;
+}
+
+#tricks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6em;
+    justify-content: center;
+}
+
+#tricks .trick {
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, .3);
+}
+
+.trick-name {
+    text-decoration: none;
+    color: var(--black);
+}
+
+.trick-options {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1em;
+    padding: .5em .5em 1em;
+}
+
+.trick-options .options {
+    display: flex;
+    gap: 1em;
+}
+
+#more-tricks {
+    display: block;
+    width: 100px;
+    padding: 0.5em;
+    margin: 0 auto;
+    text-decoration: none;
+    margin-top: 4em;
+    border-radius: 10px;
+}
+
+.update-trick {
+    border: none;
+    background: none;
+
+}
+
+.delete-trick {
+    border: none;
+    background: none;
+}
+
+#up-to-start {
+    position: absolute;
+    color: black;
+    right: 1em;
+    font-size: 2em;
+}
+
+footer {
+    display: none;
+    margin-top: 2.3em;
+}
+
+#nav-mobile {
+    padding-inline: 1em;
+}
+
+#up-to-start {
+    display: none;
+    border: none;
+    background: none;
+}
+
+@media screen and (max-width: 992px) {
+    #homepage {
         width: 100%;
         transition: all 300ms ease;
         display: flex;
         flex-direction: column;
         min-height: 100vh;
     }
-
 }
