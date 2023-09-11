@@ -310,8 +310,17 @@ class TrickController extends AbstractController
             }
             $trickRepository->getEntityManager()->remove($trick);
             $trickRepository->getEntityManager()->flush();
-
+            $this->addFlash("success","La suppression du trick a bien été prise en compte !");
             return $this->redirectToRoute('homepage');
+    }
 
+    #[Route('/delete-trick-media/{id}',name:'delete_trick_media', methods: ["DELETE"])]
+    public function  deleteTrickMedia(int $id,MediaRepository $mediaRepository):Response
+    {
+        $media = $mediaRepository->findBy(["id" => $id]);
+        $mediaRepository->getEntityManager()->remove(current($media));
+        $mediaRepository->getEntityManager()->flush();
+        $this->addFlash("success","La suppression du média a bien été prise en compte !");
+        return $this->redirectToRoute('homepage');
     }
 }

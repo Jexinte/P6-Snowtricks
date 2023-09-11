@@ -38,3 +38,7 @@ delete_trick:
     path: '/trick/delete/{trickname}/{id}'
     controller: App\Controller\TrickController::deleteTrick
     methods: [ 'DELETE' ]
+delete_trick_media:
+    path: '/delete-trick-media/{id}'
+    controller: App\Controller\TrickController::deleteTrickMedia
+    methods: [ 'DELETE' ]
