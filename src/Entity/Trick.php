@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\TrickRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\OneToMany;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -18,6 +19,7 @@ class Trick
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+
     private ?int $id = null;
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
@@ -25,6 +27,7 @@ class Trick
             'name_exception',
         ]
     )]
+
     #[Assert\Regex(
         pattern: "/^[A-ZÀ-ÿ][A-Za-zÀ-ÿ, .'\-\n]*$/u",
         message: 'Oops! Le format de votre saisie est incorrect, le nom du trick doit commencer par une lettre majuscule',
@@ -73,6 +76,9 @@ class Trick
         groups: ['name_update_exception']
     )]
     private string $nameUpdated;
+//    #[OneToMany(mappedBy: "trick", targetEntity: (Media::class))]
+//    private $medias;
+
     public function getId(): ?int
     {
         return $this->id;

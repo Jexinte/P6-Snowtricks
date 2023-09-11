@@ -123,10 +123,8 @@ class TrickController extends AbstractController
 
             $trickEntity->setDate($actualDate);
             $trickCreated = $trickRepository->createTrick($trickEntity);
-            if (is_int($trickCreated)) {
-                $mediaEntity->setIdTrick($trickCreated);
-                $mediaRepository->saveTrickMedias($mediaEntity);
-            }
+            $mediaEntity->setIdTrick($trickCreated);
+            $mediaRepository->saveTrickMedias($mediaEntity);
 
 
             return $this->redirectToRoute('homepage');
@@ -285,17 +283,35 @@ class TrickController extends AbstractController
         $this->parameters["exceptions"] = $groupsViolations;
         return new Response($this->render($this->template,$this->parameters),400);
     }
-    #[Route('/trick/delete/{id}', methods: ["POST"])]
+    #[Route('/trick/delete/{trickname}/{id}',name:'delete_trick', methods: ["DELETE"])]
     public function deleteTrick(
         ?int $id,
+        string $trickname,
         TrickRepository $trickRepository,
+        MediaRepository $mediaRepository
     ): Response|RedirectResponse {
-        if (!is_null($id)) {
+        if(is_null($id))
+        {
+            throw $this->createNotFoundException();
+
+        }
+
             $trick = $trickRepository->find(["id" => $id]);
+            $medias = $mediaRepository->getTrickMedia($id);
+            foreach($medias as $media)
+            {
+
+                if($media->getMediaType() != "web")
+                {
+                    unlink("../public".$media->getMediaPath());
+                }
+                $mediaRepository->getEntityManager()->remove($media);
+                $mediaRepository->getEntityManager()->flush($media);
+            }
             $trickRepository->getEntityManager()->remove($trick);
             $trickRepository->getEntityManager()->flush();
+
             return $this->redirectToRoute('homepage');
-        }
-        throw $this->createNotFoundException();
+
     }
 }

@@ -33,3 +33,8 @@ update_trick_content_put:
     path: '/update-trick/{trickname}/{id}'
     controller: App\Controller\TrickController::updateTrickContentValidator
     methods: [ 'PUT' ]
+
+delete_trick:
+    path: '/trick/delete/{trickname}/{id}'
+    controller: App\Controller\TrickController::deleteTrick
+    methods: [ 'DELETE' ]

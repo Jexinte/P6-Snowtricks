@@ -39,7 +39,6 @@ class MediaRepository extends ServiceEntityRepository
         $dirVideos = "../public/assets/videos";
         $bannerFile = $media->getBannerFile();
         $embedUrl = $media->getEmbedUrl();
-
         if (!empty($bannerFile)) {
             $fileExt = explode('.', $bannerFile->getClientOriginalName());
             $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
@@ -61,7 +60,6 @@ class MediaRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
             $this->getEntityManager()->clear();
         }
-
 
         foreach ($images as $k => $image) {
             $fileExt = explode('.', $image->getClientOriginalName());
