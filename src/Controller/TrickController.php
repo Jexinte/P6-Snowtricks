@@ -306,7 +306,7 @@ class TrickController extends AbstractController
                     unlink("../public".$media->getMediaPath());
                 }
                 $mediaRepository->getEntityManager()->remove($media);
-                $mediaRepository->getEntityManager()->flush($media);
+                $mediaRepository->getEntityManager()->flush();
             }
             $trickRepository->getEntityManager()->remove($trick);
             $trickRepository->getEntityManager()->flush();
@@ -317,8 +317,9 @@ class TrickController extends AbstractController
     #[Route('/delete-trick-media/{id}',name:'delete_trick_media', methods: ["DELETE"])]
     public function  deleteTrickMedia(int $id,MediaRepository $mediaRepository):Response
     {
-        $media = $mediaRepository->findBy(["id" => $id]);
-        $mediaRepository->getEntityManager()->remove(current($media));
+        $media = current($mediaRepository->findBy(["id" => $id]));
+        unlink("../public".$media->getMediaPath());
+        $mediaRepository->getEntityManager()->remove($media);
         $mediaRepository->getEntityManager()->flush();
         $this->addFlash("success","La suppression du média a bien été prise en compte !");
         return $this->redirectToRoute('homepage');
