@@ -63,7 +63,6 @@ class TrickController extends AbstractController
     }
 
 
-
     #[Route('/create-trick', name: 'create_trick_post', methods: ["POST"])]
     public function createTrickSubmit(
         Request $request,
@@ -71,7 +70,6 @@ class TrickController extends AbstractController
         TrickRepository $trickRepository,
         MediaRepository $mediaRepository
     ): Response {
-
         $this->template = "create_trick.twig";
 
         $trickEntity = new Trick();
@@ -103,28 +101,31 @@ class TrickController extends AbstractController
             $errorMediaEntity = $validator->validate($mediaEntity, null, $group);
             if (count($errorTrickEntity) >= 1) {
                 $numberOfErrors++;
-            }  if (count($errorMediaEntity) >= 1) {
+            }
+            if (count($errorMediaEntity) >= 1) {
                 $numberOfErrors++;
             }
             foreach ($errorTrickEntity as $error) {
-               $groupsViolations[$group] = $error->getMessage();
-           }            foreach ($errorMediaEntity as $error) {
-               $groupsViolations[$group] = $error->getMessage();
-           }
+                $groupsViolations[$group] = $error->getMessage();
+            }
+            foreach ($errorMediaEntity as $error) {
+                $groupsViolations[$group] = $error->getMessage();
+            }
         }
         if ($numberOfErrors == 0) {
-
             $actualDate = new \DateTime();
-            preg_match('/<iframe[^>]+src="([^"]+)"/i',$mediaEntity->getEmbedUrl(),$matches);
+            if(!empty($mediaEntity->getEmbedUrl()))
+            {
+                preg_match('/<iframe[^>]+src="([^"]+)"/i', $mediaEntity->getEmbedUrl(), $matches);
+                $urlCleaned = $matches[1];
+                $mediaEntity->setEmbedUrl($urlCleaned);
+            }
 
-            $urlCleaned = $matches[1];
-            $mediaEntity->setEmbedUrl($urlCleaned);
             $trickEntity->setDate($actualDate);
             $trickCreated = $trickRepository->createTrick($trickEntity);
-            if(is_int($trickCreated))
-            {
-            $mediaEntity->setIdTrick($trickCreated);
-            $mediaRepository->saveTrickMedias($mediaEntity);
+            if (is_int($trickCreated)) {
+                $mediaEntity->setIdTrick($trickCreated);
+                $mediaRepository->saveTrickMedias($mediaEntity);
             }
 
 
@@ -133,9 +134,157 @@ class TrickController extends AbstractController
 
 
         $this->parameters["exceptions"] = $groupsViolations;
-       return new Response($this->render($this->template, $this->parameters), 400);
+        return new Response($this->render($this->template, $this->parameters), 400);
     }
 
+    #[Route('/update-trick/{trickname}/{id}', name: 'update_trick_get', methods: ["GET"])]
+    public function updateTrickPage(
+        int $id,
+        string $trickname,
+        TrickRepository $trickRepository,
+        MediaRepository $mediaRepository,
+        Request $request
+    ): Response {
+        $this->template = "update_trick.twig";
+        $userConnected = $request->getSession()->get('user_connected');
+        $trick = $trickRepository->getTrick($id);
+        $medias = $mediaRepository->getTrickMedia($id);
+        $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
+        $frenchDateFormat = new IntlDateFormatter('fr_Fr', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
+        $dateTrick = $trick->getDate();
+        $date = $frenchDateFormat->format($dateTrick);
+        $this->parameters["trick"] = $trick;
+        $this->parameters["medias"] = $medias;
+        $this->parameters["trick_date"] = $date;
+        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        return new Response($this->render($this->template, $this->parameters));
+    }
+
+    #[Route('/update-trick-media/{id}', name: 'update_trick_media_get', methods: ["GET"])]
+    public function updateTrickMediaPage(int $id, MediaRepository $mediaRepository): Response
+    {
+        $media = $mediaRepository->findBy(["id" => $id]);
+        $this->template = "update_media.twig";
+        $this->parameters["media"] = current($media);
+        return new Response($this->render($this->template, $this->parameters));
+    }
+
+    #[Route('/update-trick-media/{id},', name: 'update_trick_media_put',methods: ["PUT"])]
+    public function updateTrickMediaValidator(int $id,Request $request,ValidatorInterface $validator,MediaRepository $mediaRepository):Response
+    {
+        $this->template ="update_media.twig";
+        $file = $request->files->get('file');
+        $embedUrl = $request->request->get('embed-url');
+        $numberOfErrors = 0;
+        $groups = [
+            "update_file_exception",
+            "url_exception"
+        ];
+        $groupsViolations = [];
+        $mediaEntity = new Media();
+        $media = $mediaRepository->findBy(["id" => $id]);
+
+        switch (true)
+        {
+            case !empty($file):
+                $mediaEntity->setUpdatedFile($file);
+                foreach ($groups as $group) {
+                    $errors = $validator->validate($mediaEntity, null, $group);
+                    if (count($errors) >= 1) {
+                        $numberOfErrors++;
+                    }
+                    foreach ($errors as $error) {
+                        $groupsViolations[$group] = $error->getMessage();
+                    }
+                }
+
+                if ($numberOfErrors == 0) {
+                    $fileUpdated = $mediaRepository->updateTrickMedia($id,$mediaEntity);
+                    if($fileUpdated)
+                    {
+                        $this->addFlash("success","Votre fichier a bien été mis à jour !");
+                        return $this->redirectToRoute('homepage');
+                    }
+                }
+                break;
+            case !empty($embedUrl):
+                $mediaEntity->setEmbedUrl($embedUrl);
+                foreach ($groups as $group) {
+                    $errors = $validator->validate($mediaEntity, null, $group);
+                    if (count($errors) >= 1) {
+                        $numberOfErrors++;
+                    }
+                    foreach ($errors as $error) {
+                        $groupsViolations[$group] = $error->getMessage();
+                    }
+                }
+
+                if ($numberOfErrors == 0) {
+                    preg_match('/<iframe[^>]+src="([^"]+)"/i', $mediaEntity->getEmbedUrl(), $matches);
+                    $urlCleaned = $matches[1];
+                    $mediaEntity->setEmbedUrl($urlCleaned);
+                    $urlUpdated = $mediaRepository->updateTrickMedia($id,$mediaEntity);
+
+                    if($urlUpdated)
+                    {
+                        $this->addFlash("success","Votre fichier a bien été mis à jour !");
+                        return $this->redirectToRoute('homepage');
+                    }
+                }
+                break;
+            default:
+                $this->addFlash("success","Votre fichier a bien été mis à jour !");
+                return $this->redirectToRoute('homepage');
+        }
+
+        $this->parameters["media"] = current($media);
+        $this->parameters["exceptions"] = $groupsViolations;
+        return new Response($this->render($this->template,$this->parameters),400);
+    }
+
+    #[Route('/update-trick-content/{trickname}/{id}', name: 'update_trick_content_put',methods: ["PUT"])]
+
+    public function updateTrickContentValidator(int $id,string $trickname,Request $request,ValidatorInterface $validator,TrickRepository $trickRepository,MediaRepository $mediaRepository):Response
+    {
+        $this->template = "update_trick.twig";
+        $numberOfErrors = 0;
+        $trick = $trickRepository->getTrick($id);
+        $media = $mediaRepository->getTrickMedia($id);
+        $trickEntity = new Trick();
+        $trickEntity->setNameUpdated($request->request->get('trick-name'));
+        $trickEntity->setDescription($request->request->get('description'));
+        $trickEntity->setTrickGroup($request->request->get('selected_options'));
+        $groups = [
+            "namex_exception",
+            "description_exception",
+            "group_exception",
+        ];
+        $groupsViolations = [];
+        foreach ($groups as $group) {
+            $errors = $validator->validate($trickEntity, null, $group);
+            if (count($errors) >= 1) {
+                $numberOfErrors++;
+            }
+            foreach ($errors as $error) {
+                $groupsViolations[$group] = $error->getMessage();
+            }
+        }
+
+        if ($numberOfErrors == 0) {
+            $trickUpdated = $trickRepository->updateTrick($id,$trickEntity);
+            if($trickUpdated)
+            {
+                $this->addFlash("success","Votre fichier a bien été mis à jour !");
+                return $this->redirectToRoute('homepage');
+            }
+        }
+        $userConnected = $request->getSession()->get('user_connected');
+        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $this->parameters["medias"] = $media;
+        $this->parameters["trick"] = $trick;
+        $this->parameters["exceptions"] = $groupsViolations;
+        return new Response($this->render($this->template,$this->parameters),400);
+    }
     #[Route('/trick/delete/{id}', methods: ["POST"])]
     public function deleteTrick(
         ?int $id,

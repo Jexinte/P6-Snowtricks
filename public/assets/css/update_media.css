@@ -42,6 +42,7 @@ header {
 
 #trick-content {
     display: flex;
+    gap: 3em;
     flex-direction: column;
     justify-content: center;
 }
@@ -49,7 +50,7 @@ header {
 #trick-content .medias {
     display: flex;
     flex-wrap: wrap;
-    gap: 2em;
+    gap: 4em;
     margin-block: 4em;
     justify-content: center;
 }
@@ -57,6 +58,10 @@ header {
 #trick-content .media-box {
     box-shadow: 5px 5px 4px rgba(0, 0, 0, .2);
     border: 2px solid black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
 }
 
 #banner-trick {
@@ -125,10 +130,7 @@ header {
 .options-button {
     background: none;
     border: none;
-    color: var(--black);
 }
-
-
 
 #comments h2 {
     font-size: 2.5em;
@@ -160,14 +162,16 @@ header {
 .media-box embed{
     height: 100%;
 }.media-box iframe{
-    height: 100%;
-}
+     height: 100%;
+ }
 .media-box .image{
     height: 100%;
 }
 
 .media-box {
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
 }
 
 .image-fullscreen {
@@ -194,4 +198,32 @@ header {
     display: flex;
     justify-content: center;
     gap: 3em;
+}
+
+
+#trick-content .options-media{
+    display: block;
+}
+
+#trick-content .options-box
+{
+    display: flex;
+    position: absolute;
+    justify-content: center;
+    gap: 2em;
+    margin-top: 45px;
+    top: 11em;
+}
+
+.about{
+    margin-top: 7em;
+}
+#submit{
+    width: 100%;
+}
+
+.box{
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
 }
