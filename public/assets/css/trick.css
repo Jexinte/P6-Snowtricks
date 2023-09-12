@@ -157,3 +157,26 @@ header {
 .media-box video{
     height: 100%;
 }
+
+.media-box {
+    cursor: pointer;
+}
+
+.image-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 9999;
+}
+
+#form .error-comment{
+    color:red;
+}
+.user-not-logged{
+    margin-block: 4em;
+    text-align: center;
+}

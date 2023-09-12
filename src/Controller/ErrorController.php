@@ -46,6 +46,7 @@ class ErrorController extends AbstractController
     public function error500(): Response
     {
         $this->template = "/bundles/TwigBundle/Exception/error.html.twig";
+
         return new Response($this->render($this->template),500);
     }
 

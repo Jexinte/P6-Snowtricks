@@ -262,7 +262,8 @@ L'équipe Snowtricks
                 case  array_key_exists("connected", $result):
                     $this->setSessionData("user_id", $result["user_id"]);
                     $this->setSessionData("user_connected", $result["connected"]);
-                    $this->code = CodeStatus::REDIRECT;
+                    $this->setSessionData("profile_image", $result["profile_image"]);
+                    $this->setToken();
                     return $this->redirectToRoute('homepage');
 
                 case array_key_exists("not_activate", $result):
@@ -281,10 +282,18 @@ L'équipe Snowtricks
         $this->template = "homepage.twig";
         $userConnected = $request->getSession()->get('user_connected');
         if (!$userConnected) {
-            return $this->redirectToRoute("ressource_not_found");
+            $this->createNotFoundException();
         }
-        $this->destroySessionData("user_connected");
+        $request->getSession()->clear();
+
         return $this->redirectToRoute('homepage');
+        //return $this->redirectToRoute("ressource_not_found");
+
+        //$this->destroySessionData("user_connected");
+        //$this->destroySessionData("user_id");
+        //$this->destroySessionData("profile_image");
+        //$this->destroySessionData("trick_date");
+        //$this->destroySessionData("trick");
     }
 
     #[Route(path: '/reset-password/', methods: ["POST"])]
@@ -399,6 +408,7 @@ L'équipe Snowtricks
                     case is_null($result):
                         $response->headers->clearCookie("token");
                         $response->send();
+                        $this->destroySessionData('ask_reset_password');
                         return $this->redirectToRoute("homepage");
                     case array_key_exists("password", $result) || array_key_exists("username", $result) :
                         $this->code = CodeStatus::CLIENT;

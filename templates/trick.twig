@@ -20,15 +20,16 @@
         </div>
 
         <div id="trick-content">
-            <h1>{{ trick.name }}</h1>
+            <h1>{{ trick is defined ? trick.name : '' }}</h1>
             <div class="medias">
+                {# Pour le moment on va laisser comme ça ainsi lorsque j'aurai termné les dernières grosses fonctionnalités je reviendrai en arrière au fur et à mesure pour gérer ses détails #}
                 <div class="media-box">
-                    <img src="{{ trick.illustrations }}" alt="test" width="200">
+                    <img src="/assets/img/banner/banner_homepage.jpg" alt="test" width="200" id="image">
+{#                    {{ trick is defined ? trick.illustrations : '' }}#}
                 </div>
                 <div class="media-box">
-                    <video controls width="200" poster="">
-                        <source src="{{ trick.videos }}" type="video/mp4">
-                        />
+                    <video controls width="200" poster="https://i.ytimg.com/vi/mABsEF-cvJg/hqdefault.jpg?sqp=-oaymwEbCKgBEF5IVfKriqkDDggBFQAAiEIYAXABwAEG&rs=AOn4CLCYCWe_9LWKGflZU5T_VgxOVtSqhw">
+                        <source src="https://www.youtube.com/watch?v=mABsEF-cvJg" type="video/mp4">
                     </video>
                 </div>
 
@@ -36,11 +37,11 @@
 
             <div class="about">
                 <p>
-                    {{ trick.description }}
+                    {{trick is defined ? trick.description : '' }}
                 </p>
                 <div class="trick-details">
-                    <p class="trick-date">{{ trick_date }} </p>
-                    <p class="trick-group">{{ trick.group }}</p>
+                    <p class="trick-date">{{ trick is defined ? trick_date : '' }} </p>
+                    <p class="trick-group">{{ trick is defined ? trick.group }}</p>
                 </div>
 
                 <div class="trick-options">
@@ -53,7 +54,6 @@
                                         class="fa-solid fa-trash"></i></button>
                         </form>
 
-                    {% endif %}
 
                 </div>
             </div>
@@ -61,26 +61,34 @@
         <div id="form">
             <h2 class="text-center">Ajouter un commentaire </h2>
 
-            <form action="#" method="post">
+            <form action="/comment" method="post">
                 <input class="form-control" type="text" name="comment" id="comment" placeholder="John">
                 <input type="submit" class="btn text-white bg-black mb-3" name="submit" id="submit"
                        value="Laisser un commentaire">
-                <p id="error-comment"></p>
+                <p class="error-comment">{{ exceptions.content_exception is defined ? exceptions.content_exception : '' }}</p>
+                <p class="error-comment">{{ exceptions.content_wrong_format_exception is defined ? exceptions.content_wrong_format_exception : '' }}</p>
             </form>
         </div>
+        {% else %}
+        <h2 class="user-not-logged">Afin d'ajouter un commentaire,merci de vous <a href="/signin">connectez !</a></h2>
+        {% endif %}
 
         <div id="comments">
             <h2>Commentaires</h2>
-            <div class="user-box">
-                <img src="/assets/img/banner/banner_homepage.jpg" alt="" width="200">
-                <h2>Utilisateur X</h2>
+            {% if comments is defined  and comments is not empty %}
 
-                <p class="comment">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi lorem purus, feugiat
-                    eget tellus maximus, posuere aliquam lectus. Fusce libero ligula, congue nec dignissim at, lobortis
-                    et libero. Suspendisse nec blandit mauris. Nunc condimentum scelerisque condimentum. Curabitur eget
-                    mi ut urna luctus bibendum</p>
+                {% for comment in  comments %}
+            <div class="user-box">
+                <img src="{{ comment.userProfileImage }}" alt="" width="200">
+                <h2>{{ comment.username }}</h2>
+                <p class="comment">{{ comment.content }}</p>
             </div>
         </div>
+                {% endfor %}
+        {% else %}
+        <h2>Soyez le premier commentaire !</h2>
+            {% endif %}
+
     </div>
 
     <footer id="footer">
@@ -96,4 +104,5 @@
             {% endif %}
         </nav>
     </footer>
+    <script src="/assets/js/mediaAnimation.js"></script>
 {% endblock %}

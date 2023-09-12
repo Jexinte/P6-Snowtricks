@@ -47,7 +47,7 @@ class UserRepository extends ServiceEntityRepository
             default:
                 $fileExt = explode('.', $user->getFile()->getClientOriginalName());
                 $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
-                $imgPath = "http://localhost:8000/Snowtricks/public/assets/img/$filename";
+                $imgPath = "/assets/img/$filename";
                 $user->setProfileImage($imgPath);
                 $user->setStatus(UserStatus::ACCOUNT_NOT_ACTIVATE);
                 $tmp = $user->getFile()->getPathname();
@@ -98,6 +98,7 @@ class UserRepository extends ServiceEntityRepository
                     return [
                         "connected" => UserStatus::CONNECTED,
                         "user_id" => $userInDb->getId(),
+                        "profile_image" => $userInDb->getProfileImage()
                     ];
                 }
                 return ["not_activate" => UserStatus::ACCOUNT_NOT_ACTIVATE];
