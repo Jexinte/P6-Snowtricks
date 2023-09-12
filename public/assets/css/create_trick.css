@@ -1,0 +1,44 @@
+body {
+    padding-inline: 0;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+}
+nav a {
+    text-decoration: none;
+    color: var(--black);
+    font-size: 1.5em;
+}
+
+header {
+    padding-inline: 1em;
+    margin-bottom: 5em;
+    padding-top: 1em;
+}
+
+#trick {
+    padding-inline: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+    width: 80%;
+    margin:0 auto;
+}
+
+#form form {
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+}
+
+form .box {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+#banner-trick img {
+    width: 100%;
+}

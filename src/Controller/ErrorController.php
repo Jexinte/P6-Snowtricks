@@ -45,6 +45,7 @@ class ErrorController extends AbstractController
     #[Route('/error/500', name: 'server_down',methods: ["GET"])]
     public function error500(): Response
     {
+
         $this->template = "/bundles/TwigBundle/Exception/error.html.twig";
 
         return new Response($this->render($this->template),500);

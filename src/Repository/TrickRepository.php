@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Media;
 use App\Entity\Trick;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -42,6 +43,14 @@ class TrickRepository extends ServiceEntityRepository
     }
 
 
+    public function createTrick(Trick $trick): int
+    {
+        $this->getEntityManager()->persist($trick);
+        $this->getEntityManager()->flush();
+        $tricks =$this->findAll();
+        $trick = end($tricks);
+        return $trick->getId();
+    }
 
 
 }
