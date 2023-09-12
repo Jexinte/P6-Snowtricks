@@ -39,7 +39,6 @@ class MediaRepository extends ServiceEntityRepository
         $dirVideos = "../public/assets/videos";
         $bannerFile = $media->getBannerFile();
         $embedUrl = $media->getEmbedUrl();
-
         if (!empty($bannerFile)) {
             $fileExt = explode('.', $bannerFile->getClientOriginalName());
             $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
@@ -61,7 +60,6 @@ class MediaRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
             $this->getEntityManager()->clear();
         }
-
 
         foreach ($images as $k => $image) {
             $fileExt = explode('.', $image->getClientOriginalName());
@@ -100,13 +98,11 @@ class MediaRepository extends ServiceEntityRepository
         return $this->findBy(["idTrick" => $id]);
     }
 
-    public function updateTrickMedia(int $id, Media $media):?bool
+    public function updateTrickMedia(int $id, Media $media): ?bool
     {
-
         $embedUrl = $media->getEmbedUrl();
         $file = $media->getUpdatedFile();
-        switch (true)
-        {
+        switch (true) {
             case !empty($file):
 
                 $fileExt = explode('.', $file->getClientOriginalName());
@@ -114,21 +110,17 @@ class MediaRepository extends ServiceEntityRepository
                 $dir = "";
                 $filePath = "";
                 $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
-                if(in_array($fileExt[1],array("jpg",'webp',"png")) && !$filePathInDb->getIsBanner())
-                {
+                if (in_array($fileExt[1], array("jpg", 'webp', "png")) && !$filePathInDb->getIsBanner()) {
                     $dir = "../public/assets/img";
                     $filePath = "/assets/img/$filename";
-                }
-
-                elseif($fileExt[1] == "mp4"){
+                } elseif ($fileExt[1] == "mp4") {
                     $dir = "../public/assets/videos";
                     $filePath = "/assets/videos/$filename";
-                }
-                else{
+                } else {
                     $dir = "../public/assets/img/banner";
                     $filePath = "/assets/img/banner/$filename";
                 }
-                unlink("../public".$filePathInDb->getMediaPath());
+                unlink("../public" . $filePathInDb->getMediaPath());
 
                 $tmp = $file->getPathname();
 

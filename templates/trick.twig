@@ -58,7 +58,12 @@
                     {% if user_connected is defined and user_connected == 1 %}
 
                         <a href="{{ path('update_trick_get',{'id':trick.id,'trickname':trick.name}) }}" class="options-button"  id="update"><i class="fa-solid fa-pencil"></i></a>
-                        <a href="#" class="options-button"  id="delete"><i class="fa-solid fa-trash"></i></a>
+{#                        <a href="#" class="options-button"  id="delete"><i class="fa-solid fa-trash"></i></a>#}
+                    <form action="{{ path('delete_trick',{trickname:trick.name,id:trick.id}) }}" method="post">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="submit" class="options-button" id="delete"><i class="fa-solid fa-trash">
+                            </i></button>
+                    </form>
 
                 </div>
             </div>

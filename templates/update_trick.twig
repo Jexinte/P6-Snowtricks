@@ -33,7 +33,11 @@
                             <img src="{{ media is defined ? media.mediaPath : '' }}" alt="test" width="200"  class="image">
                             <div class="options-box">
                                 <a href="{{ path('update_trick_media_get',{'id':media.id}) }}" class="options-media"  id="update"><i class="fa-solid fa-pencil"></i></a>
-                                <a href="#" class="options-media"  id="delete"><i class="fa-solid fa-trash"></i></a>
+                                <form action="{{ path('delete_trick_media',{id:media.id}) }}" method="post">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <button type="submit" class="options-media" id="delete"><i class="fa-solid fa-trash">
+                                        </i></button>
+                                </form>
                             </div>
                         </div>
 
@@ -44,7 +48,11 @@
                                    type="video/{{ media.mediaType }}">
                             <div class="options-box">
                                 <a href="{{ path('update_trick_media_get',{'id':media.id}) }}" class="options-media"  id="update"><i class="fa-solid fa-pencil"></i></a>
-                                <a href="#" class="options-media"  id="delete"><i class="fa-solid fa-trash"></i></a>
+                                <form action="{{ path('delete_trick_media',{id:media.id}) }}" method="post">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <button type="submit" class="options-media" id="delete"><i class="fa-solid fa-trash">
+                                        </i></button>
+                                </form>
                             </div>
                         </div>
 
@@ -53,7 +61,11 @@
                             <iframe autoplay ="0" width="200" src="{{ media.mediaPath }}"></iframe>
                             <div class="options-box">
                                 <a href="{{ path('update_trick_media_get',{'id':media.id}) }}" class="options-media"  id="update"><i class="fa-solid fa-pencil"></i></a>
-                                <a href="#" class="options-media"  id="delete"><i class="fa-solid fa-trash"></i></a>
+                               <form action="{{ path('delete_trick_media',{id:media.id}) }}" method="post">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <button type="submit" class="options-media" id="delete"><i class="fa-solid fa-trash">
+                                        </i></button>
+                                </form>
                             </div>
                         </div>
 

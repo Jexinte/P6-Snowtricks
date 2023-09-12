@@ -114,8 +114,7 @@ class TrickController extends AbstractController
         }
         if ($numberOfErrors == 0) {
             $actualDate = new \DateTime();
-            if(!empty($mediaEntity->getEmbedUrl()))
-            {
+            if (!empty($mediaEntity->getEmbedUrl())) {
                 preg_match('/<iframe[^>]+src="([^"]+)"/i', $mediaEntity->getEmbedUrl(), $matches);
                 $urlCleaned = $matches[1];
                 $mediaEntity->setEmbedUrl($urlCleaned);
@@ -123,10 +122,8 @@ class TrickController extends AbstractController
 
             $trickEntity->setDate($actualDate);
             $trickCreated = $trickRepository->createTrick($trickEntity);
-            if (is_int($trickCreated)) {
-                $mediaEntity->setIdTrick($trickCreated);
-                $mediaRepository->saveTrickMedias($mediaEntity);
-            }
+            $mediaEntity->setIdTrick($trickCreated);
+            $mediaRepository->saveTrickMedias($mediaEntity);
 
 
             return $this->redirectToRoute('homepage');
@@ -169,10 +166,14 @@ class TrickController extends AbstractController
         return new Response($this->render($this->template, $this->parameters));
     }
 
-    #[Route('/update-trick-media/{id},', name: 'update_trick_media_put',methods: ["PUT"])]
-    public function updateTrickMediaValidator(int $id,Request $request,ValidatorInterface $validator,MediaRepository $mediaRepository):Response
-    {
-        $this->template ="update_media.twig";
+    #[Route('/update-trick-media/{id},', name: 'update_trick_media_put', methods: ["PUT"])]
+    public function updateTrickMediaValidator(
+        int $id,
+        Request $request,
+        ValidatorInterface $validator,
+        MediaRepository $mediaRepository
+    ): Response {
+        $this->template = "update_media.twig";
         $file = $request->files->get('file');
         $embedUrl = $request->request->get('embed-url');
         $numberOfErrors = 0;
@@ -184,8 +185,7 @@ class TrickController extends AbstractController
         $mediaEntity = new Media();
         $media = $mediaRepository->findBy(["id" => $id]);
 
-        switch (true)
-        {
+        switch (true) {
             case !empty($file):
                 $mediaEntity->setUpdatedFile($file);
                 foreach ($groups as $group) {
@@ -199,10 +199,9 @@ class TrickController extends AbstractController
                 }
 
                 if ($numberOfErrors == 0) {
-                    $fileUpdated = $mediaRepository->updateTrickMedia($id,$mediaEntity);
-                    if($fileUpdated)
-                    {
-                        $this->addFlash("success","Votre fichier a bien été mis à jour !");
+                    $fileUpdated = $mediaRepository->updateTrickMedia($id, $mediaEntity);
+                    if ($fileUpdated) {
+                        $this->addFlash("success", "Votre fichier a bien été mis à jour !");
                         return $this->redirectToRoute('homepage');
                     }
                 }
@@ -223,29 +222,33 @@ class TrickController extends AbstractController
                     preg_match('/<iframe[^>]+src="([^"]+)"/i', $mediaEntity->getEmbedUrl(), $matches);
                     $urlCleaned = $matches[1];
                     $mediaEntity->setEmbedUrl($urlCleaned);
-                    $urlUpdated = $mediaRepository->updateTrickMedia($id,$mediaEntity);
+                    $urlUpdated = $mediaRepository->updateTrickMedia($id, $mediaEntity);
 
-                    if($urlUpdated)
-                    {
-                        $this->addFlash("success","Votre fichier a bien été mis à jour !");
+                    if ($urlUpdated) {
+                        $this->addFlash("success", "Votre fichier a bien été mis à jour !");
                         return $this->redirectToRoute('homepage');
                     }
                 }
                 break;
             default:
-                $this->addFlash("success","Votre fichier a bien été mis à jour !");
+                $this->addFlash("success", "Votre fichier a bien été mis à jour !");
                 return $this->redirectToRoute('homepage');
         }
 
         $this->parameters["media"] = current($media);
         $this->parameters["exceptions"] = $groupsViolations;
-        return new Response($this->render($this->template,$this->parameters),400);
+        return new Response($this->render($this->template, $this->parameters), 400);
     }
 
-    #[Route('/update-trick-content/{trickname}/{id}', name: 'update_trick_content_put',methods: ["PUT"])]
-
-    public function updateTrickContentValidator(int $id,string $trickname,Request $request,ValidatorInterface $validator,TrickRepository $trickRepository,MediaRepository $mediaRepository):Response
-    {
+    #[Route('/update-trick-content/{trickname}/{id}', name: 'update_trick_content_put', methods: ["PUT"])]
+    public function updateTrickContentValidator(
+        int $id,
+        string $trickname,
+        Request $request,
+        ValidatorInterface $validator,
+        TrickRepository $trickRepository,
+        MediaRepository $mediaRepository
+    ): Response {
         $this->template = "update_trick.twig";
         $numberOfErrors = 0;
         $trick = $trickRepository->getTrick($id);
@@ -271,10 +274,9 @@ class TrickController extends AbstractController
         }
 
         if ($numberOfErrors == 0) {
-            $trickUpdated = $trickRepository->updateTrick($id,$trickEntity);
-            if($trickUpdated)
-            {
-                $this->addFlash("success","Votre fichier a bien été mis à jour !");
+            $trickUpdated = $trickRepository->updateTrick($id, $trickEntity);
+            if ($trickUpdated) {
+                $this->addFlash("success", "Votre fichier a bien été mis à jour !");
                 return $this->redirectToRoute('homepage');
             }
         }
@@ -283,19 +285,44 @@ class TrickController extends AbstractController
         $this->parameters["medias"] = $media;
         $this->parameters["trick"] = $trick;
         $this->parameters["exceptions"] = $groupsViolations;
-        return new Response($this->render($this->template,$this->parameters),400);
+        return new Response($this->render($this->template, $this->parameters), 400);
     }
-    #[Route('/trick/delete/{id}', methods: ["POST"])]
+
+    #[Route('/trick/delete/{trickname}/{id}', name: 'delete_trick', methods: ["DELETE"])]
     public function deleteTrick(
         ?int $id,
+        string $trickname,
         TrickRepository $trickRepository,
+        MediaRepository $mediaRepository
     ): Response|RedirectResponse {
-        if (!is_null($id)) {
-            $trick = $trickRepository->find(["id" => $id]);
-            $trickRepository->getEntityManager()->remove($trick);
-            $trickRepository->getEntityManager()->flush();
-            return $this->redirectToRoute('homepage');
+        if (is_null($id)) {
+            throw $this->createNotFoundException();
         }
-        throw $this->createNotFoundException();
+
+        $trick = $trickRepository->find(["id" => $id]);
+        $medias = $mediaRepository->getTrickMedia($id);
+        foreach ($medias as $media) {
+            if ($media->getMediaType() != "web") {
+                unlink("../public" . $media->getMediaPath());
+            }
+            $mediaRepository->getEntityManager()->remove($media);
+        }
+        $mediaRepository->getEntityManager()->flush();
+
+        $trickRepository->getEntityManager()->remove($trick);
+        $trickRepository->getEntityManager()->flush();
+        $this->addFlash("success", "La suppression du trick a bien été prise en compte !");
+        return $this->redirectToRoute('homepage');
+    }
+
+    #[Route('/delete-trick-media/{id}', name: 'delete_trick_media', methods: ["DELETE"])]
+    public function deleteTrickMedia(int $id, MediaRepository $mediaRepository): Response
+    {
+        $media = current($mediaRepository->findBy(["id" => $id]));
+        unlink("../public" . $media->getMediaPath());
+        $mediaRepository->getEntityManager()->remove($media);
+        $mediaRepository->getEntityManager()->flush();
+        $this->addFlash("success", "La suppression du média a bien été prise en compte !");
+        return $this->redirectToRoute('homepage');
     }
 }

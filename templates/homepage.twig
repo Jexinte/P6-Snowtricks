@@ -61,11 +61,12 @@
                                                 </i>
                                             </a>
 
+                                            <form action="{{ path('delete_trick',{trickname:trick.slug,id:trick.id}) }}" method="post">
+                                                <input type="hidden" name="_method" value="DELETE">
+                                                <button type="submit" class="delete-trick"><i class="fa-solid fa-trash">
+                                                    </i></button>
+                                            </form>
 
-                                            <a href="/trick/delete/{{ trick.id }}" class="delete-trick">
-                                                <i class="fa-solid fa-trash">
-                                                </i>
-                                            </a>
 
                                         {% endif %}
                                     </div>
