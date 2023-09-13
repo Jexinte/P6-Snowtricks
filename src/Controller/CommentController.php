@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Comment;
 use App\Entity\User;
 use App\Repository\CommentRepository;
+use App\Repository\MediaRepository;
 use App\Repository\TrickRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,10 +33,12 @@ class CommentController extends AbstractController
         CommentRepository $commentRepository,
         UserRepository $userRepository,
         ValidatorInterface $validator,
+        MediaRepository $mediaRepository
     ): Response {
         $this->template = "trick.twig";
         $this->parameters["trick"] = $request->getSession()->get('trick');
         $this->parameters["trick_date"] = $request->getSession()->get('trick_date');
+        $this->parameters["medias"] = $mediaRepository->getTrickMedia($request->getSession()->get('trick')->getId());
         $this->parameters["user_connected"] = $request->getSession()->get('user_connected');
         $cookie = $this->getToken($request);
         $tokenInSession = $request->getSession()->get('token');

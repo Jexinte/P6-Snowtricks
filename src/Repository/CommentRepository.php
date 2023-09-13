@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Comment;
-use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -46,14 +45,30 @@ class CommentRepository extends ServiceEntityRepository
      */
     public function getComments(int $id,UserRepository $userRepository): array
     {
-        $comments = $this->findBy(["idTrick" => $id]);
+
+        $comments = $this->findBy(["idTrick" => $id],);
+
         foreach($comments as $k => $object)
         {
             $comments[$k]->setUsername($userRepository->find(["id" => $object->getIdUser()])->getName());
         }
-
         return $comments;
 
+    }
+
+    /**
+     * @param int $firstPage
+     * @param int $commentPerPage
+     * @return Comment[]
+     */
+    public function getCommentsPerPage(int $firstPage,int $commentPerPage):array
+    {
+        $orderBy = ['dateCreation' => 'DESC'];
+
+        $offset = $firstPage;
+        $limit = $commentPerPage;
+
+        return $this->findBy([],$orderBy,$limit,$offset);
     }
 
 }

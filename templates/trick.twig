@@ -16,7 +16,8 @@
     <div class="container-fluid" id="trick">
         <div class=" container-fluid" id="banner-trick">
             {# Bannière du trick sélectionné #}
-           <img src="{{ medias is defined and medias[0].isBanner == 1 ? medias[0].mediaPath : '/assets/img/banner/banner_homepage.jpg' }}" alt="banner">
+            <img src="{{ medias is defined and medias[0].isBanner == 1 ? medias[0].mediaPath : '/assets/img/banner/banner_homepage.jpg' }}"
+                 alt="banner">
         </div>
         <div id="trick-content">
             <h1>{{ trick is defined ? trick.name : '' }}</h1>
@@ -24,20 +25,20 @@
                 {# Pour le moment on va laisser comme ça ainsi lorsque j'aurai termné les dernières grosses fonctionnalités je reviendrai en arrière au fur et à mesure pour gérer ses détails #}
                 {% for media in medias %}
 
-                    {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp"   %}
+                    {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp" %}
                         <div class="media-box">
-                            <img src="{{ media is defined ? media.mediaPath : '' }}" alt="test" width="200" height="200" class="image">
+                            <img src="{{ media is defined ? media.mediaPath : '' }}" alt="test" width="200" height="200"
+                                 class="image">
                         </div>
                     {% elseif media.mediaType == "mp4" %}
                         <div class="media-box">
                             <embed autoplay="false" width="200" src="{{ media is defined ? media.mediaPath : '' }}"
                                    type="video/{{ media.mediaType }}">
                         </div>
-                        {% elseif media.mediaType == "web" %}
-                <div class="media-box">
-
-                     <iframe width="200" src="{{ media.mediaPath  }}"></iframe>
-                                        </div>
+                    {% elseif media.mediaType == "web" %}
+                        <div class="media-box">
+                            <iframe width="200" src="{{ media.mediaPath }}"></iframe>
+                        </div>
                     {% endif %}
 
                 {% endfor %}
@@ -57,8 +58,9 @@
                 <div class="trick-options">
                     {% if user_connected is defined and user_connected == 1 %}
 
-                        <a href="{{ path('update_trick_get',{'id':trick.id,'trickname':trick.name}) }}" class="options-button"  id="update"><i class="fa-solid fa-pencil"></i></a>
-{#                        <a href="#" class="options-button"  id="delete"><i class="fa-solid fa-trash"></i></a>#}
+                    <a href="{{ path('update_trick_get',{'id':trick.id,'trickname':trick.name}) }}"
+                       class="options-button" id="update"><i class="fa-solid fa-pencil"></i></a>
+                    {#                        <a href="#" class="options-button"  id="delete"><i class="fa-solid fa-trash"></i></a> #}
                     <form action="{{ path('delete_trick',{trickname:trick.name,id:trick.id}) }}" method="post">
                         <input type="hidden" name="_method" value="DELETE">
                         <button type="submit" class="options-button" id="delete"><i class="fa-solid fa-trash">
@@ -96,12 +98,24 @@
             </div>
         </div>
         {% endfor %}
+        <ul class="pagination">
+            <li class="page-item {{  currentPage == 1 ? "disabled" : '' }}">
+            <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{currentPage - 1 }}" class="page-link">Précédent</a>
+            </li>
+            {% for page in 1..pages %}
+                <li class="page-item {{ currentPage == page ? "active" : ''}} ">
+                    <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{ page }} " class="page-link">{{ page }}</a>
+                </li>
+            {% endfor %}
+                <li class="page-item {{ currentPage == pages ? "disabled" : ''}}">
+                    <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{  currentPage + 1 }}" class="page-link">Suivant</a>
+                </li>
+        </ul>
     {% else %}
         <h2>Soyez le premier commentaire !</h2>
         {% endif %}
 
     </div>
-
     <footer id="footer">
         <p class="text-center footer-paragraph">Copyright @ 2023</p>
         <nav id="nav-mobile">

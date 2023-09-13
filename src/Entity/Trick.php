@@ -76,8 +76,8 @@ class Trick
         groups: ['name_update_exception']
     )]
     private string $nameUpdated;
-//    #[OneToMany(mappedBy: "trick", targetEntity: (Media::class))]
-//    private $medias;
+//    #[OneToMany(mappedBy: "trick", targetEntity: (Media::class),cascade:['remove'])]
+//   private $medias;
 
     public function getId(): ?int
     {

@@ -195,3 +195,10 @@ header {
     justify-content: center;
     gap: 3em;
 }
+
+.pagination
+{
+    display: flex;
+    justify-content: center;
+    margin-top: 7em;
+}
