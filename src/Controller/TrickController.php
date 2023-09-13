@@ -35,6 +35,8 @@ class TrickController extends AbstractController
         MediaRepository $mediaRepository,
         Request $request
     ): Response {
+        $this->template = "trick.twig";
+
         $userConnected = $request->getSession()->get('user_connected');
         $trick = $trickRepository->getTrick($id);
         $medias = $mediaRepository->getTrickMedia($id);
@@ -57,8 +59,6 @@ class TrickController extends AbstractController
         $frenchDateFormat = new IntlDateFormatter('fr_Fr', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
         $dateTrick = $trick->getDate();
         $date = $frenchDateFormat->format($dateTrick);
-        $request->getSession()->set("more_than_ten_comments",false);
-        $this->template = "trick.twig";
         $this->parameters["trick"] = $trick;
         $this->parameters["medias"] = $medias;
         $this->parameters["trick_date"] = $date;
