@@ -297,7 +297,7 @@ L'équipe Snowtricks
             if ($result) {
                 $this->setToken();
                 $token = $request->getSession()->get("token");;
-                $this->setSessionData("ask_reset_password", UserStatus::ASK_RESET_PASSWORD);
+                $request->getSession()->set("ask_reset_password", UserStatus::ASK_RESET_PASSWORD);
 
                 $email = (new Email())
                     ->from("snowtricks@gmail.com")
@@ -378,7 +378,7 @@ L'équipe Snowtricks
                     case is_null($result):
                         $response->headers->clearCookie("token");
                         $response->send();
-                        $this->destroySessionData('ask_reset_password');
+                        $request->getSession()->remove('ask_reset_password');
                         return $this->redirectToRoute("homepage");
                     case array_key_exists("password", $result) || array_key_exists("username", $result) :
                         $this->code = CodeStatus::CLIENT;
