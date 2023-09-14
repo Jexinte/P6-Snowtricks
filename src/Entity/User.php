@@ -58,6 +58,12 @@ class User
             "password_exception_new_reset_password"
         ]
     )]
+    #[Assert\Regex(
+        pattern: '/^(?=.*[A-Z])(?=.*\d).{8,}$/',
+        message: 'Oops! Le format de votre mot de passe est incorrect, il doit être composé d\'une lettre majuscule , d\'un chiffre et 8 caractères minimum !',
+        match: true,
+        groups: ['password_exception', "password_exception_forgot_password", "password_exception_wrong_format"]
+    )]
     #[ORM\Column(length: 255)]
     protected ?string $password = null;
 
