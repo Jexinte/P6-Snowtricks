@@ -24,6 +24,7 @@
         "symfony/monolog-bundle": "^3.0",
         "symfony/runtime": "6.3.*",
         "symfony/security-bundle": "6.3.*",
+        "symfony/security-csrf": "6.3.*",
         "symfony/twig-bundle": "6.3.*",
         "symfony/validator": "6.3.*",
         "symfony/yaml": "6.3.*",
@@ -84,7 +85,7 @@
         "phpro/grumphp": "^2.0",
         "phpstan/phpstan": "^1.10",
         "symfony/debug-bundle": "6.3.*",
-        "symfony/maker-bundle": "^1.50",
+        "symfony/maker-bundle": "^1.51",
         "symfony/stopwatch": "6.3.*",
         "symfony/web-profiler-bundle": "6.3.*"
     }

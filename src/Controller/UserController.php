@@ -7,6 +7,8 @@ use App\Enumeration\UserStatus;
 use App\Enumeration\CodeStatus;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Validator\Constraints\Form;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,7 +18,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-
+use App\Form\Type\SignUp;
 
 class UserController extends AbstractController
 {
@@ -37,27 +39,30 @@ class UserController extends AbstractController
     public function signUpPage(Request $request): Response
     {
         $userConnected = $request->getSession()->get('user_connected');
-        $this->template = "sign_up.twig";
-        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        return new Response($this->render($this->template, $this->parameters));
+        $template = "sign_up.twig";
+        $user = new User();
+        $form = $this->createForm(SignUp::class,$user);
+        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["form"] = $form;
+        return new Response($this->render($template, $parameters));
     }
 
     #[Route(path: '/signin', methods: ["GET"])]
     public function signInPage(Request $request): Response
     {
         $userConnected = $request->getSession()->get('user_connected');
-        $this->template = "sign_in.twig";
-        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        return new Response($this->render($this->template, $this->parameters));
+        $template = "sign_in.twig";
+        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        return new Response($this->render($template, $parameters));
     }
 
     #[Route(path: '/forgot-password', methods: ["GET"])]
     public function forgotPasswordPage(Request $request): Response
     {
         $userConnected = $request->getSession()->get('user_connected');
-        $this->template = "forgot_password.twig";
-        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        return new Response($this->render($this->template, $this->parameters));
+        $template = "forgot_password.twig";
+        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        return new Response($this->render($template, $parameters));
     }
 
     #[Route(path: '/reset-password/token/{id}', methods: ["GET"])]
@@ -66,10 +71,10 @@ class UserController extends AbstractController
         $tokenInSession = $request->getSession()->get('token');
         $userConnected = $request->getSession()->get('user_connected');
         if (!is_null($id) && $id == $tokenInSession) {
-            $this->template = "reset_password.twig";
-            $this->parameters["token"] = $id;
-            $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-            return new Response($this->render($this->template, $this->parameters));
+            $template = "reset_password.twig";
+            $parameters["token"] = $id;
+            $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+            return new Response($this->render($template, $parameters));
         }
         throw $this->createNotFoundException();
     }
@@ -77,63 +82,49 @@ class UserController extends AbstractController
 
     #[Route(path: '/signup/registration', methods: ['POST'])]
     public function signUpValidator(
-        ValidatorInterface $validator,
         Request $request,
         UserRepository $userRepository,
         MailerInterface $mailer,
+
     ): ?Response {
-        $this->template = "sign_up.twig";
+        $template = "sign_up.twig";
         $user = new User();
-        $numberOfErrors = 0;
-        $result = "";
-        $user->setName($request->request->get("username"));
-        $user->setEmail($request->request->get("email"));
-        $user->setPassword($request->request->get("password"));
-        $file = $request->files->all()['file'];
+        $form = $this->createForm(SignUp::class,$user);
+        $form->handleRequest($request);
+        $serverPath = $this->getParameter('server.path');
 
-        if (!is_null($file)) {
-            $user->setFile($file);
-        }
+        if($form->isSubmitted() && $form->isValid())
+        {
+            $token = $request->request->all()["sign_up"]["_token"];
 
-        $groups = [
-            "username_exception",
-            "email_exception",
-            "file_exception",
-            "password_exception"
-        ];
-
-        $groupsViolations = [];
-
-        foreach ($groups as $group) {
-            $errors = $validator->validate($user, null, $group);
-            if (count($errors) >= 1) {
-                $numberOfErrors++;
-            }
-            foreach ($errors as $error) {
-                $groupsViolations[$group] = $error->getMessage();
-            }
-        }
-
-        if ($numberOfErrors == 0) {
-            $passwordFromForm = $request->request->get('password');
-            $user->setPassword(password_hash($passwordFromForm, PASSWORD_DEFAULT));
-            $result = $userRepository->createUser($user);
-            if (is_null($result)) {
+            if($this->isCsrfTokenValid("sign_up",$token))
+            {
+                $user->setPassword(password_hash($user->getPassword(), PASSWORD_DEFAULT));
+                $user = $form->getData();
+                $fileExt = explode('.', $user->getFile()->getClientOriginalName());
+                $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
+                $imgPath = $serverPath."assets/img/$filename";
+                $user->setProfileImage($imgPath);
+                $user->setStatus(UserStatus::ACCOUNT_NOT_ACTIVATE);
+                $tmp = $user->getFile()->getPathname();
+                $dir = "../public/assets/img";
+                move_uploaded_file($tmp, "$dir/$filename");
+                $userRepository->getEntityManager()->persist($user);
+                $userRepository->getEntityManager()->flush();
                 $user->setCreated(true);
-                $this->sendMailToUser($mailer, $user);
-                return $this->redirectToRoute("homepage");
+                $this->sendMailToUser($mailer, $user,$request);
             }
+            return $this->redirectToRoute("homepage");
         }
         $userConnected = $request->getSession()->get('user_connected');
-        $this->parameters["message_db"] = $result;
-        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        $this->parameters["exceptions"] = $groupsViolations;
-        $this->code = CodeStatus::CLIENT;
-        return new Response($this->render($this->template, $this->parameters), $this->code);
+        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+
+        $parameters["form"] = $form;
+        return new Response($this->render($template, $parameters), CodeStatus::CLIENT);
     }
 
 
-    public function getToken(Request $request): ?string
+    private function getToken(Request $request): ?string
     {
         $cookie = $request->cookies->get("token");
         if (!empty($cookie)) {
@@ -142,39 +133,23 @@ class UserController extends AbstractController
         return null;
     }
 
-    public function setToken(): void
+    private function setToken(): void
     {
         $session = new Session();
-        if (!$session->isStarted()) {
-            $response = new Response();
-            $response->headers->setCookie(new Cookie("token", bin2hex(random_bytes(20))));
-            $session->set("token", current($response->headers->getCookies())->getValue());
-            $response->send();
-        }
-    }
-
-    public function setSessionData(string $name, mixed $value): void
-    {
-        $session = new Session();
-        if (!$session->isStarted()) {
-            $session->set($name, $value);
-        }
-    }
-
-    public function destroySessionData(string $name): void
-    {
-        $session = new Session();
-        if (!$session->isStarted()) {
-            $session->remove($name);
-        }
+        $response = new Response();
+        $response->headers->setCookie(new Cookie("token", bin2hex(random_bytes(20))));
+        $session->set("token", current($response->headers->getCookies())->getValue());
+        $response->send();
     }
 
 
-    public function sendMailToUser(MailerInterface $mailer, User $user): void
+
+
+    public function sendMailToUser(MailerInterface $mailer, User $user,Request $request): void
     {
         if ($user->isCreated()) {
             $this->setToken();
-            $this->setSessionData("username", $user->getName());
+            $request->getSession()->set("username", $user->getName());
             $email = (new Email())
                 ->from("snowtricks@gmail.com")
                 ->to($user->getEmail())
@@ -197,47 +172,45 @@ L'équipe Snowtricks
         $cookie = $this->getToken($request);
         $tokenInSession = $request->getSession()->get('token');
         $response = new Response();
-        $this->template = "account_validation.twig";
+        $template = "account_validation.twig";
         if (!is_null($cookie) && $cookie == $tokenInSession) {
             $userStatusUpdated = $this->userRepository->updateUserStatus($request);
             if ($userStatusUpdated) {
-                $this->destroySessionData("token");
+                $request->getSession()->remove("token");
                 $response->headers->clearCookie("token");
                 $response->send();
-                $this->parameters["token_authenticated"] = 1;
+                $parameters["token_authenticated"] = 1;
                 return new Response(
                     $this->render(
-                        $this
-                            ->template,
-                        $this->parameters
+                        $template,
+                        $parameters
                     )
                 );
             }
         }
         $userConnected = $request->getSession()->get('user_connected');
-        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        $this->code = CodeStatus::CLIENT;
+        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
         return new Response(
             $this->render(
-                $this
-                    ->template,
-                $this->parameters
-            ), $this->code
+                $template,
+                $parameters
+            ),CodeStatus::CLIENT
         );
     }
 
-    #[Route(path: '/signin/validation', methods: ["POST"])]
+    #[Route(path: '/signin/validation',name:'login', methods: ["POST"])]
     public function signInValidator(
-        ValidatorInterface $validator,
         Request $request,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        ValidatorInterface $validator
     ): ?Response {
-        $this->template = "sign_in.twig";
-        $this->parameters = [];
+        $template = "sign_in.twig";
+        $parameters = [];
         $user = new User();
         $numberOfErrors = 0;
         $user->setName($request->request->get("username"));
         $user->setPassword($request->request->get("password"));
+        $token = $request->request->get('token');
         $groups = [
             "username_exception_sign_in",
             "password_exception_sign_in"
@@ -252,34 +225,37 @@ L'équipe Snowtricks
                 $groupsViolations[$group] = $error->getMessage();
             }
         }
-        $result = $userRepository->login($user, $request);
 
-        if ($numberOfErrors == 0) {
-            switch (true) {
-                case array_key_exists("password_failed", $result) || array_key_exists("username_failed", $result):
-                    $this->parameters["message_db"] = $result;
-                    break;
-                case  array_key_exists("connected", $result):
-                    $this->setSessionData("user_id", $result["user_id"]);
-                    $this->setSessionData("user_connected", $result["connected"]);
-                    $this->setSessionData("profile_image", $result["profile_image"]);
-                    $this->setToken();
-                    return $this->redirectToRoute('homepage');
+        if ($numberOfErrors == 0 && $this->isCsrfTokenValid("login",$token)) {
+            $result = $userRepository->login($user);
 
-                case array_key_exists("not_activate", $result):
-                    $this->parameters["not_activate"] = "L'accès à votre compte est en attente d'activation. Pour toute demande, notre support est à votre disposition.";
+          switch (true)
+          {
+              case $result->getCredentialsValid():
+                  $request->getSession()->set("user_id", $result->getId());
+                  $request->getSession()->set("user_connected", 1);
+                  return $this->redirectToRoute('homepage');
+
+              case !$result->getNameExist() && !is_null($result->getNameExist()):
+                 $groupsViolations["username_exception_sign_in"] = "Oops ! Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations de connexion !";
                     break;
-            }
+              case !$result->getAccountIsActivate() && !is_null($result->getAccountIsActivate()):
+                  $groupsViolations["username_exception_sign_in"] = "L'accès à votre compte est en attente d'activation. Pour toute demande, notre support est à votre disposition.";
+                  break;
+              case !$result->getPasswordCorrect() && !is_null($result->getPasswordCorrect()):
+                  $groupsViolations["password_exception_sign_in"] = "Oops ! Il semblerait que le mot de passe soit incorrect !";
+                  break;
+          }
         }
-        $this->parameters["exceptions"] = $groupsViolations;
-        $this->code = CodeStatus::CLIENT;
-        return new Response($this->render($this->template, $this->parameters), $this->code);
+        $parameters["exceptions"] = $groupsViolations;
+
+        return new Response($this->render($template, $parameters), CodeStatus::CLIENT);
     }
 
     #[Route(path: '/logout', methods: ["GET"])]
     public function logout(Request $request): ?RedirectResponse
     {
-        $this->template = "homepage.twig";
+        $template = "homepage.twig";
         $userConnected = $request->getSession()->get('user_connected');
         if (!$userConnected) {
             $this->createNotFoundException();
@@ -297,7 +273,7 @@ L'équipe Snowtricks
         UserRepository $userRepository,
         ValidatorInterface $validator
     ): Response {
-        $this->template = "forgot_password.twig";
+        $template = "forgot_password.twig";
         $user = new User();
         $user->setName($request->request->get('username'));
         $numberOfErrors = 0;
@@ -344,21 +320,21 @@ L'équipe Snowtricks
 "
                     );
                 $mailer->send($email);
-                $this->parameters["mail_send"] = 1;
-                $this->parameters["token"] = $token;
+                $parameters["mail_send"] = 1;
+                $parameters["token"] = $token;
                 $this->code = CodeStatus::REQUEST_SUCCEED;
             } else {
                 $errorUsername = "Oops! Le nom d'utilisateur " . $user->getName() . " n'existe pas !";
                 $this->code = CodeStatus::CLIENT;
-                $this->parameters["errorUsername"] = $errorUsername;
+                $parameters["errorUsername"] = $errorUsername;
             }
         } else {
-            $this->parameters["exceptions"] = $groupsViolations;
+            $parameters["exceptions"] = $groupsViolations;
         }
 
         $userConnected = $request->getSession()->get('user_connected');
-        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        return new Response($this->render($this->template, $this->parameters), $this->code);
+        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        return new Response($this->render($template, $parameters), $this->code);
     }
 
 
@@ -372,7 +348,7 @@ L'équipe Snowtricks
         $groupsViolations = [];
         $resetPasswordkAsk = $request->getSession()->get('ask_reset_password');
         if ($resetPasswordkAsk) {
-            $this->template = "reset_password.twig";
+            $template = "reset_password.twig";
             $numberOfErrors = 0;
             $response = new Response();
             $user = new User();
@@ -406,17 +382,17 @@ L'équipe Snowtricks
                         return $this->redirectToRoute("homepage");
                     case array_key_exists("password", $result) || array_key_exists("username", $result) :
                         $this->code = CodeStatus::CLIENT;
-                        $this->parameters["failed"] = $result;
+                        $parameters["failed"] = $result;
                 }
             } else {
                 $this->code = CodeStatus::CLIENT;
             }
         }
         $userConnected = $request->getSession()->get('user_connected');
-        $this->parameters["token"] = $id;
-        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        $this->parameters["exceptions"] = $groupsViolations;
-        return new Response($this->render($this->template, $this->parameters), $this->code);
+        $parameters["token"] = $id;
+        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["exceptions"] = $groupsViolations;
+        return new Response($this->render($template, $parameters), $this->code);
     }
 
 }

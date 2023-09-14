@@ -36,6 +36,9 @@ form{
 #sign-up {
     display: none;
 }
+#sign_up_save{
+    width: 100%;
+}
 @media screen and (max-width: 992px){
     #login{
         width: 100%;

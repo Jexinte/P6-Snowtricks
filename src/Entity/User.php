@@ -4,10 +4,19 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[UniqueEntity(
+    fields: 'name',
+    message: "Le nom utilisateur est déjà pris !",
+)]
+#[UniqueEntity(
+    fields: 'email',
+    message: "L'adresse email n'est pas disponible, merci d'en sélectionner une autre !",
+)]
 class User
 {
     #[ORM\Id]
@@ -30,25 +39,15 @@ class User
         match: true,
         groups: ['username_exception']
     )]
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    #[ORM\Column(length: 255,unique:true)]
+    public ?string $name = null;
 
 
     #[ORM\Column(length: 255)]
-    private ?string $profileImage;
+    public ?string $profileImage;
 
-    #[Assert\NotBlank(
-        message: 'Ce champ ne peut être vide !',
-        groups: ['email_exception']
-    )]
-    #[Assert\Regex(
-        pattern: '/^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$/',
-        message: 'Oops! Le format de votre saisie est incorrect,merci de suivre le format requis : nomadressemail@domaine.extension',
-        match: true,
-        groups: ['email_exception']
-    )]
     #[ORM\Column(length: 255)]
-    private ?string $email = null;
+    protected ?string $email = null;
 
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
@@ -59,33 +58,25 @@ class User
             "password_exception_new_reset_password"
         ]
     )]
-    #[Assert\Regex(
-        pattern: '/^(?=.*[A-Z])(?=.*\d).{8,}$/',
-        message: 'Oops! Le format de votre mot de passe est incorrect, il doit être composé d\'une lettre majuscule , d\'un chiffre et 8 caractères minimum !',
-        match: true,
-        groups: ['password_exception', "password_exception_forgot_password", "password_exception_wrong_format"]
-    )]
     #[ORM\Column(length: 255)]
-    private ?string $password = null;
+    protected ?string $password = null;
 
     #[ORM\Column(length: 1)]
-    private ?bool $status = null;
+    protected ?bool $status = null;
 
     private ?bool $created;
-    #[Assert\File(
-        maxSize: '3000K',
-        groups: ['file_exception'],
-        extensions: ['jpg', 'png', 'webp'],
-        extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
-    )]
-    #[Assert\NotBlank(
-        message: 'Veuillez sélectionner un fichier !',
-        groups: ['file_exception']
-    )]
+
     private UploadedFile $file;
 
 
     protected string $oldPassword;
+
+    public ?bool $credentialsValid = null;
+
+    public ?bool $nameExist = null;
+    public ?bool $passwordIsCorrect = null;
+    public ?bool $accountIsActivate = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -185,4 +176,68 @@ class User
     {
         $this->oldPassword = $oldPassword;
     }
+
+    /**
+     * @return bool|null
+     */
+    public function getCredentialsValid(): ?bool
+    {
+        return $this->credentialsValid;
+    }
+
+    /**
+     * @param bool|null $credentialsValid
+     */
+    public function isCredentialsValid(?bool $credentialsValid): void
+    {
+        $this->credentialsValid = $credentialsValid;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getNameExist(): ?bool
+    {
+        return $this->nameExist;
+    }
+
+    /**
+     * @param bool|null $nameExist
+     */
+    public function isNameExist(?bool $nameExist): void
+    {
+        $this->nameExist = $nameExist;
+    }
+
+
+    /**
+     * @param bool|null $passwordIsCorrect
+     */
+    public function isPasswordCorrect(?bool $passwordIsCorrect): void
+    {
+        $this->passwordIsCorrect = $passwordIsCorrect;
+    }
+
+    public function getPasswordCorrect():?bool
+    {
+        return $this->passwordIsCorrect;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getAccountIsActivate(): ?bool
+    {
+        return $this->accountIsActivate;
+    }
+
+    /**
+     * @param bool|null $accountIsActivate
+     */
+    public function isAccountActivate(?bool $accountIsActivate): void
+    {
+        $this->accountIsActivate = $accountIsActivate;
+    }
+
+
 }
