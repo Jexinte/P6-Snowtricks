@@ -30,7 +30,7 @@ class CommentController extends AbstractController
         $this->actualDate = new DateTime();
     }
     #[Route('/add-comment/{id}',name:'add_comment', methods: ["POST"])]
-    public function handleSendComment(
+    public function handleAddComment(
         int $id,
         Request $request,
         CommentRepository $commentRepository,
