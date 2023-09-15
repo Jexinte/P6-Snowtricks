@@ -74,6 +74,7 @@ class User
 
     private UploadedFile $file;
 
+    private ?int $userId = null;
 
     protected string $oldPassword;
 
@@ -243,6 +244,22 @@ class User
     public function isAccountActivate(?bool $accountIsActivate): void
     {
         $this->accountIsActivate = $accountIsActivate;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUserId():?int
+    {
+        return $this->userId;
+    }
+
+    /**
+     * @param int $userId
+     */
+    public function setUserId(?int $userId): void
+    {
+        $this->userId = $userId;
     }
 
 

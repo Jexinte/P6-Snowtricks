@@ -61,6 +61,7 @@ class UserRepository extends ServiceEntityRepository
                 ):
                 if ($userInDb->getStatus() == UserStatus::ACCOUNT_ACTIVATE) {
                     $user->isCredentialsValid(true);
+                    $user->setUserId($userInDb->getId());
                     break;
                 }
                 $user->isAccountActivate(false);

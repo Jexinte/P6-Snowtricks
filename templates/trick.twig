@@ -16,8 +16,13 @@
     <div class="container-fluid" id="trick">
         <div class=" container-fluid" id="banner-trick">
             {# Bannière du trick sélectionné #}
-            <img src="{{ medias is defined and medias[0].isBanner == 1 ? medias[0].mediaPath : '/assets/img/banner/banner_homepage.jpg' }}"
-                 alt="banner">
+            {% if medias is defined and medias is not empty and medias[0].isBanner == 1 %}
+                <img src="{{ medias[0].mediaPath }}"
+                     alt="banner">
+                {% else %}
+                    <img src="/assets/img/banner/banner_homepage.jpg" alt="banner">
+            {% endif %}
+
         </div>
         <div id="trick-content">
             <h1>{{ trick is defined ? trick.name : '' }}</h1>
@@ -51,7 +56,7 @@
                     {{ trick is defined ? trick.description : '' }}
                 </p>
                 <div class="trick-details">
-                    <p class="trick-date">{{ trick is defined ? trick_date : '' }} </p>
+                    <p class="trick-date">{{ trick_date is defined ? trick_date : '' }} </p>
                     <p class="trick-group">{{ trick is defined ? trick.trickGroup }}</p>
                 </div>
 
@@ -73,10 +78,11 @@
         <div id="form">
             <h2 class="text-center">Ajouter un commentaire </h2>
 
-            <form action="/comment" method="post">
+            <form action="{{ path('add_comment',{id:trick.id}) }}" method="post">
                 <input class="form-control" type="text" name="comment" id="comment" placeholder="John">
+                <input type="hidden" name="token" value="{{ csrf_token('add_comment') }}">
                 <input type="submit" class="btn text-white bg-black mb-3" name="submit" id="submit"
-                       value="Laisser un commentaire">
+                       value="Envoyer">
                 <p class="error-comment">{{ exceptions.content_exception is defined ? exceptions.content_exception : '' }}</p>
                 <p class="error-comment">{{ exceptions.content_wrong_format_exception is defined ? exceptions.content_wrong_format_exception : '' }}</p>
             </form>

@@ -230,7 +230,7 @@ L'équipe Snowtricks
           switch (true)
           {
               case $result->getCredentialsValid():
-                  $request->getSession()->set("user_id", $result->getId());
+                  $request->getSession()->set("user_id", $result->getUserId());
                   $request->getSession()->set("user_connected", 1);
                   return $this->redirectToRoute('homepage');
 

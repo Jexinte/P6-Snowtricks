@@ -29,14 +29,12 @@ class TrickController extends AbstractController
         string $trickname,
         int $id,
         TrickRepository $trickRepository,
-        Trick $trickEntity,
         UserRepository $userRepository,
         CommentRepository $commentRepository,
         MediaRepository $mediaRepository,
         Request $request
     ): Response {
         $this->template = "trick.twig";
-
         $userConnected = $request->getSession()->get('user_connected');
         $trick = $trickRepository->getTrick($id);
         $medias = $mediaRepository->getTrickMedia($id);
