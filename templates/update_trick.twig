@@ -77,52 +77,54 @@
 
             <div class="about">
                 <div class="row">
-                <form class="pt-5" action="{{ path('update_trick_content_put',{'trickname':trick.name|lower,'id':trick.id}) }}"  method="post" >
                 {% if user_connected is defined and user_connected == 1 %}
-                    <div class="col-sm-12 col-md-12">
-                        <div class="mb-3 box">
-                            <label for="trick-name" class="form-label">Nom du trick</label>
-                            <input class="form-control" type="text" name="trick-name" id="trick-name" placeholder="Ollie Molie" value="{{ trick.name is defined ? trick.name : '' }}">
-                            <p class="text-danger" id="error-trick-name">
-                                {{ exceptions.name_update_exception is defined ? exceptions.name_update_exception : '' }}
-                            </p>
-                        </div>
-                    </div>
+                    {{ form_start(form,{'action':path('update_trick_content_put',{'trickname':trick.name|lower,'id':trick.id})}) }} {{ form_end(form) }}
+{#                    <form class="pt-5" action="{{ path('update_trick_content_put',{'trickname':trick.name|lower,'id':trick.id}) }}"  method="post" >#}
+{#                    #}
+{#                    <div class="col-sm-12 col-md-12">#}
+{#                        <div class="mb-3 box">#}
+{#                            <label for="trick-name" class="form-label">Nom du trick</label>#}
+{#                            <input class="form-control" type="text" name="trick-name" id="trick-name" placeholder="Ollie Molie" value="{{ trick.name is defined ? trick.name : '' }}">#}
+{#                            <p class="text-danger" id="error-trick-name">#}
+{#                                {{ exceptions.name_update_exception is defined ? exceptions.name_update_exception : '' }}#}
+{#                            </p>#}
+{#                        </div>#}
+{#                    </div>#}
 
-                    {#         DESCRIPTION TRICK #}
-                    <div class="col-sm-12 col-md-12">
-                        <div class="mb-3 box">
-                            <label for="description">Description :</label>
-                            <textarea class="form-control" name="description" id="description" cols="30" rows="10" placeholder="Exprimez-vous !">{{ trick.description is defined ? trick.description : '' }}</textarea>
-                            <p class="text-danger" id="description-trick-name">
-                                {{ exceptions.description_exception is defined ? exceptions.description_exception : '' }}
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-sm-12 col-md-12">
-                        {# GROUP TRICK #}
-                        <div class="mb-3 box">
-                            <label for="group">Sélectionner un groupe</label>
+{#                    #}{#         DESCRIPTION TRICK #}
+{#                    <div class="col-sm-12 col-md-12">#}
+{#                        <div class="mb-3 box">#}
+{#                            <label for="description">Description :</label>#}
+{#                            <textarea class="form-control" name="description" id="description" cols="30" rows="10" placeholder="Exprimez-vous !">{{ trick.description is defined ? trick.description : '' }}</textarea>#}
+{#                            <p class="text-danger" id="description-trick-name">#}
+{#                                {{ exceptions.description_exception is defined ? exceptions.description_exception : '' }}#}
+{#                            </p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="col-sm-12 col-md-12">#}
+{#                        #}{# GROUP TRICK #}
+{#                        <div class="mb-3 box">#}
+{#                            <label for="group">Sélectionner un groupe</label>#}
 
-                            <select class="form-select" id="group" name="selected_options">
+{#                            <select class="form-select" id="group" name="selected_options">#}
 
-                                <option  selected>{{ trick.trickGroup is defined ? trick.trickGroup : '' }}</option>
-                                <option value="Grabs">Grabs</option>
-                                <option value="Rotations">Rotations</option>
-                                <option value="Flips">Flips</option>
-                                <option value="Rotation désaxées">Rotation désaxées</option>
-                                <option value="Slides">Slides</option>
-                                <option value="One Foot Tricks">One Foot Tricks</option>
-                                <option value="Old School">Old School</option>
-                            </select>
-                            <p class="text-danger" id="error-group">
-                                {{ exceptions.group_exception is defined ?  exceptions.group_exception : '' }}
-                            </p>
-                        </div>
-                    </div>
-                    <input type="hidden" name="_method" value="PUT">
-                    <input class="btn btn-dark" id="submit" type="submit" value="Envoyer">
-                </form>
+{#                                <option  selected>{{ trick.trickGroup is defined ? trick.trickGroup : '' }}</option>#}
+{#                                <option value="Grabs">Grabs</option>#}
+{#                                <option value="Rotations">Rotations</option>#}
+{#                                <option value="Flips">Flips</option>#}
+{#                                <option value="Rotation désaxées">Rotation désaxées</option>#}
+{#                                <option value="Slides">Slides</option>#}
+{#                                <option value="One Foot Tricks">One Foot Tricks</option>#}
+{#                                <option value="Old School">Old School</option>#}
+{#                            </select>#}
+{#                            <p class="text-danger" id="error-group">#}
+{#                                {{ exceptions.group_exception is defined ?  exceptions.group_exception : '' }}#}
+{#                            </p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <input type="hidden" name="_method" value="PUT">#}
+{#                    <input class="btn btn-dark" id="submit" type="submit" value="Envoyer">#}
+{#                </form>#}
 {#                    SES COMMANDES SONT POUR LA MODIFICATION DU CONTENU DE L'ARTICLE AINSI IL FAUDRA AJOUTER PLUS TARD LES CHAMPS TEXTE AVEC LEUR VALEUR PREDEFINIS ET TOUT LE TRALALA#}
 {#                    <div class="trick-options">#}
 {#                        <form action="#" method="post" class="options-form">#}
