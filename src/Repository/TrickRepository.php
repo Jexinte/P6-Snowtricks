@@ -52,12 +52,12 @@ class TrickRepository extends ServiceEntityRepository
         return $trick->getId();
     }
 
-    public function updateTrick(int $id, Trick $trick): bool
+    public function updateTrick(int $id, Trick $trick): void
     {
         $trickName = $trick->getNameUpdated();
         $trickDescription = $trick->getDescription();
         $trickGroup = $trick->getTrickGroup();
-        $trickNameFromDb = $this->getTrick($id)->getName();
+        $trickNameFromDb = current($this->findBy(["id" => $id]))->getName();
         $dataToUpdate = $this->getEntityManager()->getRepository(Trick::class)->findBy(["id" => $id]);
 
         if ($trickName == $trickNameFromDb) {
@@ -73,6 +73,5 @@ class TrickRepository extends ServiceEntityRepository
             }
         }
         $this->getEntityManager()->flush();
-        return true;
     }
 }

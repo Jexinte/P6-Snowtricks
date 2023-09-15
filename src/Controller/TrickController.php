@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use IntlDateFormatter;
@@ -159,18 +160,9 @@ class TrickController extends AbstractController
         return new Response($this->render($template, $parameters), 400);
     }
 
-    #[Route('/update-trick/{trickname}/{id}', name: 'update_trick_get', methods: ["GET"])]
-    public function updateTrickPage(
-        int $id,
-        string $trickname,
-        TrickRepository $trickRepository,
-        MediaRepository $mediaRepository,
-        Request $request
-    ): Response {
-        $template = "update_trick.twig";
-        $userConnected = $request->getSession()->get('user_connected');
-        $trick = current($trickRepository->findBy(["id" => $id]));
-        $formBuilder = $this->createFormBuilder()
+    public function initializeUpdateForm(Trick $trick) : FormBuilderInterface
+    {
+        return $this->createFormBuilder()
             ->add("nameupdated", TextType::class, options: [
                 'label' => 'Nom du trick',
                 'required' => false,
@@ -210,7 +202,20 @@ class TrickController extends AbstractController
                 ]
             ])->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']]
             )->setMethod("PUT");
-        $form = $formBuilder->getForm();
+
+    }
+    #[Route('/update-trick/{trickname}/{id}', name: 'update_trick_get', methods: ["GET"])]
+    public function updateTrickPage(
+        int $id,
+        string $trickname,
+        TrickRepository $trickRepository,
+        MediaRepository $mediaRepository,
+        Request $request
+    ): Response {
+        $template = "update_trick.twig";
+        $userConnected = $request->getSession()->get('user_connected');
+        $trick = current($trickRepository->findBy(["id" => $id]));
+        $form = $this->initializeUpdateForm($trick)->getForm();
         $medias = $mediaRepository->getTrickMedia($id);
         $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
         $dateTrick = $trick->getDate();
@@ -317,47 +322,7 @@ class TrickController extends AbstractController
         $template = "update_trick.twig";
         $trick = current($trickRepository->findBy(["id" => $id]));
         $media = $mediaRepository->findBy(["idTrick" => $id]);
-
-        $formBuilder = $this->createFormBuilder()
-            ->add("nameupdated", TextType::class, options: [
-                'label' => 'Nom du trick',
-                'required' => false,
-                'constraints' => [
-                    new Regex(
-                        pattern: "/^[A-ZÀ-ÿ][A-Za-zÀ-ÿ, .'\-\n]*$/u",
-                        message: 'Oops! Le format de votre saisie est incorrect, le nom du trick doit commencer par une lettre majuscule',
-                        match: true,
-                    )
-                ],
-                "attr" => ["value" => $trick->getName()]
-            ])
-            ->add('description', TextareaType::class, options: [
-                'label' => 'Description',
-                'required' => false,
-                'constraints' =>
-                    [
-                        new Regex(
-                            pattern: "/^[A-ZÀ-ÿ][A-Za-zÀ-ÿ, .'\-\n]*$/u",
-                            message: 'Oops! Le format de votre saisie est incorrect, votre description doit commencer par une lettre majuscule',
-                            match: true,
-                        )
-                    ],
-                "data" => $trick->getDescription(),
-            ])
-            ->add('trickGroup', ChoiceType::class, options: [
-                'label' => 'Sélectionner un groupe',
-                "choices" => [
-                    $trick->getTrickGroup() => true,
-                    "Grabs" => "Grabs",
-                    "Rotations" => "Rotations",
-                    "Flips" => "Flips",
-                    "Rotation désaxées" => "Rotation désaxées",
-                    "Slides" => "Slides",
-                    "One Foot Tricks" => "One Foot Tricks",
-                    "Old School" => "Old School"
-                ]
-            ])->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']]
-            )->setMethod("PUT");
+        $formBuilder = $this->initializeUpdateForm($trick);
         $form = $formBuilder->getForm();
         $form->handleRequest($request);
         if ($form->isValid() && $form->isSubmitted()) {
