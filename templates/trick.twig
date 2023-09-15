@@ -78,7 +78,6 @@
         <div id="form">
             <h2 class="text-center">Ajouter un commentaire </h2>
             {{ form_start(form,{'action':path('add_comment',{id:trick.id})}) }} {{ form_end(form) }}
-
         </div>
         {% else %}
             <h2 class="user-not-logged">Afin d'ajouter un commentaire,merci de vous <a href="/signin">connectez !</a>
