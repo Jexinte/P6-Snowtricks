@@ -77,15 +77,8 @@
         </div>
         <div id="form">
             <h2 class="text-center">Ajouter un commentaire </h2>
+            {{ form_start(form,{'action':path('add_comment',{id:trick.id})}) }} {{ form_end(form) }}
 
-            <form action="{{ path('add_comment',{id:trick.id}) }}" method="post">
-                <input class="form-control" type="text" name="comment" id="comment" placeholder="John">
-                <input type="hidden" name="token" value="{{ csrf_token('add_comment') }}">
-                <input type="submit" class="btn text-white bg-black mb-3" name="submit" id="submit"
-                       value="Envoyer">
-                <p class="error-comment">{{ exceptions.content_exception is defined ? exceptions.content_exception : '' }}</p>
-                <p class="error-comment">{{ exceptions.content_wrong_format_exception is defined ? exceptions.content_wrong_format_exception : '' }}</p>
-            </form>
         </div>
         {% else %}
             <h2 class="user-not-logged">Afin d'ajouter un commentaire,merci de vous <a href="/signin">connectez !</a>

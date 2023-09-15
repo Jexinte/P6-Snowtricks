@@ -25,25 +25,12 @@ class Comment
 
     #[ORM\Column(type: 'date')]
     private ?\DateTimeInterface $dateCreation = null;
-    #[Assert\NotBlank(
-        message: 'Ce champ ne peut être vide !',
-        groups: [
-            'content_exception',
 
-        ]
-    )]
-    #[Assert\Regex(
-        pattern: '/^[A-ZÀ-ÿ][A-ZÀ-ÿa-zÀ-ÿ0-9\s\-\_\!\@\#\$\%\&\'\(\)\*\+\,\.\:\/\;\=\?\[\]\^\`\{\|\}\~]{0,498}[A-ZÀ-ÿa-zÀ-ÿ0-9\s\-\_\!\@\#\$\%\&\'\(\)\*\+\,\.\:\/\;\=\?\[\]\^\`\{\|\}\~]$/',
-        message: 'Un commentaire 
-    doit commencer par une lettre majuscule
-     et ne peut excéder 500 caractères',
-        match: true,
-        groups: ['content_wrong_format_exception']
-    )]
+
     #[ORM\Column(length: 255)]
     private ?string $content = null;
 
-    public string $username;
+    public ?string $username = null;
     public function getId(): ?int
     {
         return $this->id;
@@ -113,11 +100,12 @@ class Comment
         $this->idTrick = $idTrick;
     }
 
-    public function setUsername(string $username): void
+    public function setUsername(?string $username): void
     {
         $this->username = $username;
     }  public function getUsername():string
     {
+
         return $this->username;
     }
 }

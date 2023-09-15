@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Media;
+use App\Form\Type\AddComment;
 use App\Repository\CommentRepository;
 use App\Repository\MediaRepository;
 use App\Repository\TrickRepository;
@@ -34,7 +35,8 @@ class TrickController extends AbstractController
         MediaRepository $mediaRepository,
         Request $request
     ): Response {
-        $this->template = "trick.twig";
+        $template = "trick.twig";
+        $form = $this->createForm(AddComment::class);
         $userConnected = $request->getSession()->get('user_connected');
         $trick = $trickRepository->getTrick($id);
         $medias = $mediaRepository->getTrickMedia($id);
@@ -50,22 +52,23 @@ class TrickController extends AbstractController
         $pages = ceil($nbComments/$commentsPerPage);
         $firstPage = ($currentPage * $commentsPerPage) - $commentsPerPage;
         $commentsPerPageRequest = $commentRepository->getCommentsPerPage($firstPage,$commentsPerPage);
-        $this->parameters["comments"] = $commentsPerPageRequest;
-        $this->parameters["pages"] = $pages;
-        $this->parameters["currentPage"] = $currentPage;
+        $parameters["comments"] = $commentsPerPageRequest;
+        $parameters["pages"] = $pages;
+        $parameters["currentPage"] = $currentPage;
         $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
         $frenchDateFormat = new IntlDateFormatter('fr_Fr', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
         $dateTrick = $trick->getDate();
         $date = $frenchDateFormat->format($dateTrick);
-        $this->parameters["trick"] = $trick;
-        $this->parameters["medias"] = $medias;
-        $this->parameters["trick_date"] = $date;
+        $parameters["form"] = $form;
+        $parameters["trick"] = $trick;
+        $parameters["medias"] = $medias;
+        $parameters["trick_date"] = $date;
 
 
 
-        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
 
-        return new Response($this->render($this->template, $this->parameters));
+        return new Response($this->render($template, $parameters));
     }
 
 
@@ -73,8 +76,8 @@ class TrickController extends AbstractController
     #[Route('/create-trick', name: 'create_trick_get', methods: ["GET"])]
     public function createTrickPage(): Response
     {
-        $this->template = "create_trick.twig";
-        return new Response($this->render($this->template));
+        $template = "create_trick.twig";
+        return new Response($this->render($template));
     }
 
 
@@ -85,7 +88,7 @@ class TrickController extends AbstractController
         TrickRepository $trickRepository,
         MediaRepository $mediaRepository
     ): Response {
-        $this->template = "create_trick.twig";
+        $template = "create_trick.twig";
 
         $trickEntity = new Trick();
         $trickEntity->setName($request->request->get('trick-name'));
@@ -145,8 +148,8 @@ class TrickController extends AbstractController
         }
 
 
-        $this->parameters["exceptions"] = $groupsViolations;
-        return new Response($this->render($this->template, $this->parameters), 400);
+        $parameters["exceptions"] = $groupsViolations;
+        return new Response($this->render($template, $parameters), 400);
     }
 
     #[Route('/update-trick/{trickname}/{id}', name: 'update_trick_get', methods: ["GET"])]
@@ -157,7 +160,7 @@ class TrickController extends AbstractController
         MediaRepository $mediaRepository,
         Request $request
     ): Response {
-        $this->template = "update_trick.twig";
+        $template = "update_trick.twig";
         $userConnected = $request->getSession()->get('user_connected');
         $trick = $trickRepository->getTrick($id);
         $medias = $mediaRepository->getTrickMedia($id);
@@ -165,20 +168,20 @@ class TrickController extends AbstractController
         $frenchDateFormat = new IntlDateFormatter('fr_Fr', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
         $dateTrick = $trick->getDate();
         $date = $frenchDateFormat->format($dateTrick);
-        $this->parameters["trick"] = $trick;
-        $this->parameters["medias"] = $medias;
-        $this->parameters["trick_date"] = $date;
-        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        return new Response($this->render($this->template, $this->parameters));
+        $parameters["trick"] = $trick;
+        $parameters["medias"] = $medias;
+        $parameters["trick_date"] = $date;
+        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        return new Response($this->render($template, $parameters));
     }
 
     #[Route('/update-trick-media/{id}', name: 'update_trick_media_get', methods: ["GET"])]
     public function updateTrickMediaPage(int $id, MediaRepository $mediaRepository): Response
     {
         $media = $mediaRepository->findBy(["id" => $id]);
-        $this->template = "update_media.twig";
-        $this->parameters["media"] = current($media);
-        return new Response($this->render($this->template, $this->parameters));
+        $template = "update_media.twig";
+        $parameters["media"] = current($media);
+        return new Response($this->render($template, $parameters));
     }
 
     #[Route('/update-trick-media/{id},', name: 'update_trick_media_put', methods: ["PUT"])]
@@ -188,7 +191,7 @@ class TrickController extends AbstractController
         ValidatorInterface $validator,
         MediaRepository $mediaRepository
     ): Response {
-        $this->template = "update_media.twig";
+        $template = "update_media.twig";
         $file = $request->files->get('file');
         $embedUrl = $request->request->get('embed-url');
         $numberOfErrors = 0;
@@ -250,9 +253,9 @@ class TrickController extends AbstractController
                 return $this->redirectToRoute('homepage');
         }
 
-        $this->parameters["media"] = current($media);
-        $this->parameters["exceptions"] = $groupsViolations;
-        return new Response($this->render($this->template, $this->parameters), 400);
+        $parameters["media"] = current($media);
+        $parameters["exceptions"] = $groupsViolations;
+        return new Response($this->render($template, $parameters), 400);
     }
 
     #[Route('/update-trick-content/{trickname}/{id}', name: 'update_trick_content_put', methods: ["PUT"])]
@@ -264,7 +267,7 @@ class TrickController extends AbstractController
         TrickRepository $trickRepository,
         MediaRepository $mediaRepository
     ): Response {
-        $this->template = "update_trick.twig";
+        $template = "update_trick.twig";
         $numberOfErrors = 0;
         $trick = $trickRepository->getTrick($id);
         $media = $mediaRepository->getTrickMedia($id);
@@ -296,11 +299,11 @@ class TrickController extends AbstractController
             }
         }
         $userConnected = $request->getSession()->get('user_connected');
-        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        $this->parameters["medias"] = $media;
-        $this->parameters["trick"] = $trick;
-        $this->parameters["exceptions"] = $groupsViolations;
-        return new Response($this->render($this->template, $this->parameters), 400);
+        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["medias"] = $media;
+        $parameters["trick"] = $trick;
+        $parameters["exceptions"] = $groupsViolations;
+        return new Response($this->render($template, $parameters), 400);
     }
 
     #[Route('/trick/delete/{trickname}/{id}', name: 'delete_trick', methods: ["DELETE"])]
