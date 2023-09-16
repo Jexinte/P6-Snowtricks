@@ -27,16 +27,6 @@ class CommentRepository extends ServiceEntityRepository
         return parent::getEntityManager();
     }
 
-    /**
-     * @param Comment $comment
-     * @return bool
-     */
-    public function saveComment(Comment $comment):bool
-    {
-        $this->getEntityManager()->persist($comment);
-        $this->getEntityManager()->flush();
-        return true;
-    }
 
     /**
      * @param int $id

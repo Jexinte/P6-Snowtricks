@@ -89,14 +89,6 @@ class MediaRepository extends ServiceEntityRepository
         }
     }
 
-    /**
-     * @param int $id
-     * @return Media[]
-     */
-    public function getTrickMedia(int $id): array
-    {
-        return $this->findBy(["idTrick" => $id]);
-    }
 
     public function updateTrickMedia(int $id, Media $media): ?bool
     {

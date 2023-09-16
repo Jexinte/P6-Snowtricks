@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Media;
 use App\Entity\Trick;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -24,23 +25,14 @@ class TrickRepository extends ServiceEntityRepository
 
 
     /**
-     * @return Trick[]
+     * @return EntityManagerInterface
      */
-    public function getTricks(): array
-    {
-        $this->getEntityManager()->getRepository(Trick::class);
-        return $this->findAll();
-    }
-
     public function getEntityManager()
     {
         return parent::getEntityManager();
     }
 
-    public function getTrick(int $id): ?Trick
-    {
-        return $this->findOneBy(["id" => $id]);
-    }
+
 
 
     public function createTrick(Trick $trick): int
