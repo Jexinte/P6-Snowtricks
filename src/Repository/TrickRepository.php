@@ -54,20 +54,21 @@ class TrickRepository extends ServiceEntityRepository
 
     public function updateTrick(int $id, Trick $trick): void
     {
-        $trickName = $trick->getNameUpdated();
+        $trickNameFromForm = $trick->getNameUpdated();
         $trickDescription = $trick->getDescription();
         $trickGroup = $trick->getTrickGroup();
-        $trickNameFromDb = current($this->findBy(["id" => $id]))->getName();
+        $trickNameAlreadyExist = current($this->findBy(["name" => $trickNameFromForm]))->getName();
         $dataToUpdate = $this->getEntityManager()->getRepository(Trick::class)->findBy(["id" => $id]);
 
-        if ($trickName == $trickNameFromDb) {
+        if (!$trickNameAlreadyExist) {
             foreach ($dataToUpdate as $record) {
+                $record->setName($trickNameFromForm);
                 $record->setDescription($trickDescription);
                 $record->setTrickGroup($trickGroup);
             }
+
         } else {
             foreach ($dataToUpdate as $record) {
-                $record->setName($trickName);
                 $record->setDescription($trickDescription);
                 $record->setTrickGroup($trickGroup);
             }
