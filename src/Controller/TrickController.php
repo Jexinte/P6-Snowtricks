@@ -49,7 +49,7 @@ class TrickController extends AbstractController
         $form = $this->createForm(AddComment::class);
         $userConnected = $request->getSession()->get('user_connected');
         $trick = $trickRepository->getTrick($id);
-        $medias = $mediaRepository->getTrickMedia($id);
+        $medias = $mediaRepository->findBy(["idTrick" => $id]);
         $trickComments = $commentRepository->getComments($id, $userRepository);
 
         if ($request->query->get('page') !== null && !empty($request->query->get('page'))) {
@@ -160,7 +160,7 @@ class TrickController extends AbstractController
         return new Response($this->render($template, $parameters), 400);
     }
 
-    public function initializeUpdateTrickContentForm(Trick $trick) : FormBuilderInterface
+    public function initializeUpdateTrickContentForm(Trick $trick): FormBuilderInterface
     {
         return $this->createFormBuilder()
             ->add("nameupdated", TextType::class, options: [
@@ -202,8 +202,8 @@ class TrickController extends AbstractController
                 ]
             ])->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']]
             )->setMethod("PUT");
-
     }
+
     #[Route('/update-trick/{trickname}/{id}', name: 'update_trick_get', methods: ["GET"])]
     public function updateTrickPage(
         int $id,
@@ -216,7 +216,7 @@ class TrickController extends AbstractController
         $userConnected = $request->getSession()->get('user_connected');
         $trick = current($trickRepository->findBy(["id" => $id]));
         $form = $this->initializeUpdateTrickContentForm($trick)->getForm();
-        $medias = $mediaRepository->getTrickMedia($id);
+        $medias = $mediaRepository->findBy(["idTrick" => $id]);
         $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
         $dateTrick = $trick->getDate();
         $date = $this->dateFormatter->format($dateTrick);
@@ -228,88 +228,6 @@ class TrickController extends AbstractController
         return new Response($this->render($template, $parameters));
     }
 
-    #[Route('/update-trick-media/{id}', name: 'update_trick_media_get', methods: ["GET"])]
-    public function updateTrickMediaPage(int $id, MediaRepository $mediaRepository): Response
-    {
-        $media = $mediaRepository->findBy(["id" => $id]);
-        $template = "update_media.twig";
-        $parameters["media"] = current($media);
-        return new Response($this->render($template, $parameters));
-    }
-
-    #[Route('/update-trick-media/{id},', name: 'update_trick_media_put', methods: ["PUT"])]
-    public function updateTrickMediaValidator(
-        int $id,
-        Request $request,
-        ValidatorInterface $validator,
-        MediaRepository $mediaRepository
-    ): Response {
-        $template = "update_media.twig";
-        $file = $request->files->get('file');
-        $embedUrl = $request->request->get('embed-url');
-        $numberOfErrors = 0;
-        $groups = [
-            "update_file_exception",
-            "url_exception"
-        ];
-        $groupsViolations = [];
-        $mediaEntity = new Media();
-        $media = $mediaRepository->findBy(["id" => $id]);
-
-        switch (true) {
-            case !empty($file):
-                $mediaEntity->setUpdatedFile($file);
-                foreach ($groups as $group) {
-                    $errors = $validator->validate($mediaEntity, null, $group);
-                    if (count($errors) >= 1) {
-                        $numberOfErrors++;
-                    }
-                    foreach ($errors as $error) {
-                        $groupsViolations[$group] = $error->getMessage();
-                    }
-                }
-
-                if ($numberOfErrors == 0) {
-                    $fileUpdated = $mediaRepository->updateTrickMedia($id, $mediaEntity);
-                    if ($fileUpdated) {
-                        $this->addFlash("success", "Votre fichier a bien été mis à jour !");
-                        return $this->redirectToRoute('homepage');
-                    }
-                }
-                break;
-            case !empty($embedUrl):
-                $mediaEntity->setEmbedUrl($embedUrl);
-                foreach ($groups as $group) {
-                    $errors = $validator->validate($mediaEntity, null, $group);
-                    if (count($errors) >= 1) {
-                        $numberOfErrors++;
-                    }
-                    foreach ($errors as $error) {
-                        $groupsViolations[$group] = $error->getMessage();
-                    }
-                }
-
-                if ($numberOfErrors == 0) {
-                    preg_match('/<iframe[^>]+src="([^"]+)"/i', $mediaEntity->getEmbedUrl(), $matches);
-                    $urlCleaned = $matches[1];
-                    $mediaEntity->setEmbedUrl($urlCleaned);
-                    $urlUpdated = $mediaRepository->updateTrickMedia($id, $mediaEntity);
-
-                    if ($urlUpdated) {
-                        $this->addFlash("success", "Votre fichier a bien été mis à jour !");
-                        return $this->redirectToRoute('homepage');
-                    }
-                }
-                break;
-            default:
-                $this->addFlash("success", "Votre fichier a bien été mis à jour !");
-                return $this->redirectToRoute('homepage');
-        }
-
-        $parameters["media"] = current($media);
-        $parameters["exceptions"] = $groupsViolations;
-        return new Response($this->render($template, $parameters), 400);
-    }
 
     #[Route('/update-trick-content/{trickname}/{id}', name: 'update_trick_content_put', methods: ["PUT"])]
     public function updateTrickContentValidator(
@@ -357,7 +275,7 @@ class TrickController extends AbstractController
         }
 
         $trick = $trickRepository->find(["id" => $id]);
-        $medias = $mediaRepository->getTrickMedia($id);
+        $medias = $mediaRepository->findBy(["idTrick" => $id]);
         foreach ($medias as $media) {
             if ($media->getMediaType() != "web") {
                 unlink("../public" . $media->getMediaPath());
@@ -372,16 +290,5 @@ class TrickController extends AbstractController
         return $this->redirectToRoute('homepage');
     }
 
-    #[Route('/delete-trick-media/{id}', name: 'delete_trick_media', methods: ["DELETE"])]
-    public function deleteTrickMedia(int $id, MediaRepository $mediaRepository): Response
-    {
-        $media = current($mediaRepository->findBy(["id" => $id]));
-        if ($media->getMediaType() != "web") {
-            unlink("../public" . $media->getMediaPath());
-        }
-        $mediaRepository->getEntityManager()->remove($media);
-        $mediaRepository->getEntityManager()->flush();
-        $this->addFlash("success", "La suppression du média a bien été prise en compte !");
-        return $this->redirectToRoute('homepage');
-    }
+
 }

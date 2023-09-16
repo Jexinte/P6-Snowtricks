@@ -14,32 +14,5 @@ create_trick_post:
     controller: App\Controller\TrickController::createTrickSubmit
     methods: ['POST']
 
-update_trick_get:
-    path: '/update-trick/{trickname}/{id}'
-    controller: App\Controller\TrickController::updateTrickPage
-    methods: [ 'GET' ]
 
-update_trick_media_get:
-    path: '/update-trick-media/{id}'
-    controller: App\Controller\TrickController::updateTrickMediaPage
-    methods: [ 'GET' ]
-
-update_trick_media_put:
-    path: '/update-trick-media/{id}'
-    controller: App\Controller\TrickController::updateTrickMediaValidator
-    methods: [ 'PUT' ]
-
-update_trick_content_put:
-    path: '/update-trick/{trickname}/{id}'
-    controller: App\Controller\TrickController::updateTrickContentValidator
-    methods: [ 'PUT' ]
-
-delete_trick:
-    path: '/trick/delete/{trickname}/{id}'
-    controller: App\Controller\TrickController::deleteTrick
-    methods: [ 'DELETE' ]
-delete_trick_media:
-    path: '/delete-trick-media/{id}'
-    controller: App\Controller\TrickController::deleteTrickMedia
-    methods: [ 'DELETE' ]
 

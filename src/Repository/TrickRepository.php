@@ -57,7 +57,7 @@ class TrickRepository extends ServiceEntityRepository
         $trickNameFromForm = $trick->getNameUpdated();
         $trickDescription = $trick->getDescription();
         $trickGroup = $trick->getTrickGroup();
-        $trickNameAlreadyExist = current($this->findBy(["name" => $trickNameFromForm]))->getName();
+        $trickNameAlreadyExist = current($this->findBy(["name" => $trickNameFromForm]));
         $dataToUpdate = $this->getEntityManager()->getRepository(Trick::class)->findBy(["id" => $id]);
 
         if (!$trickNameAlreadyExist) {

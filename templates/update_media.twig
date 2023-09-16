@@ -15,40 +15,16 @@
     </header>
     <div class="container-fluid" id="trick">
         <div class="row">
-            <form class="pt-5" action="{{ path('update_trick_media_put',{'id':media.id}) }}" enctype="multipart/form-data" method="post">
                 <div id="trick-content">
                     {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp" or media.mediaType == "mp4" or media.isBanner == 1 %}
                         <h1 class="text-center">Modifier une image / vidéo</h1>
-                        <div class="col-sm-12 col-md-12">
-                            {# ONE FILE #}
-                            <div class="mb-3 box">
-                                <label for="inputGroupFile02">Sélectionner un fichier</label>
-                                <input type="file" name="file" class="form-control">
-                                <p class="text-danger" id="error-files">
-                                    {{ exceptions.update_file_exception is defined ?  exceptions.update_file_exception : '' }}
-                                </p>
-                            </div>
-                        </div>
+                        {{ form_start(form,{'action':path('update_trick_media_form',{'id':media.id})}) }}{{ form_end(form) }}
 
                     {% elseif media.mediaType == "web" %}
                         <h1 class="text-center">Modifier URL Dailymotion / Youtube</h1>
-                        {#      EMBED VIDEO  #}
-                        <div class="col-sm-12 col-md-12">
-                            <div class="mb-3 box">
-                                <label for="embed-url" class="form-label">Url Vidéo Dailymotion / Youtube</label>
-                                <input class="form-control" type="text" name="embed-url" id="embed-url"
-                                       placeholder="Insérer ici l'adresse url de votre vidéo youtube commencant par https...">
-                                <p class="text-danger" id="error-video">
-                                    {#                            {{ dump(exceptions is defined ? exceptions : '') }} #}
-                                    {{ exceptions.url_exception is defined ? exceptions.url_exception : '' }}
-                                </p>
-                            </div>
-                        </div>
+                        {{ form_start(form,{'action':path('update_trick_media_form',{'id':media.id})}) }} {{ form_end(form) }}
                     {% endif %}
                 </div>
-                <input type="hidden" name="_method" value="PUT">
-                <input class="btn btn-dark" type="submit" value="Envoyer" id="submit">
-            </form>
                 </div>
         </div>
 
