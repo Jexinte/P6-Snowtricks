@@ -160,7 +160,7 @@ class TrickController extends AbstractController
         return new Response($this->render($template, $parameters), 400);
     }
 
-    public function initializeUpdateForm(Trick $trick) : FormBuilderInterface
+    public function initializeUpdateTrickContentForm(Trick $trick) : FormBuilderInterface
     {
         return $this->createFormBuilder()
             ->add("nameupdated", TextType::class, options: [
@@ -215,7 +215,7 @@ class TrickController extends AbstractController
         $template = "update_trick.twig";
         $userConnected = $request->getSession()->get('user_connected');
         $trick = current($trickRepository->findBy(["id" => $id]));
-        $form = $this->initializeUpdateForm($trick)->getForm();
+        $form = $this->initializeUpdateTrickContentForm($trick)->getForm();
         $medias = $mediaRepository->getTrickMedia($id);
         $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
         $dateTrick = $trick->getDate();
@@ -322,7 +322,7 @@ class TrickController extends AbstractController
         $template = "update_trick.twig";
         $trick = current($trickRepository->findBy(["id" => $id]));
         $media = $mediaRepository->findBy(["idTrick" => $id]);
-        $formBuilder = $this->initializeUpdateForm($trick);
+        $formBuilder = $this->initializeUpdateTrickContentForm($trick);
         $form = $formBuilder->getForm();
         $form->handleRequest($request);
         if ($form->isValid() && $form->isSubmitted()) {
