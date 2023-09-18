@@ -35,24 +35,41 @@ class TrickController extends AbstractController
         MediaRepository $mediaRepository,
         Request $request
     ): Response {
+        $this->template = "trick.twig";
+
         $userConnected = $request->getSession()->get('user_connected');
         $trick = $trickRepository->getTrick($id);
         $medias = $mediaRepository->getTrickMedia($id);
         $trickComments = $commentRepository->getComments($id, $userRepository);
+
+        if($request->query->get('page') !== null && !empty($request->query->get('page'))){
+            $currentPage = $request->query->get('page');
+        } else{
+            $currentPage = 1;
+        }
+        $nbComments = count($trickComments);
+        $commentsPerPage = 10;
+        $pages = ceil($nbComments/$commentsPerPage);
+        $firstPage = ($currentPage * $commentsPerPage) - $commentsPerPage;
+        $commentsPerPageRequest = $commentRepository->getCommentsPerPage($firstPage,$commentsPerPage);
+        $this->parameters["comments"] = $commentsPerPageRequest;
+        $this->parameters["pages"] = $pages;
+        $this->parameters["currentPage"] = $currentPage;
         $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
         $frenchDateFormat = new IntlDateFormatter('fr_Fr', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
         $dateTrick = $trick->getDate();
         $date = $frenchDateFormat->format($dateTrick);
-        $this->template = "trick.twig";
         $this->parameters["trick"] = $trick;
         $this->parameters["medias"] = $medias;
         $this->parameters["trick_date"] = $date;
-        $this->parameters["comments"] = $trickComments;
+
+
+
         $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        $request->getSession()->set("trick", $trick);
-        $request->getSession()->set("trick_date", $date);
+
         return new Response($this->render($this->template, $this->parameters));
     }
+
 
 
     #[Route('/create-trick', name: 'create_trick_get', methods: ["GET"])]
@@ -319,7 +336,11 @@ class TrickController extends AbstractController
     public function deleteTrickMedia(int $id, MediaRepository $mediaRepository): Response
     {
         $media = current($mediaRepository->findBy(["id" => $id]));
-        unlink("../public" . $media->getMediaPath());
+        if($media->getMediaType() != "web")
+        {
+            unlink("../public" . $media->getMediaPath());
+
+        }
         $mediaRepository->getEntityManager()->remove($media);
         $mediaRepository->getEntityManager()->flush();
         $this->addFlash("success", "La suppression du média a bien été prise en compte !");
