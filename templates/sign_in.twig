@@ -29,7 +29,7 @@
         <div class="row">
             {{ form_start(form,{'action':path('login')}) }}
             {{ form_row(form.name) }}
-            {{ form_row(form.password,{'attr' : {'class' : 'text-center'}}) }}
+            {{ form_row(form.password) }}
             <a class="text-center" href="/forgot-password" id="forgot-password">Mot de passe oublié ?</a>
             {{ form_end(form) }}
 
