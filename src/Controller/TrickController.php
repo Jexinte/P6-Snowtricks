@@ -26,12 +26,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class TrickController extends AbstractController
 {
 
-    private Trick $trick;
-    private IntlDateFormatter $dateFormatter;
+    private readonly IntlDateFormatter $dateFormatter;
 
     public function __construct()
     {
-        $this->trick = new Trick();
         $this->dateFormatter = new IntlDateFormatter('fr_Fr', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
     }
 
@@ -45,10 +43,15 @@ class TrickController extends AbstractController
         MediaRepository $mediaRepository,
         Request $request
     ): Response {
+
         $template = "trick.twig";
         $form = $this->createForm(AddComment::class);
         $userConnected = $request->getSession()->get('user_connected');
-        $trick = $trickRepository->getTrick($id);
+        $trick = current($trickRepository->findBy(["id" => $id]));
+        if(!$trick)
+        {
+            throw $this->createNotFoundException();
+        }
         $medias = $mediaRepository->findBy(["idTrick" => $id]);
         $trickComments = $commentRepository->getComments($id, $userRepository);
 
@@ -66,13 +69,11 @@ class TrickController extends AbstractController
         $parameters["pages"] = $pages;
         $parameters["currentPage"] = $currentPage;
         $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
-        $frenchDateFormat = new IntlDateFormatter('fr_Fr', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
-        $dateTrick = $trick->getDate();
-        $date = $frenchDateFormat->format($dateTrick);
+        $dateTrick = ucfirst($this->dateFormatter->format($trick->getDate()));
         $parameters["form"] = $form;
         $parameters["trick"] = $trick;
         $parameters["medias"] = $medias;
-        $parameters["trick_date"] = $date;
+        $parameters["trick_date"] = $dateTrick;
 
 
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
@@ -90,7 +91,7 @@ class TrickController extends AbstractController
 
 
     #[Route('/create-trick', name: 'create_trick_post', methods: ["POST"])]
-    public function createTrickSubmit(
+    public function createTrick(
         Request $request,
         ValidatorInterface $validator,
         TrickRepository $trickRepository,
@@ -243,14 +244,15 @@ class TrickController extends AbstractController
         $formBuilder = $this->initializeUpdateTrickContentForm($trick);
         $form = $formBuilder->getForm();
         $form->handleRequest($request);
+        $trickEntity = new Trick();
         if ($form->isValid() && $form->isSubmitted()) {
             $token = $request->request->all()["form"]["_token"];
             if ($this->isCsrfTokenValid("form", $token)) {
-                $this->trick->setNameUpdated($form->getData()["nameupdated"]);
-                $this->trick->setDescription($form->getData()["description"]);
-                $this->trick->setTrickGroup($form->getData()["trickGroup"]);
-                $trickRepository->updateTrick($id, $this->trick);
-                $this->addFlash("success", "Votre fichier a bien été mis à jour !");
+                $trickEntity->setNameUpdated($form->getData()["nameupdated"]);
+                $trickEntity->setDescription($form->getData()["description"]);
+                $trickEntity->setTrickGroup($form->getData()["trickGroup"]);
+                $trickRepository->updateTrick($id, $trickEntity);
+                $this->addFlash("success", "Le trick a bien été mis à jour !");
                 return $this->redirectToRoute('homepage');
             }
         }
@@ -283,7 +285,6 @@ class TrickController extends AbstractController
             $mediaRepository->getEntityManager()->remove($media);
         }
         $mediaRepository->getEntityManager()->flush();
-
         $trickRepository->getEntityManager()->remove($trick);
         $trickRepository->getEntityManager()->flush();
         $this->addFlash("success", "La suppression du trick a bien été prise en compte !");

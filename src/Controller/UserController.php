@@ -22,16 +22,6 @@ class UserController extends AbstractController
 {
 
 
-    public string $template = "";
-    /**
-     * @var array <string,int>
-     */
-    public array $parameters = [];
-    public ?int $code = null;
-
-    public function __construct(private readonly UserRepository $userRepository)
-    {
-    }
 
     #[Route(path: '/signup', methods: ["GET"])]
     public function signUpPage(Request $request): Response
@@ -165,14 +155,14 @@ L'équipe Snowtricks
     }
 
     #[Route(path: '/signup/account-validation', methods: ["GET"])]
-    public function checkToken(Request $request): ?Response
+    public function checkToken(Request $request,UserRepository $userRepository): ?Response
     {
         $cookie = $this->getToken($request);
         $tokenInSession = $request->getSession()->get('token');
         $response = new Response();
         $template = "account_validation.twig";
         if (!is_null($cookie) && $cookie == $tokenInSession) {
-            $userStatusUpdated = $this->userRepository->updateUserStatus($request);
+            $userStatusUpdated = $userRepository->updateUserStatus($request);
             if ($userStatusUpdated) {
                 $request->getSession()->remove("token");
                 $response->headers->clearCookie("token");
@@ -253,7 +243,6 @@ L'équipe Snowtricks
     #[Route(path: '/logout', methods: ["GET"])]
     public function logout(Request $request): ?RedirectResponse
     {
-        $template = "homepage.twig";
         $userConnected = $request->getSession()->get('user_connected');
         if (!$userConnected) {
             $this->createNotFoundException();
