@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\MediaRepository;
 use App\Repository\TrickRepository;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,20 +21,39 @@ class HomepageController extends AbstractController
     }
 
     #[Route(path: '/', name: 'homepage', methods: ["GET"])]
-    public function homepage(TrickRepository $trickRepository, Request $request): Response
-    {
+    public function homepage(
+        TrickRepository $trickRepository,
+        Request $request,
+        MediaRepository $mediaRepository
+    ): Response {
         $template = "homepage.twig";
         $parameters = [];
         $userConnected = $request->getSession()->get('user_connected');
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
         $tricks = $trickRepository->findAll();
         $result = [];
+        $medias = $mediaRepository->findAll();
+
         foreach ($tricks as $k => $value) {
-            $result[$k] = [
-                "name" => $value->getName(),
-                "slug" => strtolower($this->slugger->slug($value->getName())),
-                "id" => $value->getId()
-            ];
+            if (!empty($medias)) {
+                if( $medias[$k]->getIsBanner() && $value->getId() == $medias[$k]->getIdTrick())
+                {
+
+                $result[$k] = [
+                    "name" => $value->getName(),
+                    "slug" => strtolower($this->slugger->slug($value->getName())),
+                    "id" => $value->getId(),
+                    "main_banner" => $medias[$k]->getMediaPath()
+                ];
+            }else {
+                    $result[$k] = [
+                        "name" => $value->getName(),
+                        "slug" => strtolower($this->slugger->slug($value->getName())),
+                        "id" => $value->getId(),
+                    ];
+                }
+
+            }
         }
         $parameters["tricks"] = $result;
         return new Response($this->render($template, $parameters));

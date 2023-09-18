@@ -6,6 +6,7 @@ nav {
     display: flex;
     justify-content: space-between;
 }
+
 nav a {
     text-decoration: none;
     color: var(--black);
@@ -24,7 +25,7 @@ header {
     flex-direction: column;
     gap: 2em;
     width: 80%;
-    margin:0 auto;
+    margin: 0 auto;
 }
 
 #form form {
@@ -41,4 +42,25 @@ form .box {
 
 #banner-trick img {
     width: 100%;
+}
+
+@media screen and (max-width: 992px) {
+    #trick {
+        margin-bottom: 8em;
+    }
+
+    #banner-trick img {
+        height: 100%;
+    }
+
+    #banner-trick {
+        height: 600px;
+    }
+
+    footer {
+        padding-inline: 1em;
+    }
+
+
+
 }

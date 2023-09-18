@@ -45,6 +45,17 @@ header {
     gap: 3em;
     flex-direction: column;
     justify-content: center;
+    min-height: 100vh;
+}
+
+#trick-content form{
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+}
+
+#trick-content #form_save{
+    width: 100%;
 }
 
 #trick-content .medias {
@@ -226,4 +237,8 @@ header {
     display: flex;
     flex-direction: column;
     gap: 1.5em;
+}
+
+footer{
+    padding-inline: 1em;
 }

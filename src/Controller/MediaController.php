@@ -54,7 +54,7 @@ class MediaController extends AbstractController
     }
 
     #[Route('/update-trick-media/{id}', name: 'update_trick_media_page', methods: ["GET"])]
-    public function updateTrickMediaPage(int $id, MediaRepository $mediaRepository): Response
+    public function updateTrickMediaPage(int $id, MediaRepository $mediaRepository,Request $request): Response
     {
         $media = current($mediaRepository->findBy(["id" => $id]));
         if ($media->getMediaType() == "web") {
@@ -63,6 +63,8 @@ class MediaController extends AbstractController
             $form = $this->initializeUpdateFileForm()->getForm();
         }
         $template = "update_media.twig";
+        $userConnected = $request->getSession()->get('user_connected');
+        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
         $parameters["form"] = $form;
         $parameters["media"] = $media;
         return new Response($this->render($template, $parameters));
@@ -102,7 +104,7 @@ class MediaController extends AbstractController
                         $urlUpdated = $mediaRepository->updateTrickMedia($id, $mediaEntity);
 
                         if ($urlUpdated) {
-                            $this->addFlash("success", "Votre url a bien été mis à jour !");
+                            $this->addFlash("success", "Le lien a bien été mis à jour !");
                             return $this->redirectToRoute('homepage');
                         }
                         break;

@@ -33,21 +33,22 @@
         <div class="container-fluid" id="tricks-container">
             <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="tricks">
-                    {% if tricks is empty %}
-                        <h2 class="text-center">Aucun trick de disponible pour le moment !</h2>
-                    {% endif %}
                     {% for message in app.flashes('success') %}
                         {#                        Mise en page à faire plus tard #}
                         <div class="flash-notice">
                             {{ message }}
                         </div>
                     {% endfor %}
+                    {% if tricks is empty %}
+                        <h2 class="text-center">Aucun trick de disponible pour le moment !</h2>
+                    {% endif %}
+
                     {% if tricks is defined %}
                         {% for trick in tricks %}
                             <div class="trick">
                                 <div class="trick-banner">
                                     {# banniere du trick #}
-                                    <img src="/assets/img/banner/banner_homepage.jpg" alt="" width="250px">
+                                    <img src="{{ trick.main_banner is defined ? trick.main_banner : '/assets/img/banner/banner_homepage.jpg' }}" height="200" alt="">
                                 </div>
                                 <div class="trick-options">
                                     <a href="/{{ trick.slug }}/details/{{ trick.id }}"
@@ -87,8 +88,8 @@
         <p class="text-center footer-paragraph">Copyright @ 2023</p>
         <nav id="nav-mobile">
             <a href="/" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
-            <a href="#" class="mobile-link" id="bookmark"><i class="fa-solid fa-bookmark"></i></a>
             {% if user_connected is defined and user_connected == 1 %}
+                <a href="/create-trick" class="mobile-link" id="plus"><i class="fa-solid fa-plus"></i></a>
                 <a href="/logout" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
                 <a href="/signin" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
@@ -97,8 +98,10 @@
         </nav>
     </footer>
 
-    <script src="/assets/js/watchScrollBar.js">
-    </script>
-    <script src="/assets/js/deleteConfirm.js">
-    </script>
 {% endblock %}
+    {% block javascript %}
+    <script src="/assets/js/watch-scroll-bar.js">
+    </script>
+    <script src="/assets/js/delete-trick-homepage.js">
+    </script>
+    {% endblock %}

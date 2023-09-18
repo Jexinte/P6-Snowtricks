@@ -82,7 +82,7 @@ class CommentController extends AbstractController
         $commentsPerPage = 10;
         $pages = ceil($nbComments / $commentsPerPage);
         $firstPage = ($currentPage * $commentsPerPage) - $commentsPerPage;
-        $commentsPerPageRequest = $commentRepository->getCommentsPerPage($firstPage, $commentsPerPage);
+        $commentsPerPageRequest = $commentRepository->getCommentsPerPage($id,$firstPage, $commentsPerPage);
         $parameters["comments"] = $commentsPerPageRequest;
         $parameters["pages"] = $pages;
         $parameters["currentPage"] = $currentPage;

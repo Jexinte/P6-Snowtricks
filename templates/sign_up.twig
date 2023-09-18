@@ -31,5 +31,16 @@
           {{ form(form) }}
           </div>
       </div>
-
+    <footer id="footer">
+        <p class="text-center footer-paragraph">Copyright @ 2023</p>
+        <nav id="nav-mobile">
+            <a href="/" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
+            <a href="#" class="mobile-link" id="bookmark"><i class="fa-solid fa-bookmark"></i></a>
+            {% if user_connected is defined and user_connected == 1 %}
+                <a href="/logout" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
+            {% else %}
+                <a href="/signin" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
+            {% endif %}
+        </nav>
+    </footer>
 {% endblock %}

@@ -86,6 +86,7 @@ header {
     flex-direction: column;
     gap: 3em;
     border-top: 5px solid black;
+    padding-top: 5em;
 }
 
 #form form {
@@ -129,7 +130,6 @@ header {
 }
 
 
-
 #comments h2 {
     font-size: 2.5em;
     width: 100%;
@@ -140,7 +140,7 @@ header {
 
 .user-box {
     display: flex;
-    gap: 1em;
+    gap: 2em;
     align-items: center;
     flex-direction: column;
 }
@@ -157,17 +157,21 @@ header {
     text-align: center;
 }
 
-.media-box embed{
+.media-box embed {
     height: 100%;
-}.media-box iframe{
-    height: 100%;
+
 }
-.media-box .image{
+
+.media-box iframe {
     height: 100%;
+
 }
+
+
 
 .media-box {
     cursor: pointer;
+    transition: all 700ms ease-in;
 }
 
 .image-fullscreen {
@@ -181,24 +185,101 @@ header {
     z-index: 9999;
 }
 
-#form .error-comment{
-    color:red;
+#form .error-comment {
+    color: red;
 }
-.user-not-logged{
+
+.user-not-logged {
     margin-block: 4em;
     text-align: center;
 }
 
-#trick-content .trick-options
-{
+#trick-content .trick-options {
     display: flex;
     justify-content: center;
     gap: 3em;
 }
 
-.pagination
-{
+.show-comments {
+    border: 0 solid black;
+    padding: 1em;
+    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .2);
+    display: none;
+}
+
+#comments .page-link {
+    color: var(--black);
+}
+
+#comments .page-link:visited {
+    color: var(--black);
+}
+
+#comments .page-link:active {
+    color: var(--white);
+}
+
+#comments .pagination #before {
+    display: block;
+}
+
+#comments #next {
+    display: block;
+}
+
+.pagination {
     display: flex;
     justify-content: center;
     margin-top: 7em;
+}
+
+#comments .active > .page-link {
+    background-color: var(--black);
+    border-color: var(--black);;
+    color: var(--white);
+}
+
+#comments .page-link:focus {
+    background-color: var(--black);
+    border-color: var(--black);
+    color: var(--white);
+}
+
+#add_comment_save {
+    width: 100%;
+}
+
+@media screen and (max-width: 992px) {
+    .trick-details {
+        flex-direction: column;
+    }
+
+    footer {
+        padding-inline: 1em;
+        margin-top: 2em;
+    }
+
+    .page-number {
+        display: none;
+    }
+
+    .pagination {
+        display: flex;
+        gap: 2em;
+    }
+
+    #trick-content .media-box {
+        width: 300px;
+        height: 400px;
+    }
+
+    #trick-content .media-box img, iframe, embed {
+
+        width: 100%;
+    }
+
+    .media-box .image {
+        height: 100%;
+    }
 }

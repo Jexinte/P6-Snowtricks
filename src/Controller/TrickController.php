@@ -43,18 +43,17 @@ class TrickController extends AbstractController
         MediaRepository $mediaRepository,
         Request $request
     ): Response {
-
         $template = "trick.twig";
         $form = $this->createForm(AddComment::class);
         $userConnected = $request->getSession()->get('user_connected');
         $trick = current($trickRepository->findBy(["id" => $id]));
-        if(!$trick)
-        {
+        if (!$trick) {
             throw $this->createNotFoundException();
         }
         $medias = $mediaRepository->findBy(["idTrick" => $id]);
+        unset($medias[0]);
+        $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $id, "isBanner" => true]));
         $trickComments = $commentRepository->getComments($id, $userRepository);
-
         if ($request->query->get('page') !== null && !empty($request->query->get('page'))) {
             $currentPage = $request->query->get('page');
         } else {
@@ -64,7 +63,10 @@ class TrickController extends AbstractController
         $commentsPerPage = 10;
         $pages = ceil($nbComments / $commentsPerPage);
         $firstPage = ($currentPage * $commentsPerPage) - $commentsPerPage;
-        $commentsPerPageRequest = $commentRepository->getCommentsPerPage($firstPage, $commentsPerPage);
+        $commentsPerPageRequest = $commentRepository->getCommentsPerPage($id, $firstPage, $commentsPerPage);
+        foreach ($commentsPerPageRequest as $comment) {
+            $comment->date = ucfirst($this->dateFormatter->format($comment->getDateCreation()));
+        }
         $parameters["comments"] = $commentsPerPageRequest;
         $parameters["pages"] = $pages;
         $parameters["currentPage"] = $currentPage;
@@ -72,9 +74,10 @@ class TrickController extends AbstractController
         $dateTrick = ucfirst($this->dateFormatter->format($trick->getDate()));
         $parameters["form"] = $form;
         $parameters["trick"] = $trick;
+        $parameters["totalComments"] = $nbComments;
+        $parameters["banner"] = $mainBannerOfTrick;
         $parameters["medias"] = $medias;
         $parameters["trick_date"] = $dateTrick;
-
 
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
 
@@ -83,10 +86,12 @@ class TrickController extends AbstractController
 
 
     #[Route('/create-trick', name: 'create_trick_get', methods: ["GET"])]
-    public function createTrickPage(): Response
+    public function createTrickPage(Request $request): Response
     {
         $template = "create_trick.twig";
-        return new Response($this->render($template));
+        $userConnected = $request->getSession()->get('user_connected');
+        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        return new Response($this->render($template, $parameters));
     }
 
 
@@ -98,7 +103,7 @@ class TrickController extends AbstractController
         MediaRepository $mediaRepository
     ): Response {
         $template = "create_trick.twig";
-
+        $userConnected = $request->getSession()->get('user_connected');
         $trickEntity = new Trick();
         $trickEntity->setName($request->request->get('trick-name'));
         $trickEntity->setDescription($request->request->get('description'));
@@ -156,7 +161,7 @@ class TrickController extends AbstractController
             return $this->redirectToRoute('homepage');
         }
 
-
+        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
         $parameters["exceptions"] = $groupsViolations;
         return new Response($this->render($template, $parameters), 400);
     }
@@ -218,10 +223,13 @@ class TrickController extends AbstractController
         $trick = current($trickRepository->findBy(["id" => $id]));
         $form = $this->initializeUpdateTrickContentForm($trick)->getForm();
         $medias = $mediaRepository->findBy(["idTrick" => $id]);
+        unset($medias[0]);
+        $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $id, "isBanner" => true]));
         $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
         $dateTrick = $trick->getDate();
         $date = $this->dateFormatter->format($dateTrick);
         $parameters["trick"] = $trick;
+        $parameters["banner"] = $mainBannerOfTrick;
         $parameters["medias"] = $medias;
         $parameters["trick_date"] = $date;
         $parameters["form"] = $form;
@@ -287,7 +295,8 @@ class TrickController extends AbstractController
         $mediaRepository->getEntityManager()->flush();
         $trickRepository->getEntityManager()->remove($trick);
         $trickRepository->getEntityManager()->flush();
-        $this->addFlash("success", "La suppression du trick a bien été prise en compte !");
+
+        $this->addFlash("success", "La suppression du trick a bien été pris en compte !");
         return $this->redirectToRoute('homepage');
     }
 

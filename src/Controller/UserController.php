@@ -79,7 +79,6 @@ class UserController extends AbstractController
         $user = new User();
         $form = $this->createForm(SignUp::class,$user);
         $form->handleRequest($request);
-        $serverPath = $this->getParameter('server.path');
 
         if($form->isSubmitted() && $form->isValid())
         {
@@ -91,7 +90,7 @@ class UserController extends AbstractController
                 $user = $form->getData();
                 $fileExt = explode('.', $user->getFile()->getClientOriginalName());
                 $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
-                $imgPath = $serverPath."assets/img/$filename";
+                $imgPath = "/assets/img/$filename";
                 $user->setProfileImage($imgPath);
                 $user->setStatus(UserStatus::ACCOUNT_NOT_ACTIVATE);
                 $tmp = $user->getFile()->getPathname();

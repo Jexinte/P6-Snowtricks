@@ -4,7 +4,7 @@
     <link rel="icon" type="image/png" href="/favicon.ico"/>
 {% endblock %}
 {% block title %}
-    <title>Création d'un trick | {{ parent ()}}  </title>
+    <title>Création d'un trick | {{ parent () }}  </title>
 {% endblock %}
 
 {% block css_page %}
@@ -18,115 +18,118 @@
 
         </nav>
     </header>
-<div class="container-fluid" id="trick">
-    <div class=" container-fluid" id="banner-trick">
-        {# Bannière du trick sélectionné #}
-        <img src="/assets/img/banner/banner_homepage.jpg" alt="banner">
-    </div>
+    <div class="container-fluid" id="trick">
+        <div class=" container-fluid" id="banner-trick">
+            {# Bannière du trick sélectionné #}
+            <img src="/assets/img/banner/banner_homepage.jpg" alt="banner">
+        </div>
 
-    <div class="container-fluid" id="form">
-        <div class="row">
-            <form class="pt-5" action="{{ path('create_trick_post')}}" enctype="multipart/form-data" method="post" >
+        <div class="container-fluid" id="form">
+            <div class="row">
+                <form class="pt-5" action="{{ path('create_trick_post') }}" enctype="multipart/form-data" method="post">
 
-                {#         NOM TRICK #}
-                <div class="col-sm-12 col-md-12">
-                    <div class="mb-3 box">
-                        <label for="trick-name" class="form-label">Nom du trick</label>
-                        <input class="form-control" type="text" name="trick-name" id="trick-name" placeholder="Ollie Molie">
-                        <p class="text-danger" id="error-trick-name">
-                            {{ exceptions.name_exception is defined ? exceptions.name_exception : '' }}
-                        </p>
+                    {#         NOM TRICK #}
+                    <div class="col-sm-12 col-md-12">
+                        <div class="mb-3 box">
+                            <label for="trick-name" class="form-label">Nom du trick</label>
+                            <input class="form-control" type="text" name="trick-name" id="trick-name"
+                                   placeholder="Ollie Molie">
+                            <p class="text-danger" id="error-trick-name">
+                                {{ exceptions.name_exception is defined ? exceptions.name_exception : '' }}
+                            </p>
+                        </div>
                     </div>
-                </div>
 
-                {#         DESCRIPTION TRICK #}
-                <div class="col-sm-12 col-md-12">
-                    <div class="mb-3 box">
-                        <label for="description">Description :</label>
-                        <textarea class="form-control" name="description" id="description" cols="30" rows="10" placeholder="Exprimez-vous !"></textarea>
-                        <p class="text-danger" id="description-trick-name">
-                            {{ exceptions.description_exception is defined ? exceptions.description_exception : '' }}
-                        </p>
+                    {#         DESCRIPTION TRICK #}
+                    <div class="col-sm-12 col-md-12">
+                        <div class="mb-3 box">
+                            <label for="description">Description :</label>
+                            <textarea class="form-control" name="description" id="description" cols="30" rows="10"
+                                      placeholder="Exprimez-vous !"></textarea>
+                            <p class="text-danger" id="description-trick-name">
+                                {{ exceptions.description_exception is defined ? exceptions.description_exception : '' }}
+                            </p>
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-12 col-md-12">
-                    {# GROUP TRICK #}
-                    <div class="mb-3 box">
-                        <label for="group">Sélectionner un groupe</label>
+                    <div class="col-sm-12 col-md-12">
+                        {# GROUP TRICK #}
+                        <div class="mb-3 box">
+                            <label for="group">Sélectionner un groupe</label>
 
-                        <select class="form-select" id="group" name="selected_options">
+                            <select class="form-select" id="group" name="selected_options">
 
-                            <option selected></option>
-                            <option value="Grabs">Grabs</option>
-                            <option value="Rotations">Rotations</option>
-                            <option value="Flips">Flips</option>
-                            <option value="Rotation désaxées">Rotation désaxées</option>
-                            <option value="Slides">Slides</option>
-                            <option value="One Foot Tricks">One Foot Tricks</option>
-                            <option value="Old School">Old School</option>
-                        </select>
-                        <p class="text-danger" id="error-group">
-                            {{ exceptions.group_exception is defined ?  exceptions.group_exception : '' }}
-                        </p>
+                                <option selected></option>
+                                <option value="Grabs">Grabs</option>
+                                <option value="Rotations">Rotations</option>
+                                <option value="Flips">Flips</option>
+                                <option value="Rotation désaxées">Rotation désaxées</option>
+                                <option value="Slides">Slides</option>
+                                <option value="One Foot Tricks">One Foot Tricks</option>
+                                <option value="Old School">Old School</option>
+                            </select>
+                            <p class="text-danger" id="error-group">
+                                {{ exceptions.group_exception is defined ?  exceptions.group_exception : '' }}
+                            </p>
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-12 col-md-12">
-                    {# ONE FILE #}
-                    <div class="mb-3 box">
-                        <label  for="inputGroupFile02">Sélectionner une image qui servira de bannière pour le trick (obligatoire)</label>
-                        <input type="file" name="image" class="form-control">
-                        <p class="text-danger" id="error-files">
-                            {{ exceptions.banner_exception is defined ?  exceptions.banner_exception : '' }}
-                        </p>
+                    <div class="col-sm-12 col-md-12">
+                        {# ONE FILE #}
+                        <div class="mb-3 box">
+                            <label for="inputGroupFile02">Sélectionner une image qui servira de bannière pour le trick
+                                (obligatoire)</label>
+                            <input type="file" name="image" class="form-control">
+                            <p class="text-danger" id="error-files">
+                                {{ exceptions.banner_exception is defined ?  exceptions.banner_exception : '' }}
+                            </p>
+                        </div>
                     </div>
-                </div>
 
-                <div class="col-sm-12 col-md-12">
-                    {# MULTIPLE FILES #}
-                    <div class="mb-3 box">
-                        <label  for="inputGroupFile02">Sélectionner une / plusieur(s) image(s)</label>
-                        <input type="file" name="images[]" class="form-control" id="images" multiple>
-                        <p class="text-danger" id="error-files">
-                            {{ exceptions.illustration_exception is defined ?  exceptions.illustration_exception : '' }}
-                        </p>
+                    <div class="col-sm-12 col-md-12">
+                        {# MULTIPLE FILES #}
+                        <div class="mb-3 box">
+                            <label for="inputGroupFile02">Sélectionner une / plusieur(s) image(s)</label>
+                            <input type="file" name="images[]" class="form-control" id="images" multiple>
+                            <p class="text-danger" id="error-files">
+                                {{ exceptions.illustration_exception is defined ?  exceptions.illustration_exception : '' }}
+                            </p>
+                        </div>
                     </div>
-                </div>
 
 
-                {# VIDEO TRICK #}
+                    {# VIDEO TRICK #}
 
-                <div class="col-sm-12 col-md-12">
-                    <div class="mb-3 box">
-                        <label  for="videos">Sélectionner une / plusieur(s) vidéo(s)</label>
-                        <input type="file" name="videos[]" class="form-control" id="videos" multiple>
-                        <p class="text-danger" id="error-video">
-                            {{ exceptions.video_exception is defined ? exceptions.video_exception : '' }}
-                        </p>
+                    <div class="col-sm-12 col-md-12">
+                        <div class="mb-3 box">
+                            <label for="videos">Sélectionner une / plusieur(s) vidéo(s)</label>
+                            <input type="file" name="videos[]" class="form-control" id="videos" multiple>
+                            <p class="text-danger" id="error-video">
+                                {{ exceptions.video_exception is defined ? exceptions.video_exception : '' }}
+                            </p>
+                        </div>
                     </div>
-                </div>
 
 
-                {#      EMBED VIDEO  #}
-                <div class="col-sm-12 col-md-12">
-                    <div class="mb-3 box">
-                        <label for="embed-url" class="form-label">Url Vidéo Dailymotion / Youtube</label>
-                        <input class="form-control" type="text" name="embed-url" id="embed-url" placeholder="Insérer ici l'adresse url de votre vidéo youtube commencant par https...">
-                        <p class="text-danger" id="error-video">
-{#                            {{ dump(exceptions is defined ? exceptions : '') }}#}
-                            {{ exceptions.url_exception is defined ? exceptions.url_exception : '' }}
-                        </p>
+                    {#      EMBED VIDEO  #}
+                    <div class="col-sm-12 col-md-12">
+                        <div class="mb-3 box">
+                            <label for="embed-url" class="form-label">Url Vidéo Dailymotion / Youtube</label>
+                            <input class="form-control" type="text" name="embed-url" id="embed-url"
+                                   placeholder="Insérer ici l'adresse url de votre vidéo youtube commencant par https...">
+                            <p class="text-danger" id="error-video">
+                                {#                            {{ dump(exceptions is defined ? exceptions : '') }} #}
+                                {{ exceptions.url_exception is defined ? exceptions.url_exception : '' }}
+                            </p>
+                        </div>
                     </div>
-                </div>
-                <input class="btn btn-dark" type="submit" value="Envoyer">
-            </form>
+                    <input class="btn btn-dark" type="submit" value="Envoyer">
+                </form>
+            </div>
         </div>
     </div>
-</div>
     <footer id="footer">
         <p class="text-center footer-paragraph">Copyright @ 2023</p>
         <nav id="nav-mobile">
             <a href="/" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
-            <a href="#" class="mobile-link" id="bookmark"><i class="fa-solid fa-bookmark"></i></a>
             {% if user_connected is defined and user_connected == 1 %}
                 <a href="/logout" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}

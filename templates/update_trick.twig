@@ -15,17 +15,25 @@
     </header>
     <div class="container-fluid" id="trick">
         <div class=" container-fluid" id="banner-trick">
-            <img src="{{ medias is defined and medias[0].isBanner == 1 ? medias[0].mediaPath : '/assets/img/banner/banner_homepage.jpg' }}"
-                 alt="banner">
-            <div class="options-box">
-                <a href="{{ path('update_trick_media_page',{'id':medias[0].id}) }}" class="options-media" id="update"><i
-                            class="fa-solid fa-pencil"></i></a>
-                <a href="{{ path('delete_trick_media',{'id':medias[0].id}) }}" class="options-media" id="delete"><i
-                            class="fa-solid fa-trash"></i></a>
-            </div>
+            {% if banner is defined and banner.isBanner is defined %}
+                <img src="{{ banner.mediaPath }}"
+                     alt="banner">
+                <div class="options-box">
+                    <a href="{{ path('update_trick_media_page',{'id':banner.id}) }}" class="options-media"
+                       id="update"><i
+                                class="fa-solid fa-pencil"></i></a>
+                    <a href="{{ path('delete_trick_media',{'id':banner.id}) }}" class="options-media delete" id="delete"><i
+                                class="fa-solid fa-trash"></i></a>
+                </div>
+            {% else %}
+                <img src="/assets/img/banner/banner_homepage.jpg"
+                     alt="banner">
+            {% endif %}
+
         </div>
         <div id="trick-content">
-            <h1>{{ trick is defined ? trick.name : '' }}</h1>
+
+
             <div class="medias">
                 {% for media in medias %}
 
@@ -36,7 +44,7 @@
                             <div class="options-box">
                                 <a href="{{ path('update_trick_media_page',{'id':media.id}) }}" class="options-media"
                                    id="update"><i class="fa-solid fa-pencil"></i></a>
-                                <a href="{{ path('delete_trick_media',{'id':media.id}) }}" class="options-media"
+                                <a href="{{ path('delete_trick_media',{'id':media.id}) }}" class="options-media delete"
                                    id="delete"><i class="fa-solid fa-trash"></i></a>
                             </div>
                         </div>
@@ -49,7 +57,7 @@
                             <div class="options-box">
                                 <a href="{{ path('update_trick_media_page',{'id':media.id}) }}" class="options-media"
                                    id="update"><i class="fa-solid fa-pencil"></i></a>
-                                <a href="{{ path('delete_trick_media',{'id':media.id}) }}" class="options-media"
+                                <a href="{{ path('delete_trick_media',{'id':media.id}) }}" class="options-media delete"
                                    id="delete"><i class="fa-solid fa-trash"></i></a>
                             </div>
                         </div>
@@ -60,7 +68,7 @@
                             <div class="options-box">
                                 <a href="{{ path('update_trick_media_page',{'id':media.id}) }}" class="options-media"
                                    id="update"><i class="fa-solid fa-pencil"></i></a>
-                                <a href="{{ path('delete_trick_media',{'id':media.id}) }}" class="options-media"
+                                <a href="{{ path('delete_trick_media',{'id':media.id}) }}" class="options-media delete"
                                    id="delete"><i class="fa-solid fa-trash"></i></a>
                             </div>
                         </div>
@@ -75,7 +83,6 @@
                 <div class="row">
                     {% if user_connected is defined and user_connected == 1 %}
                         {{ form_start(form,{'action':path('update_trick_content_put',{'trickname':trick.name|lower,'id':trick.id})}) }} {{ form_end(form) }}
-
                     {% endif %}
                 </div>
             </div>
@@ -87,7 +94,7 @@
         <p class="text-center footer-paragraph">Copyright @ 2023</p>
         <nav id="nav-mobile">
             <a href="/" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
-            <a href="#" class="mobile-link" id="bookmark"><i class="fa-solid fa-bookmark"></i></a>
+            <a href="/create-trick" class="mobile-link" id="plus"><i class="fa-solid fa-plus"></i></a>
             {% if user_connected is defined and user_connected == 1 %}
                 <a href="/logout" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
@@ -96,5 +103,9 @@
             {% endif %}
         </nav>
     </footer>
-    <script src="/assets/js/mediaAnimation.js"></script>
+
 {% endblock %}
+    {% block javascript %}
+    <script src="/assets/js/media-animation.js"></script>
+    <script src="/assets/js/delete-trick-on-update.js"></script>
+    {% endblock %}

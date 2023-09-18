@@ -15,14 +15,13 @@
     </header>
     <div class="container-fluid" id="trick">
         <div class=" container-fluid" id="banner-trick">
-            {# Bannière du trick sélectionné #}
-            {% if medias is defined and medias is not empty and medias[0].isBanner == 1 %}
-                <img src="{{ medias[0].mediaPath }}"
+            {% if banner is defined and banner.isBanner is defined or banner == 1 %}
+                <img src="{{ banner.mediaPath }}"
                      alt="banner">
-                {% else %}
-                    <img src="/assets/img/banner/banner_homepage.jpg" alt="banner">
+            {% else %}
+                <img src="/assets/img/banner/banner_homepage.jpg"
+                     alt="banner">
             {% endif %}
-
         </div>
         <div id="trick-content">
             <h1>{{ trick is defined ? trick.name : '' }}</h1>
@@ -65,7 +64,6 @@
 
                     <a href="{{ path('update_trick_get',{'id':trick.id,'trickname':trick.name}) }}"
                        class="options-button" id="update"><i class="fa-solid fa-pencil"></i></a>
-                    {#                        <a href="#" class="options-button"  id="delete"><i class="fa-solid fa-trash"></i></a> #}
                     <form action="{{ path('delete_trick',{trickname:trick.name,id:trick.id}) }}" method="post">
                         <input type="hidden" name="_method" value="DELETE">
                         <button type="submit" class="options-button" id="delete"><i class="fa-solid fa-trash">
@@ -76,13 +74,12 @@
             </div>
         </div>
         <div id="form">
-            <h2 class="text-center">Ajouter un commentaire </h2>
             {{ form_start(form,{'action':path('add_comment',{id:trick.id})}) }} {{ form_end(form) }}
-        </div>
         {% else %}
             <h2 class="user-not-logged">Afin d'ajouter un commentaire,merci de vous <a href="/signin">connectez !</a>
             </h2>
         {% endif %}
+        </div>
 
         <div id="comments">
             <h2>Commentaires</h2>
@@ -91,34 +88,38 @@
             {% for comment in  comments %}
             <div class="user-box">
                 <img src="{{ comment.userProfileImage }}" alt="" width="200">
-                <h2>{{ comment.username }}</h2>
+                <p>{{ comment.username }}, le {{ comment.date }}</p>
                 <p class="comment">{{ comment.content }}</p>
             </div>
-        </div>
+{#        </div>#}
         {% endfor %}
-        <ul class="pagination">
-            <li class="page-item {{  currentPage == 1 ? "disabled" : '' }}">
-            <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{currentPage - 1 }}" class="page-link">Précédent</a>
-            </li>
-            {% for page in 1..pages %}
-                <li class="page-item {{ currentPage == page ? "active" : ''}} ">
-                    <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{ page }} " class="page-link">{{ page }}</a>
-                </li>
-            {% endfor %}
-                <li class="page-item {{ currentPage == pages ? "disabled" : ''}}">
-                    <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{  currentPage + 1 }}" class="page-link">Suivant</a>
-                </li>
-        </ul>
+                {% if totalComments > 10 %}
+                    <ul class="pagination">
+                        <li class="page-item {{  currentPage == 1 ? "disabled" : '' }}" id="previous">
+                            <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{currentPage - 1 }}" class="page-link">Précédent</a>
+                        </li>
+                        {% for page in 1..pages %}
+                            <li class="page-item {{ currentPage == page ? "active" : ''}} page-number">
+                                <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{ page }} " class="page-link">{{ page }}</a>
+                            </li>
+                        {% endfor %}
+                        <li class="page-item {{ currentPage == pages ? "disabled" : ''}} " id="next">
+                            <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{  currentPage + 1 }}" class="page-link">Suivant</a>
+                        </li>
+                    </ul>
+                {% endif %}
+
     {% else %}
         <h2>Soyez le premier commentaire !</h2>
         {% endif %}
 
     </div>
+    </div>
     <footer id="footer">
         <p class="text-center footer-paragraph">Copyright @ 2023</p>
         <nav id="nav-mobile">
             <a href="/" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
-            <a href="#" class="mobile-link" id="bookmark"><i class="fa-solid fa-bookmark"></i></a>
+            <a href="/create-trick" class="mobile-link" id="plus"><i class="fa-solid fa-plus"></i></a>
             {% if user_connected is defined and user_connected == 1 %}
                 <a href="/logout" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
@@ -127,5 +128,9 @@
             {% endif %}
         </nav>
     </footer>
-    <script src="/assets/js/mediaAnimation.js"></script>
+
 {% endblock %}
+ {% block javascript %}
+ <script src="/assets/js/media-animation.js"></script>
+ <script src="/assets/js/delete-trick-on-display.js"></script>
+ {% endblock %}
