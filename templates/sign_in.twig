@@ -27,35 +27,12 @@
     <div class="container-fluid" id="login">
         <h1 class="text-center" >Connexion</h1>
         <div class="row">
-            <form class="pt-5" action="{{ path('login') }}" enctype="multipart/form-data" method="post" >
-                {# USER #}
-                <div class="col-sm-12 col-md-12">
-                    <div class="mb-3 user-box">
-                        <label for="username" class="form-label">Utilisateur</label>
-                        <input class="form-control" type="text" name="username" id="username" placeholder="John">
-                        <p class="text-danger" id="error-username">
-                            {{ exceptions.username_exception_sign_in is defined ? exceptions.username_exception_sign_in : '' }}
+            {{ form_start(form,{'action':path('login')}) }}
+            {{ form_row(form.name) }}
+            {{ form_row(form.password,{'attr' : {'class' : 'text-center'}}) }}
+            <a class="text-center" href="/forgot-password" id="forgot-password">Mot de passe oublié ?</a>
+            {{ form_end(form) }}
 
-                        </p>
-                    </div>
-                </div>
-                <div class="col-sm-12 col-md-12">
-                    <div class="mb-3 password-box">
-                        <label for="password" class="form-label">Mot de passe</label>
-                        <input class="form-control" type="password" name="password" id="password" placeholder="">
-                        <p class="text-danger" id="error-password">
-                            {{ exceptions.password_exception_sign_in is defined ? exceptions.password_exception_sign_in : '' }}
-                        </p>
-                    </div>
-                </div>
-                <div class="col-sm-12 col-md-12">
-                    <div class="mb-3 forgot-password-box">
-                        <a class="text-center" href="/forgot-password" id="forgot-password">Mot de passe oublié ?</a>
-                    </div>
-                </div>
-                <input type="hidden" name="token" value="{{ csrf_token('login') }}">
-                <input type="submit" class="btn text-white bg-black mb-3" name="submit" id="submit" value="Envoyer">
-            </form>
 
         </div>
     </div>

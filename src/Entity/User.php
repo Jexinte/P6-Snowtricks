@@ -9,10 +9,10 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[UniqueEntity(
-    fields: 'name',
-    message: "Le nom utilisateur est déjà pris !",
-)]
+//#[UniqueEntity(
+//    fields: 'name',
+//    message: "Le nom utilisateur est déjà pris !",
+//)]
 #[UniqueEntity(
     fields: 'email',
     message: "L'adresse email n'est pas disponible, merci d'en sélectionner une autre !",

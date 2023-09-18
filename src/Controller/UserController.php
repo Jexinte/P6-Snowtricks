@@ -7,6 +7,7 @@ use App\Enumeration\UserStatus;
 use App\Enumeration\CodeStatus;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,10 +18,10 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use App\Form\Type\SignUp;
+use App\Form\Type\Login;
 
 class UserController extends AbstractController
 {
-
 
 
     #[Route(path: '/signup', methods: ["GET"])]
@@ -29,7 +30,7 @@ class UserController extends AbstractController
         $userConnected = $request->getSession()->get('user_connected');
         $template = "sign_up.twig";
         $user = new User();
-        $form = $this->createForm(SignUp::class,$user);
+        $form = $this->createForm(SignUp::class, $user);
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
         $parameters["form"] = $form;
         return new Response($this->render($template, $parameters));
@@ -39,8 +40,11 @@ class UserController extends AbstractController
     public function signInPage(Request $request): Response
     {
         $userConnected = $request->getSession()->get('user_connected');
+        $user = new User();
+        $form = $this->createForm(Login::class, $user);
         $template = "sign_in.twig";
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["form"] = $form;
         return new Response($this->render($template, $parameters));
     }
 
@@ -77,15 +81,13 @@ class UserController extends AbstractController
     ): ?Response {
         $template = "sign_up.twig";
         $user = new User();
-        $form = $this->createForm(SignUp::class,$user);
+        $form = $this->createForm(SignUp::class, $user);
         $form->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid())
-        {
+        if ($form->isSubmitted() && $form->isValid()) {
             $token = $request->request->all()["sign_up"]["_token"];
 
-            if($this->isCsrfTokenValid("sign_up",$token))
-            {
+            if ($this->isCsrfTokenValid("sign_up", $token)) {
                 $user->setPassword(password_hash($user->getPassword(), PASSWORD_DEFAULT));
                 $user = $form->getData();
                 $fileExt = explode('.', $user->getFile()->getClientOriginalName());
@@ -99,7 +101,7 @@ class UserController extends AbstractController
                 $userRepository->getEntityManager()->persist($user);
                 $userRepository->getEntityManager()->flush();
                 $user->setCreated(true);
-                $this->sendMailToUser($mailer, $user,$request);
+                $this->sendMailToUser($mailer, $user, $request);
             }
             return $this->redirectToRoute("homepage");
         }
@@ -130,9 +132,7 @@ class UserController extends AbstractController
     }
 
 
-
-
-    public function sendMailToUser(MailerInterface $mailer, User $user,Request $request): void
+    public function sendMailToUser(MailerInterface $mailer, User $user, Request $request): void
     {
         if ($user->isCreated()) {
             $this->setToken();
@@ -154,7 +154,7 @@ L'équipe Snowtricks
     }
 
     #[Route(path: '/signup/account-validation', methods: ["GET"])]
-    public function checkToken(Request $request,UserRepository $userRepository): ?Response
+    public function checkToken(Request $request, UserRepository $userRepository): ?Response
     {
         $cookie = $this->getToken($request);
         $tokenInSession = $request->getSession()->get('token');
@@ -181,60 +181,57 @@ L'équipe Snowtricks
             $this->render(
                 $template,
                 $parameters
-            ),CodeStatus::CLIENT
+            ), CodeStatus::CLIENT
         );
     }
 
-    #[Route(path: '/signin/validation',name:'login', methods: ["POST"])]
+    #[Route(path: '/signin/validation', name: 'login', methods: ["POST"])]
     public function signInValidator(
         Request $request,
         UserRepository $userRepository,
-        ValidatorInterface $validator
     ): ?Response {
         $template = "sign_in.twig";
         $parameters = [];
         $user = new User();
-        $numberOfErrors = 0;
-        $user->setName($request->request->get("username"));
-        $user->setPassword($request->request->get("password"));
-        $token = $request->request->get('token');
-        $groups = [
-            "username_exception_sign_in",
-            "password_exception_sign_in"
-        ];
-        $groupsViolations = [];
-        foreach ($groups as $group) {
-            $errors = $validator->validate($user, null, $group);
-            if (count($errors) >= 1) {
-                $numberOfErrors++;
-            }
-            foreach ($errors as $error) {
-                $groupsViolations[$group] = $error->getMessage();
+        $form = $this->createForm(Login::class, $user);
+        $token = $request->request->all()["login"]["_token"];
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($this->isCsrfTokenValid("login", $token)) {
+                $userData = $form->getData();
+
+                $result = $userRepository->login($userData);
+
+                switch (true) {
+                    case $result->getCredentialsValid():
+                        $request->getSession()->set("user_id", $result->getUserId());
+                        $request->getSession()->set("user_connected", 1);
+                        return $this->redirectToRoute('homepage');
+
+                    case !$result->getNameExist() && !is_null($result->getNameExist()):
+                        $field = $form->get('name');
+                        $error = new FormError(
+                            'Oops ! Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations de connexion !'
+                        );
+
+                        $field->addError($error);
+                        break;
+                    case !$result->getAccountIsActivate() && !is_null($result->getAccountIsActivate()):
+                        $field = $form->get('name');
+                        $error = new FormError(
+                            'L\'accès à votre compte est en attente d\'activation. Pour toute demande, notre support est à votre disposition.'
+                        );
+                        $field->addError($error);
+                        break;
+                    case !$result->getPasswordCorrect() && !is_null($result->getPasswordCorrect()):
+                        $field = $form->get('password');
+                        $error = new FormError('Oops ! Il semblerait que le mot de passe soit incorrect !');
+                        $field->addError($error);
+                        break;
+                }
             }
         }
-
-        if ($numberOfErrors == 0 && $this->isCsrfTokenValid("login",$token)) {
-            $result = $userRepository->login($user);
-
-          switch (true)
-          {
-              case $result->getCredentialsValid():
-                  $request->getSession()->set("user_id", $result->getUserId());
-                  $request->getSession()->set("user_connected", 1);
-                  return $this->redirectToRoute('homepage');
-
-              case !$result->getNameExist() && !is_null($result->getNameExist()):
-                 $groupsViolations["username_exception_sign_in"] = "Oops ! Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations de connexion !";
-                    break;
-              case !$result->getAccountIsActivate() && !is_null($result->getAccountIsActivate()):
-                  $groupsViolations["username_exception_sign_in"] = "L'accès à votre compte est en attente d'activation. Pour toute demande, notre support est à votre disposition.";
-                  break;
-              case !$result->getPasswordCorrect() && !is_null($result->getPasswordCorrect()):
-                  $groupsViolations["password_exception_sign_in"] = "Oops ! Il semblerait que le mot de passe soit incorrect !";
-                  break;
-          }
-        }
-        $parameters["exceptions"] = $groupsViolations;
+        $parameters["form"] = $form;
 
         return new Response($this->render($template, $parameters), CodeStatus::CLIENT);
     }
@@ -249,7 +246,6 @@ L'équipe Snowtricks
         $request->getSession()->clear();
 
         return $this->redirectToRoute('homepage');
-
     }
 
     #[Route(path: '/reset-password/', name: 'send_reset_password_link', methods: ["POST"])]
@@ -323,7 +319,7 @@ L'équipe Snowtricks
     }
 
 
-    #[Route(path: '/reset-password/token/{id}',name:'reset_password_with_token', methods: ["POST"])]
+    #[Route(path: '/reset-password/token/{id}', name: 'reset_password_with_token', methods: ["POST"])]
     public function resetPassword(
         Request $request,
         string $id,
@@ -358,7 +354,7 @@ L'équipe Snowtricks
                 }
             }
 
-            if ($numberOfErrors == 0 && $this->isCsrfTokenValid("reset_password_with_token",$token)) {
+            if ($numberOfErrors == 0 && $this->isCsrfTokenValid("reset_password_with_token", $token)) {
                 $userEntity = $userRepository->checkPasswordReset($user);
                 switch (true) {
                     case $userEntity->getCredentialsValid():
