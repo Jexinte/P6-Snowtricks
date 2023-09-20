@@ -72,41 +72,28 @@ class UserRepository extends ServiceEntityRepository
         return $user;
     }
 
-    public function checkUser(User $user): ?User
+
+    public function checkPasswordReset(User $user): User
     {
-        $userMatch = $this->findOneBy(["name" => $user->getName()]);
-        if ($userMatch) {
-            return $userMatch;
-        }
-        return null;
-    }
-
-
-    /**
-     * @param User $user
-     * @return string[]|null
-     */
-    public function checkPasswordReset(User $user): ?array
-    {
-        $userDataFromDb = $this->checkUser($user);
-
+        $userDataFromDb = current($this->findBy(["name" => $user->getName()]));
         $oldPasswordFromForm = $user->getOldPassword();
         $newPasswordFromForm = $user->getPassword();
-        if (!is_null($userDataFromDb)) {
+        if (is_object($userDataFromDb)) {
             if (password_verify($oldPasswordFromForm, $userDataFromDb->getPassword())) {
-                $entityManager = $this->getEntityManager();
-                $dataToUpdate = $entityManager->getRepository(User::class)->findBy(
+                $dataToUpdate = $this->getEntityManager()->getRepository(User::class)->findBy(
                     ["name" => $userDataFromDb->getName()]
                 );
                 foreach ($dataToUpdate as $record) {
                     $record->setPassword(password_hash($newPasswordFromForm, PASSWORD_DEFAULT));
                 }
-                $entityManager->flush();
-                return null;
+                $this->getEntityManager()->flush();
+                $user->isCredentialsValid(true);
+            } else {
+                $user->isPasswordCorrect(false);
             }
-            return ["password" => "Oops ! Il semble que le mot de passe saisi est incorrect !"];
+        } else {
+            $user->isCredentialsValid(false);
         }
-
-        return ["username" => "Oops ! Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations de connexion !"];
+        return $user;
     }
 }

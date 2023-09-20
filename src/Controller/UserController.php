@@ -7,8 +7,6 @@ use App\Enumeration\UserStatus;
 use App\Enumeration\CodeStatus;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Validator\Constraints\Form;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -266,7 +264,7 @@ L'équipe Snowtricks
 
     }
 
-    #[Route(path: '/reset-password/', methods: ["POST"])]
+    #[Route(path: '/reset-password/', name: 'send_reset_password_link', methods: ["POST"])]
     public function sendPasswordResetLink(
         MailerInterface $mailer,
         Request $request,
@@ -277,11 +275,13 @@ L'équipe Snowtricks
         $user = new User();
         $user->setName($request->request->get('username'));
         $numberOfErrors = 0;
-        $errorUsername = "";
+        $code = CodeStatus::CLIENT;
+        $token = $request->request->get('token');
         $groups = [
             "username_exception_forgot_password",
         ];
         $groupsViolations = [];
+
         foreach ($groups as $group) {
             $errors = $validator->validate($user, null, $group);
             if (count($errors) >= 1) {
@@ -292,16 +292,16 @@ L'équipe Snowtricks
             }
         }
 
-        if ($numberOfErrors == 0) {
-            $result = $userRepository->checkUser($user);
-            if ($result) {
+        if ($numberOfErrors == 0 && $this->isCsrfTokenValid("reset_password_with_link", $token)) {
+            $userFound = current($userRepository->findBy(["name" => $user->getName()]));
+            if ($userFound) {
                 $this->setToken();
                 $token = $request->getSession()->get("token");;
-                $request->getSession()->set("ask_reset_password", UserStatus::ASK_RESET_PASSWORD);
+                $request->getSession()->set("ask_reset_password", true);
 
                 $email = (new Email())
                     ->from("snowtricks@gmail.com")
-                    ->to($result->getEmail())
+                    ->to($userFound->getEmail())
                     ->subject('Réinitialisation de votre mot de passe')
                     ->text(
                         body: "Bonjour " . $user->getName() . ",\n
@@ -322,23 +322,20 @@ L'équipe Snowtricks
                 $mailer->send($email);
                 $parameters["mail_send"] = 1;
                 $parameters["token"] = $token;
-                $this->code = CodeStatus::REQUEST_SUCCEED;
+                $code = CodeStatus::REQUEST_SUCCEED;
             } else {
-                $errorUsername = "Oops! Le nom d'utilisateur " . $user->getName() . " n'existe pas !";
-                $this->code = CodeStatus::CLIENT;
-                $parameters["errorUsername"] = $errorUsername;
+                $groupsViolations["username_exception_forgot_password"] = "Oops ! Identifiant incorrect. Veuillez vérifier vos informations !";
             }
-        } else {
-            $parameters["exceptions"] = $groupsViolations;
         }
 
+        $parameters["exceptions"] = $groupsViolations;
         $userConnected = $request->getSession()->get('user_connected');
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        return new Response($this->render($template, $parameters), $this->code);
+        return new Response($this->render($template, $parameters), $code);
     }
 
 
-    #[Route(path: '/reset-password/token/{id}', methods: ["POST"])]
+    #[Route(path: '/reset-password/token/{id}',name:'reset_password_with_token', methods: ["POST"])]
     public function resetPassword(
         Request $request,
         string $id,
@@ -347,15 +344,16 @@ L'équipe Snowtricks
     ): Response {
         $groupsViolations = [];
         $resetPasswordkAsk = $request->getSession()->get('ask_reset_password');
+        $template = "reset_password.twig";
+
         if ($resetPasswordkAsk) {
-            $template = "reset_password.twig";
             $numberOfErrors = 0;
             $response = new Response();
             $user = new User();
             $user->setName($request->request->get("username"));
             $user->setOldPassword($request->request->get("old-password"));
             $user->setPassword($request->request->get("password"));
-
+            $token = $request->request->get('token');
             $groups = [
                 "username_exception_reset_password",
                 "password_exception_old_reset_password",
@@ -372,27 +370,28 @@ L'équipe Snowtricks
                 }
             }
 
-            if ($numberOfErrors == 0) {
-                $result = $userRepository->checkPasswordReset($user);
+            if ($numberOfErrors == 0 && $this->isCsrfTokenValid("reset_password_with_token",$token)) {
+                $userEntity = $userRepository->checkPasswordReset($user);
                 switch (true) {
-                    case is_null($result):
+                    case $userEntity->getCredentialsValid():
+
                         $response->headers->clearCookie("token");
                         $response->send();
                         $request->getSession()->remove('ask_reset_password');
                         return $this->redirectToRoute("homepage");
-                    case array_key_exists("password", $result) || array_key_exists("username", $result) :
-                        $this->code = CodeStatus::CLIENT;
-                        $parameters["failed"] = $result;
+                    case !$user->getPasswordCorrect() && !is_null($user->getPasswordCorrect()):
+                        $groupsViolations["password_exception_old_reset_password"] = "Oops ! Il semble que le mot de passe saisi est incorrect !";
+                        break;
+                    default:
+                        $groupsViolations["username_exception_reset_password"] = "Oops ! Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations de connexion !";
                 }
-            } else {
-                $this->code = CodeStatus::CLIENT;
             }
         }
         $userConnected = $request->getSession()->get('user_connected');
         $parameters["token"] = $id;
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
         $parameters["exceptions"] = $groupsViolations;
-        return new Response($this->render($template, $parameters), $this->code);
+        return new Response($this->render($template, $parameters), CodeStatus::CLIENT);
     }
 
 }
