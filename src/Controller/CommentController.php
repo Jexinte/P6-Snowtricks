@@ -42,7 +42,6 @@ class CommentController extends AbstractController
         MediaRepository $mediaRepository,
         TrickRepository $trickRepository,
     ): Response {
-        $template = "trick.twig";
         $form = $this->createForm(AddComment::class, $this->comment);
         $form->handleRequest($request);
         $user = current($userRepository->findBy(["id" => $request->getSession()->get('user_id')]));
@@ -87,7 +86,7 @@ class CommentController extends AbstractController
         $parameters["pages"] = $pages;
         $parameters["currentPage"] = $currentPage;
         $parameters["form"] = $form;
-        return new Response($this->render($template, $parameters), 400);
+        return new Response($this->render("trick.twig", $parameters), 400);
     }
 
 
