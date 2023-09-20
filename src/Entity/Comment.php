@@ -43,7 +43,7 @@ class Comment
     #[ORM\Column(length: 255)]
     private ?string $content = null;
 
-    public string $username;
+    private string $username;
     public function getId(): ?int
     {
         return $this->id;

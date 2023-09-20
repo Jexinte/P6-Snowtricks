@@ -40,14 +40,14 @@ class User
         groups: ['username_exception']
     )]
     #[ORM\Column(length: 255,unique:true)]
-    public ?string $name = null;
+    private ?string $name = null;
 
 
     #[ORM\Column(length: 255)]
-    public ?string $profileImage;
+    private ?string $profileImage;
 
     #[ORM\Column(length: 255)]
-    protected ?string $email = null;
+    private ?string $email = null;
 
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
@@ -59,23 +59,23 @@ class User
         ]
     )]
     #[ORM\Column(length: 255)]
-    protected ?string $password = null;
+    private ?string $password = null;
 
     #[ORM\Column(length: 1)]
-    protected ?bool $status = null;
+    private ?bool $status = null;
 
     private ?bool $created;
 
     private UploadedFile $file;
 
 
-    protected string $oldPassword;
+    private string $oldPassword;
 
-    public ?bool $credentialsValid = null;
+    private ?bool $credentialsValid = null;
 
-    public ?bool $nameExist = null;
-    public ?bool $passwordIsCorrect = null;
-    public ?bool $accountIsActivate = null;
+    private ?bool $nameExist = null;
+    private ?bool $passwordIsCorrect = null;
+    private ?bool $accountIsActivate = null;
 
     public function getId(): ?int
     {
