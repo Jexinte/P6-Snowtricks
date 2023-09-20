@@ -30,28 +30,26 @@ class MediaRepository extends ServiceEntityRepository
      * @param Media $media
      * @return void
      */
-    public function saveTrickMedias(Media $media)
+    public function saveTrickMedias(Media $media):void
     {
-        $images = $media->getIllustrations();
+        $images = $media->getImages();
         $videos = $media->getVideos();
         $dirImages = "../public/assets/img";
         $dirImagesBanner = "../public/assets/img/banner";
         $dirVideos = "../public/assets/videos";
         $bannerFile = $media->getBannerFile();
         $embedUrl = $media->getEmbedUrl();
-        if (!empty($bannerFile)) {
-            $fileExt = explode('.', $bannerFile->getClientOriginalName());
-            $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
-            $imgBannerPath = "/assets/img/banner/$filename";
-            $tmp = $bannerFile->getPathname();
-            move_uploaded_file($tmp, "$dirImagesBanner/$filename");
-            $media->setMediaPath($imgBannerPath);
-            $media->setMediaType($fileExt[1]);
-            $media->setIsBanner(true);
-            $this->getEntityManager()->persist($media);
-            $this->getEntityManager()->flush();
-            $this->getEntityManager()->clear();
-        }
+        $fileExt = explode('.', $bannerFile->getClientOriginalName());
+        $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
+        $imgBannerPath = "/assets/img/banner/$filename";
+        $tmp = $bannerFile->getPathname();
+        move_uploaded_file($tmp, "$dirImagesBanner/$filename");
+        $media->setMediaPath($imgBannerPath);
+        $media->setMediaType($fileExt[1]);
+        $media->setIsBanner(true);
+        $this->getEntityManager()->persist($media);
+        $this->getEntityManager()->flush();
+        $this->getEntityManager()->clear();
         if (!empty($embedUrl)) {
             $media->setMediaPath($embedUrl);
             $media->setMediaType("web");

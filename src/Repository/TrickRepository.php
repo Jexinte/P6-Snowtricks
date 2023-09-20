@@ -27,22 +27,11 @@ class TrickRepository extends ServiceEntityRepository
     /**
      * @return EntityManagerInterface
      */
-    public function getEntityManager()
+    public function getEntityManager():EntityManagerInterface
     {
         return parent::getEntityManager();
     }
 
-
-
-
-    public function createTrick(Trick $trick): int
-    {
-        $this->getEntityManager()->persist($trick);
-        $this->getEntityManager()->flush();
-        $tricks = $this->findAll();
-        $trick = end($tricks);
-        return $trick->getId();
-    }
 
     public function updateTrick(int $id, Trick $trick): void
     {
@@ -58,7 +47,6 @@ class TrickRepository extends ServiceEntityRepository
                 $record->setDescription($trickDescription);
                 $record->setTrickGroup($trickGroup);
             }
-
         } else {
             foreach ($dataToUpdate as $record) {
                 $record->setDescription($trickDescription);

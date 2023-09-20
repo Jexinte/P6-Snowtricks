@@ -29,20 +29,20 @@ class HomepageController extends AbstractController
         $medias = $mediaRepository->findAll();
 
         foreach ($tricks as $k => $value) {
-            if ($medias[$k]->getIsBanner() && $value->getId() == $medias[$k]->getIdTrick()) {
+//            if ($medias[$k]->getIsBanner() && $value->getId() == $medias[$k]->getIdTrick()) {
+//                $result[$k] = [
+//                    "name" => $value->getName(),
+//                    "slug" => strtolower($slugger->slug($value->getName())),
+//                    "id" => $value->getId(),
+//                    "main_banner" => $medias[$k]->getMediaPath()
+//                ];
+//            } else {
                 $result[$k] = [
                     "name" => $value->getName(),
                     "slug" => strtolower($slugger->slug($value->getName())),
                     "id" => $value->getId(),
-                    "main_banner" => $medias[$k]->getMediaPath()
                 ];
-            } else {
-                $result[$k] = [
-                    "name" => $value->getName(),
-                    "slug" => strtolower($slugger->slug($value->getName())),
-                    "id" => $value->getId(),
-                ];
-            }
+//            }
         }
         $parameters["tricks"] = $result;
         return new Response($this->render("homepage.twig", $parameters));
