@@ -19,6 +19,11 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
-
+    IntlDateFormatter:
+        class: IntlDateFormatter
+        arguments:
+            - 'fr_Fr'
+            - 0
+            - -1
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

@@ -26,11 +26,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class TrickController extends AbstractController
 {
 
-    private readonly IntlDateFormatter $dateFormatter;
 
-    public function __construct()
+
+    public function __construct(private readonly IntlDateFormatter $dateFormatter)
     {
-        $this->dateFormatter = new IntlDateFormatter('fr_Fr', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
     }
 
     #[Route('/{trickname}/details/{id}', name: 'trick', methods: ["GET"])]
