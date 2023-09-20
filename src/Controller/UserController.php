@@ -28,12 +28,11 @@ class UserController extends AbstractController
     public function signUpPage(Request $request): Response
     {
         $userConnected = $request->getSession()->get('user_connected');
-        $template = "sign_up.twig";
         $user = new User();
         $form = $this->createForm(SignUp::class, $user);
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
         $parameters["form"] = $form;
-        return new Response($this->render($template, $parameters));
+        return new Response($this->render("sign_up.twig", $parameters));
     }
 
     #[Route(path: '/signin', methods: ["GET"])]
@@ -42,19 +41,17 @@ class UserController extends AbstractController
         $userConnected = $request->getSession()->get('user_connected');
         $user = new User();
         $form = $this->createForm(Login::class, $user);
-        $template = "sign_in.twig";
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
         $parameters["form"] = $form;
-        return new Response($this->render($template, $parameters));
+        return new Response($this->render("sign_in.twig", $parameters));
     }
 
     #[Route(path: '/forgot-password', methods: ["GET"])]
     public function forgotPasswordPage(Request $request): Response
     {
         $userConnected = $request->getSession()->get('user_connected');
-        $template = "forgot_password.twig";
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        return new Response($this->render($template, $parameters));
+        return new Response($this->render("forgot_password.twig", $parameters));
     }
 
     #[Route(path: '/reset-password/token/{id}', methods: ["GET"])]
@@ -63,10 +60,9 @@ class UserController extends AbstractController
         $tokenInSession = $request->getSession()->get('token');
         $userConnected = $request->getSession()->get('user_connected');
         if (!is_null($id) && $id == $tokenInSession) {
-            $template = "reset_password.twig";
             $parameters["token"] = $id;
             $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-            return new Response($this->render($template, $parameters));
+            return new Response($this->render("reset_password.twig", $parameters));
         }
         throw $this->createNotFoundException();
     }
@@ -79,7 +75,6 @@ class UserController extends AbstractController
         MailerInterface $mailer,
 
     ): ?Response {
-        $template = "sign_up.twig";
         $user = new User();
         $form = $this->createForm(SignUp::class, $user);
         $form->handleRequest($request);
@@ -109,7 +104,7 @@ class UserController extends AbstractController
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
 
         $parameters["form"] = $form;
-        return new Response($this->render($template, $parameters), CodeStatus::CLIENT);
+        return new Response($this->render("sign_up.twig", $parameters), CodeStatus::CLIENT);
     }
 
 
@@ -159,7 +154,6 @@ L'équipe Snowtricks
         $cookie = $this->getToken($request);
         $tokenInSession = $request->getSession()->get('token');
         $response = new Response();
-        $template = "account_validation.twig";
         if (!is_null($cookie) && $cookie == $tokenInSession) {
             $userStatusUpdated = $userRepository->updateUserStatus($request);
             if ($userStatusUpdated) {
@@ -179,7 +173,7 @@ L'équipe Snowtricks
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
         return new Response(
             $this->render(
-                $template,
+                "account_validation.twig",
                 $parameters
             ), CodeStatus::CLIENT
         );
@@ -190,7 +184,6 @@ L'équipe Snowtricks
         Request $request,
         UserRepository $userRepository,
     ): ?Response {
-        $template = "sign_in.twig";
         $parameters = [];
         $user = new User();
         $form = $this->createForm(Login::class, $user);
@@ -233,7 +226,7 @@ L'équipe Snowtricks
         }
         $parameters["form"] = $form;
 
-        return new Response($this->render($template, $parameters), CodeStatus::CLIENT);
+        return new Response($this->render("sign_in.twig", $parameters), CodeStatus::CLIENT);
     }
 
     #[Route(path: '/logout', methods: ["GET"])]
@@ -255,7 +248,6 @@ L'équipe Snowtricks
         UserRepository $userRepository,
         ValidatorInterface $validator
     ): Response {
-        $template = "forgot_password.twig";
         $user = new User();
         $user->setName($request->request->get('username'));
         $numberOfErrors = 0;
@@ -315,7 +307,7 @@ L'équipe Snowtricks
         $parameters["exceptions"] = $groupsViolations;
         $userConnected = $request->getSession()->get('user_connected');
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        return new Response($this->render($template, $parameters), $code);
+        return new Response($this->render("forgot_password.twig", $parameters), $code);
     }
 
 
@@ -328,7 +320,6 @@ L'équipe Snowtricks
     ): Response {
         $groupsViolations = [];
         $resetPasswordkAsk = $request->getSession()->get('ask_reset_password');
-        $template = "reset_password.twig";
 
         if ($resetPasswordkAsk) {
             $numberOfErrors = 0;
@@ -375,7 +366,7 @@ L'équipe Snowtricks
         $parameters["token"] = $id;
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
         $parameters["exceptions"] = $groupsViolations;
-        return new Response($this->render($template, $parameters), CodeStatus::CLIENT);
+        return new Response($this->render("reset_password.twig", $parameters), CodeStatus::CLIENT);
     }
 
 }

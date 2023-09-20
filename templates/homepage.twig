@@ -34,7 +34,6 @@
             <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="tricks">
                     {% for message in app.flashes('success') %}
-                        {#                        Mise en page à faire plus tard #}
                         <div class="flash-notice">
                             {{ message }}
                         </div>
@@ -47,8 +46,8 @@
                         {% for trick in tricks %}
                             <div class="trick">
                                 <div class="trick-banner">
-                                    {# banniere du trick #}
-                                    <img src="{{ trick.main_banner is defined ? trick.main_banner : '/assets/img/banner/banner_homepage.jpg' }}" height="200" alt="">
+                                    <img src="{{ trick.main_banner is defined ? trick.main_banner : '/assets/img/banner/banner_homepage.jpg' }}"
+                                         height="200" alt="">
                                 </div>
                                 <div class="trick-options">
                                     <a href="/{{ trick.slug }}/details/{{ trick.id }}"
@@ -62,7 +61,8 @@
                                                 </i>
                                             </a>
 
-                                            <form action="{{ path('delete_trick',{trickname:trick.slug,id:trick.id}) }}" method="post">
+                                            <form action="{{ path('delete_trick',{trickname:trick.slug,id:trick.id}) }}"
+                                                  method="post">
                                                 <input type="hidden" name="_method" value="DELETE">
                                                 <button type="submit" class="delete-trick"><i class="fa-solid fa-trash">
                                                     </i></button>

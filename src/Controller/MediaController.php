@@ -54,7 +54,7 @@ class MediaController extends AbstractController
     }
 
     #[Route('/update-trick-media/{id}', name: 'update_trick_media_page', methods: ["GET"])]
-    public function updateTrickMediaPage(int $id, MediaRepository $mediaRepository,Request $request): Response
+    public function updateTrickMediaPage(int $id, MediaRepository $mediaRepository, Request $request): Response
     {
         $media = current($mediaRepository->findBy(["id" => $id]));
         if ($media->getMediaType() == "web") {
@@ -62,12 +62,11 @@ class MediaController extends AbstractController
         } else {
             $form = $this->initializeUpdateFileForm()->getForm();
         }
-        $template = "update_media.twig";
         $userConnected = $request->getSession()->get('user_connected');
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
         $parameters["form"] = $form;
         $parameters["media"] = $media;
-        return new Response($this->render($template, $parameters));
+        return new Response($this->render("update_media.twig", $parameters));
     }
 
     #[Route('/update-trick-media/{id},', name: 'update_trick_media_form', methods: ["PUT"])]
@@ -114,12 +113,11 @@ class MediaController extends AbstractController
                 }
             }
         }
-        $template = "update_media.twig";
 
 
         $parameters["media"] = $media;
         $parameters["form"] = $form;
-        return new Response($this->render($template, $parameters), 400);
+        return new Response($this->render("update_media.twig", $parameters), 400);
     }
 
     #[Route('/delete-trick-media/{id}', name: 'delete_trick_media', methods: ["GET"])]

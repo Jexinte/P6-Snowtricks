@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Repository\TrickRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\OneToMany;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -76,8 +75,7 @@ class Trick
         groups: ['name_update_exception']
     )]
     private string $nameUpdated;
-//    #[OneToMany(mappedBy: "trick", targetEntity: (Media::class),cascade:['remove'])]
-//   private $medias;
+
 
     public function getId(): ?int
     {

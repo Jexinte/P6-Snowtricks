@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Repository\MediaRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\ManyToOne;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -84,9 +83,7 @@ class Media
         extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg,png,webp et mp4 sont acceptés !'
     )]
     private ?UploadedFile $updatedFile = null;
-//    #[ManyToOne(targetEntity: Trick::class,inversedBy:"medias")]
-//    #[ORM\JoinColumn(name:'id_trick',referencedColumnName: 'id')]
-//    private $trick;
+
     public function getId(): ?int
     {
         return $this->id;

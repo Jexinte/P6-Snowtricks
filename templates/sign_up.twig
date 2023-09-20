@@ -3,7 +3,7 @@
     <link rel="icon" type="image/png" href="/favicon.ico"/>
 {% endblock %}
 {% block title %}
-    <title>Inscription | {{ parent ()}}  </title>
+    <title>Inscription | {{ parent () }}  </title>
 {% endblock %}
 
 {% block css_page %}
@@ -17,20 +17,20 @@
             <a href="/"><img src="/assets/img/logo/logo.jpg" alt="main logo" height="60"></a>
             <ul>
                 {% if user_connected is defined and user_connected == 1 %}
-                <li><a href="/logout">Déconnexion</a></li>
+                    <li><a href="/logout">Déconnexion</a></li>
                 {% else %}
-                <li><a href="/signin">Connexion</a></li>
+                    <li><a href="/signin">Connexion</a></li>
                 {% endif %}
             </ul>
         </nav>
     </header>
 
     <div class="container-fluid" id="login">
-        <h1 class="text-center" >Inscription</h1>
-      <div class="row">
-          {{ form(form) }}
-          </div>
-      </div>
+        <h1 class="text-center">Inscription</h1>
+        <div class="row">
+            {{ form(form) }}
+        </div>
+    </div>
     <footer id="footer">
         <p class="text-center footer-paragraph">Copyright @ 2023</p>
         <nav id="nav-mobile">

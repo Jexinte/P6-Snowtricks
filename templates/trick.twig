@@ -26,7 +26,6 @@
         <div id="trick-content">
             <h1>{{ trick is defined ? trick.name : '' }}</h1>
             <div class="medias">
-                {# Pour le moment on va laisser comme ça ainsi lorsque j'aurai termné les dernières grosses fonctionnalités je reviendrai en arrière au fur et à mesure pour gérer ses détails #}
                 {% for media in medias %}
 
                     {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp" %}
@@ -91,7 +90,6 @@
                 <p>{{ comment.username }}, le {{ comment.date }}</p>
                 <p class="comment">{{ comment.content }}</p>
             </div>
-{#        </div>#}
         {% endfor %}
                 {% if totalComments > 10 %}
                     <ul class="pagination">

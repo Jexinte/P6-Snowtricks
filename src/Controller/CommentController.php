@@ -13,23 +13,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 use DateTime;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class CommentController extends AbstractController
 {
 
 
-    private readonly IntlDateFormatter $dateFormatter;
-    private readonly AsciiSlugger $slugger;
-    private readonly DateTime $actualDate;
 
-    public function __construct()
-    {
-        $this->dateFormatter = new IntlDateFormatter("fr_Fr", IntlDateFormatter::FULL, IntlDateFormatter::NONE);
-        $this->slugger = new AsciiSlugger();
-        $this->actualDate = new DateTime();
-    }
+
+
+
 
     #[Route('/add-comment/{id}', name: 'add_comment', methods: ["POST"])]
     public function handleAddComment(
@@ -38,9 +32,11 @@ class CommentController extends AbstractController
         CommentRepository $commentRepository,
         UserRepository $userRepository,
         MediaRepository $mediaRepository,
+        IntlDateFormatter $dateFormatter,
+        SluggerInterface $slugger,
+        DateTime $dateTime,
         TrickRepository $trickRepository,
     ): Response {
-        $template = "trick.twig";
         $commentEntity = new Comment();
         $form = $this->createForm(AddComment::class, $commentEntity);
         $form->handleRequest($request);
@@ -54,17 +50,17 @@ class CommentController extends AbstractController
                 $commentEntity->setIdUser($user->getId());
                 $commentEntity->setIdTrick($id);
                 $commentEntity->setUserProfileImage($user->getProfileImage());
-                $commentEntity->setDateCreation($this->actualDate);
+                $commentEntity->setDateCreation($dateTime);
                 $commentRepository->getEntityManager()->persist($commentEntity);
                 $commentRepository->getEntityManager()->flush();
-                $trickNameSlug = $this->slugger->slug($trick->getName())->lower();
+                $trickNameSlug = $slugger->slug($trick->getName())->lower();
                 return $this->redirectToRoute("trick", [
                     "trickname" => $trickNameSlug,
                     "id" => $id
                 ]);
             }
         }
-        $dateTrick = ucfirst($this->dateFormatter->format($trick->getDate()));
+        $dateTrick = ucfirst($dateFormatter->format($trick->getDate()));
         $medias = $mediaRepository->findBy(["idTrick" => $id]);
         $trickComments = $commentRepository->getComments($id, $userRepository);
         $parameters["trick"] = $trick;
@@ -82,12 +78,12 @@ class CommentController extends AbstractController
         $commentsPerPage = 10;
         $pages = ceil($nbComments / $commentsPerPage);
         $firstPage = ($currentPage * $commentsPerPage) - $commentsPerPage;
-        $commentsPerPageRequest = $commentRepository->getCommentsPerPage($id,$firstPage, $commentsPerPage);
+        $commentsPerPageRequest = $commentRepository->getCommentsPerPage($id, $firstPage, $commentsPerPage);
         $parameters["comments"] = $commentsPerPageRequest;
         $parameters["pages"] = $pages;
         $parameters["currentPage"] = $currentPage;
         $parameters["form"] = $form;
-        return new Response($this->render($template, $parameters), 400);
+        return new Response($this->render("trick.twig", $parameters), 400);
     }
 
 

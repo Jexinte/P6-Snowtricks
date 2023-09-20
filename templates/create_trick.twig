@@ -20,7 +20,6 @@
     </header>
     <div class="container-fluid" id="trick">
         <div class=" container-fluid" id="banner-trick">
-            {# Bannière du trick sélectionné #}
             <img src="/assets/img/banner/banner_homepage.jpg" alt="banner">
         </div>
 
@@ -28,7 +27,6 @@
             <div class="row">
                 <form class="pt-5" action="{{ path('create_trick_post') }}" enctype="multipart/form-data" method="post">
 
-                    {#         NOM TRICK #}
                     <div class="col-sm-12 col-md-12">
                         <div class="mb-3 box">
                             <label for="trick-name" class="form-label">Nom du trick</label>
@@ -40,7 +38,6 @@
                         </div>
                     </div>
 
-                    {#         DESCRIPTION TRICK #}
                     <div class="col-sm-12 col-md-12">
                         <div class="mb-3 box">
                             <label for="description">Description :</label>
@@ -52,7 +49,6 @@
                         </div>
                     </div>
                     <div class="col-sm-12 col-md-12">
-                        {# GROUP TRICK #}
                         <div class="mb-3 box">
                             <label for="group">Sélectionner un groupe</label>
 
@@ -85,7 +81,6 @@
                     </div>
 
                     <div class="col-sm-12 col-md-12">
-                        {# MULTIPLE FILES #}
                         <div class="mb-3 box">
                             <label for="inputGroupFile02">Sélectionner une / plusieur(s) image(s)</label>
                             <input type="file" name="images[]" class="form-control" id="images" multiple>
@@ -96,7 +91,6 @@
                     </div>
 
 
-                    {# VIDEO TRICK #}
 
                     <div class="col-sm-12 col-md-12">
                         <div class="mb-3 box">
@@ -109,7 +103,6 @@
                     </div>
 
 
-                    {#      EMBED VIDEO  #}
                     <div class="col-sm-12 col-md-12">
                         <div class="mb-3 box">
                             <label for="embed-url" class="form-label">Url Vidéo Dailymotion / Youtube</label>

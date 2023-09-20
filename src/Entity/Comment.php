@@ -28,7 +28,7 @@ class Comment
     #[ORM\Column(length: 255)]
     private ?string $content = null;
 
-    public ?string $username = null;
+    private ?string $username = null;
     public function getId(): ?int
     {
         return $this->id;

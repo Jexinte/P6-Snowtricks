@@ -27,11 +27,6 @@ class TrickController extends AbstractController
 {
 
 
-
-    public function __construct(private readonly IntlDateFormatter $dateFormatter)
-    {
-    }
-
     #[Route('/{trickname}/details/{id}', name: 'trick', methods: ["GET"])]
     public function getTrickPage(
         string $trickname,
@@ -40,9 +35,9 @@ class TrickController extends AbstractController
         UserRepository $userRepository,
         CommentRepository $commentRepository,
         MediaRepository $mediaRepository,
+        IntlDateFormatter $dateFormatter,
         Request $request
     ): Response {
-        $template = "trick.twig";
         $form = $this->createForm(AddComment::class);
         $userConnected = $request->getSession()->get('user_connected');
         $trick = current($trickRepository->findBy(["id" => $id]));
@@ -64,13 +59,13 @@ class TrickController extends AbstractController
         $firstPage = ($currentPage * $commentsPerPage) - $commentsPerPage;
         $commentsPerPageRequest = $commentRepository->getCommentsPerPage($id, $firstPage, $commentsPerPage);
         foreach ($commentsPerPageRequest as $comment) {
-            $comment->date = ucfirst($this->dateFormatter->format($comment->getDateCreation()));
+            $comment->date = ucfirst($dateFormatter->format($comment->getDateCreation()));
         }
         $parameters["comments"] = $commentsPerPageRequest;
         $parameters["pages"] = $pages;
         $parameters["currentPage"] = $currentPage;
         $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
-        $dateTrick = ucfirst($this->dateFormatter->format($trick->getDate()));
+        $dateTrick = ucfirst($dateFormatter->format($trick->getDate()));
         $parameters["form"] = $form;
         $parameters["trick"] = $trick;
         $parameters["totalComments"] = $nbComments;
@@ -80,17 +75,16 @@ class TrickController extends AbstractController
 
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
 
-        return new Response($this->render($template, $parameters));
+        return new Response($this->render("trick.twig", $parameters));
     }
 
 
     #[Route('/create-trick', name: 'create_trick_get', methods: ["GET"])]
     public function createTrickPage(Request $request): Response
     {
-        $template = "create_trick.twig";
         $userConnected = $request->getSession()->get('user_connected');
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        return new Response($this->render($template, $parameters));
+        return new Response($this->render("create_trick.twig", $parameters));
     }
 
 
@@ -101,7 +95,6 @@ class TrickController extends AbstractController
         TrickRepository $trickRepository,
         MediaRepository $mediaRepository
     ): Response {
-        $template = "create_trick.twig";
         $userConnected = $request->getSession()->get('user_connected');
         $trickEntity = new Trick();
         $trickEntity->setName($request->request->get('trick-name'));
@@ -162,7 +155,7 @@ class TrickController extends AbstractController
 
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
         $parameters["exceptions"] = $groupsViolations;
-        return new Response($this->render($template, $parameters), 400);
+        return new Response($this->render("create_trick.twig", $parameters), 400);
     }
 
     public function initializeUpdateTrickContentForm(Trick $trick): FormBuilderInterface
@@ -217,7 +210,6 @@ class TrickController extends AbstractController
         MediaRepository $mediaRepository,
         Request $request
     ): Response {
-        $template = "update_trick.twig";
         $userConnected = $request->getSession()->get('user_connected');
         $trick = current($trickRepository->findBy(["id" => $id]));
         $form = $this->initializeUpdateTrickContentForm($trick)->getForm();
@@ -233,7 +225,7 @@ class TrickController extends AbstractController
         $parameters["trick_date"] = $date;
         $parameters["form"] = $form;
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        return new Response($this->render($template, $parameters));
+        return new Response($this->render("update_trick.twig", $parameters));
     }
 
 
@@ -245,7 +237,6 @@ class TrickController extends AbstractController
         TrickRepository $trickRepository,
         MediaRepository $mediaRepository
     ): Response {
-        $template = "update_trick.twig";
         $trick = current($trickRepository->findBy(["id" => $id]));
         $media = $mediaRepository->findBy(["idTrick" => $id]);
         $formBuilder = $this->initializeUpdateTrickContentForm($trick);
@@ -269,7 +260,7 @@ class TrickController extends AbstractController
         $parameters["medias"] = $media;
         $parameters["form"] = $form;
         $parameters["trick"] = $trick;
-        return new Response($this->render($template, $parameters), 400);
+        return new Response($this->render("update_trick.twig", $parameters), 400);
     }
 
     #[Route('/trick/delete/{trickname}/{id}', name: 'delete_trick', methods: ["DELETE"])]

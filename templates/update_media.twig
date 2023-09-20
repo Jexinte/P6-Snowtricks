@@ -15,18 +15,18 @@
     </header>
     <div class="container-fluid" id="trick">
         <div class="row">
-                <div id="trick-content">
-                    {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp" or media.mediaType == "mp4" or media.isBanner == 1 %}
-                        <h1 class="text-center">Modifier une image / vidéo</h1>
-                        {{ form_start(form,{'action':path('update_trick_media_form',{'id':media.id})}) }}{{ form_end(form) }}
+            <div id="trick-content">
+                {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp" or media.mediaType == "mp4" or media.isBanner == 1 %}
+                    <h1 class="text-center">Modifier une image / vidéo</h1>
+                    {{ form_start(form,{'action':path('update_trick_media_form',{'id':media.id})}) }}{{ form_end(form) }}
 
-                    {% elseif media.mediaType == "web" %}
-                        <h1 class="text-center">Modifier URL Dailymotion / Youtube</h1>
-                        {{ form_start(form,{'action':path('update_trick_media_form',{'id':media.id})}) }} {{ form_end(form) }}
-                    {% endif %}
-                </div>
-                </div>
+                {% elseif media.mediaType == "web" %}
+                    <h1 class="text-center">Modifier URL Dailymotion / Youtube</h1>
+                    {{ form_start(form,{'action':path('update_trick_media_form',{'id':media.id})}) }} {{ form_end(form) }}
+                {% endif %}
+            </div>
         </div>
+    </div>
 
 
 

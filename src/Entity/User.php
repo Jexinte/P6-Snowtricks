@@ -4,19 +4,12 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-//#[UniqueEntity(
-//    fields: 'name',
-//    message: "Le nom utilisateur est déjà pris !",
-//)]
-#[UniqueEntity(
-    fields: 'email',
-    message: "L'adresse email n'est pas disponible, merci d'en sélectionner une autre !",
-)]
+
+
 class User
 {
     #[ORM\Id]
@@ -40,14 +33,14 @@ class User
         groups: ['username_exception']
     )]
     #[ORM\Column(length: 255,unique:true)]
-    public ?string $name = null;
+    private ?string $name = null;
 
 
     #[ORM\Column(length: 255)]
-    public ?string $profileImage;
+    private ?string $profileImage;
 
     #[ORM\Column(length: 255)]
-    protected ?string $email = null;
+    private ?string $email = null;
 
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
@@ -65,10 +58,10 @@ class User
         groups: ['password_exception', "password_exception_forgot_password", "password_exception_wrong_format"]
     )]
     #[ORM\Column(length: 255)]
-    protected ?string $password = null;
+    private ?string $password = null;
 
     #[ORM\Column(length: 1)]
-    protected ?bool $status = null;
+    private ?bool $status = null;
 
     private ?bool $created;
 
@@ -76,13 +69,13 @@ class User
 
     private ?int $userId = null;
 
-    protected string $oldPassword;
+    private string $oldPassword;
 
-    public ?bool $credentialsValid = null;
+    private ?bool $credentialsValid = null;
 
-    public ?bool $nameExist = null;
-    public ?bool $passwordIsCorrect = null;
-    public ?bool $accountIsActivate = null;
+    private ?bool $nameExist = null;
+    private ?bool $passwordIsCorrect = null;
+    private ?bool $accountIsActivate = null;
 
     public function getId(): ?int
     {
