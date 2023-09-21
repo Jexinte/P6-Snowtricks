@@ -70,7 +70,6 @@ class TrickController extends AbstractController
         $parameters["banner"] = $mainBannerOfTrick;
         $parameters["medias"] = $medias;
         $parameters["trick_date"] = $dateTrick;
-
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
 
         return new Response($this->render("trick.twig", $parameters));
@@ -106,7 +105,7 @@ class TrickController extends AbstractController
             $trickEntity->setDescription($formData->getDescription());
             $trickEntity->setTrickGroup($formData->getTrickGroup());
             $trickEntity->setDate($dateTime);
-
+            $trickEntity->isTrickUpdated(false);
             $mediaEntity = new Media();
             $mediaEntity->setImages($formData->getImages());
             $mediaEntity->setBannerFile($formData->getBannerFile());
@@ -183,6 +182,7 @@ class TrickController extends AbstractController
             $trickEntity->setNameUpdated($form->getData()->getName());
             $trickEntity->setDescription($form->getData()->getDescription());
             $trickEntity->setTrickGroup($form->getData()->getTrickGroup());
+            $trickEntity->isTrickUpdated(true);
             $trickRepository->updateTrick($id, $trickEntity);
             $this->addFlash("success", "Le trick a bien été mis à jour !");
             return $this->redirectToRoute('homepage');

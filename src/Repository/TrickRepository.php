@@ -27,7 +27,7 @@ class TrickRepository extends ServiceEntityRepository
     /**
      * @return EntityManagerInterface
      */
-    public function getEntityManager():EntityManagerInterface
+    public function getEntityManager(): EntityManagerInterface
     {
         return parent::getEntityManager();
     }
@@ -38,21 +38,16 @@ class TrickRepository extends ServiceEntityRepository
         $trickNameFromForm = $trick->getNameUpdated();
         $trickDescription = $trick->getDescription();
         $trickGroup = $trick->getTrickGroup();
-        $trickNameAlreadyExist = current($this->findBy(["name" => $trickNameFromForm]));
         $dataToUpdate = $this->getEntityManager()->getRepository(Trick::class)->findBy(["id" => $id]);
 
-        if (!$trickNameAlreadyExist) {
-            foreach ($dataToUpdate as $record) {
-                $record->setName($trickNameFromForm);
-                $record->setDescription($trickDescription);
-                $record->setTrickGroup($trickGroup);
-            }
-        } else {
-            foreach ($dataToUpdate as $record) {
-                $record->setDescription($trickDescription);
-                $record->setTrickGroup($trickGroup);
-            }
+
+        foreach ($dataToUpdate as $record) {
+            $record->setName($trickNameFromForm);
+            $record->setDescription($trickDescription);
+            $record->setTrickGroup($trickGroup);
+            $record->isTrickUpdated($trick->getTrickUpdated());
         }
+
         $this->getEntityManager()->flush();
     }
 }

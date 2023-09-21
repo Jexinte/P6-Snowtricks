@@ -54,7 +54,11 @@
                     {{ trick is defined ? trick.description : '' }}
                 </p>
                 <div class="trick-details">
-                    <p class="trick-date">{{ trick_date is defined ? trick_date : '' }} </p>
+                    {% if trick.trickUpdated is defined and trick.trickUpdated == 1 %}
+                        <p class="trick-date">Modifiée le {{ trick_date is defined ? trick_date : '' }} </p>
+                        {% else %}
+                            <p class="trick-date">{{ trick_date is defined ? trick_date : '' }} </p>
+                    {% endif %}
                     <p class="trick-group">{{ trick is defined ? trick.trickGroup }}</p>
                 </div>
 

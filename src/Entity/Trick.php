@@ -27,7 +27,9 @@ class Trick
     #[ORM\Column(type: 'date')]
     private ?\DateTimeInterface $date = null;
 
-//
+    #[ORM\Column(type: 'boolean')]
+    private ?bool $trickUpdated;
+
     private string $nameUpdated;
 
     private ?bool $nameAlreadyExist;
@@ -192,6 +194,22 @@ class Trick
     public function setEmbedUrl(?string $embedUrl): void
     {
         $this->embedUrl = $embedUrl;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getTrickUpdated(): ?bool
+    {
+        return $this->trickUpdated;
+    }
+
+    /**
+     * @param bool|null $trickUpdated
+     */
+    public function isTrickUpdated(?bool $trickUpdated): void
+    {
+        $this->trickUpdated = $trickUpdated;
     }
 
 }
