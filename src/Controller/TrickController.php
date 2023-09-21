@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Media;
 use App\Form\Type\AddComment;
 use App\Form\Type\CreateTrick;
+use App\Form\Type\UpdateEmbedUrl;
 use App\Form\Type\UpdateTrickContent;
 use App\Repository\CommentRepository;
 use App\Repository\MediaRepository;
