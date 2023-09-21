@@ -83,7 +83,8 @@
             <div class="about">
                 <div class="row">
                     {% if user_connected is defined and user_connected == 1 %}
-                        {{ form_start(form,{'action':path('update_trick_content_put',{'trickname':trick.name|lower,'id':trick.id})}) }} {{ form_end(form) }}
+                        {{ form_start(form,{'action':path('update_trick_content_put',{'trickname':trick.name|lower,'id':trick.id})}) }}
+                        {{ form_end(form) }}
                     {% endif %}
                 </div>
             </div>
