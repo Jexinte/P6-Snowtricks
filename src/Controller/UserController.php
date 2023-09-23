@@ -46,7 +46,7 @@ class UserController extends AbstractController
         return new Response($this->render("sign_in.twig", $parameters));
     }
 
-    #[Route(path: '/forgot-password', methods: ["GET"])]
+    #[Route(path: '/forgot-password', name:'forgot_password_get',methods: ["GET"])]
     public function forgotPasswordPage(Request $request): Response
     {
         $userConnected = $request->getSession()->get('user_connected');
@@ -68,7 +68,7 @@ class UserController extends AbstractController
     }
 
 
-    #[Route(path: '/signup/registration', methods: ['POST'])]
+    #[Route(path: '/signup/registration',name:'registration',methods: ['POST'])]
     public function signUpValidator(
         Request $request,
         UserRepository $userRepository,
@@ -226,7 +226,7 @@ L'équipe Snowtricks
         return new Response($this->render("sign_in.twig", $parameters), CodeStatus::CLIENT);
     }
 
-    #[Route(path: '/logout', methods: ["GET"])]
+    #[Route(path: '/logout',name:'logout',methods: ["GET"])]
     public function logout(Request $request): ?RedirectResponse
     {
         $userConnected = $request->getSession()->get('user_connected');

@@ -81,7 +81,7 @@ class TrickController extends AbstractController
         $userConnected = $request->getSession()->get('user_connected');
         $form = $this->createForm(CreateTrick::class);
         $form->add('mediaForm', CreateTrickMedia::class);
-        $parameters["user_ connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
         $parameters["form"] = $form;
         return new Response($this->render("create_trick.twig", $parameters));
     }
@@ -122,7 +122,7 @@ class TrickController extends AbstractController
             $mediaRepository->saveTrickMedias($mediaEntity, $trickEntity);
             $trickRepository->getEntityManager()->persist($trickEntity);
             $trickRepository->getEntityManager()->flush();
-
+            $this->addFlash("success", "Votre nouveau trick a été créé avec succès !");
             return $this->redirectToRoute('homepage');
         }
 
@@ -180,7 +180,7 @@ class TrickController extends AbstractController
             $trickEntity->setTrickGroup($form->getData()->getTrickGroup());
             $trickEntity->isTrickUpdated(true);
             $trickRepository->updateTrick($id, $trickEntity);
-            $this->addFlash("success", "Le trick a bien été mis à jour !");
+            $this->addFlash("success", "Votre trick a été mis à jour avec succès !");
             return $this->redirectToRoute('homepage');
         }
 
@@ -214,7 +214,7 @@ class TrickController extends AbstractController
         $trickRepository->getEntityManager()->remove($trick);
         $trickRepository->getEntityManager()->flush();
 
-        $this->addFlash("success", "La suppression du trick a bien été pris en compte !");
+        $this->addFlash("success", "Votre trick a été supprimé avec succès !");
         return $this->redirectToRoute('homepage');
     }
 
