@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Entity\Media;
 use App\Entity\Trick;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,15 +22,10 @@ class TrickRepository extends ServiceEntityRepository
         parent::__construct($registry, Trick::class);
     }
 
-
-    /**
-     * @return EntityManagerInterface
-     */
     public function getEntityManager(): EntityManagerInterface
     {
         return parent::getEntityManager();
     }
-
 
     public function updateTrick(int $id, Trick $trick): void
     {

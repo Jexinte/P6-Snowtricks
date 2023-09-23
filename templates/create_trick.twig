@@ -25,7 +25,10 @@
 
         <div class="container-fluid" id="form">
             <div class="row">
-                {{ form(form,{'action':path('create_trick_post')}) }}
+                {{ form_start(form,{'action':path('create_trick_post')}) }}
+                <button class="btn btn-dark" type="submit">Envoyer</button>
+                {{ form_end(form) }}
+
             </div>
         </div>
     </div>

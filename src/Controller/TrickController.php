@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\Media;
 use App\Form\Type\AddComment;
 use App\Form\Type\CreateTrick;
-use App\Form\Type\UpdateEmbedUrl;
+use App\Form\Type\CreateTrickMedia;
 use App\Form\Type\UpdateTrickContent;
 use App\Repository\CommentRepository;
 use App\Repository\MediaRepository;
@@ -43,7 +43,6 @@ class TrickController extends AbstractController
             throw $this->createNotFoundException();
         }
         $medias = $mediaRepository->findBy(["idTrick" => $id]);
-        unset($medias[0]);
         $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $id, "isBanner" => true]));
         $trickComments = $commentRepository->getComments($id, $userRepository);
         if ($request->query->get('page') !== null && !empty($request->query->get('page'))) {
@@ -81,6 +80,7 @@ class TrickController extends AbstractController
     {
         $userConnected = $request->getSession()->get('user_connected');
         $form = $this->createForm(CreateTrick::class);
+        $form->add('mediaForm', CreateTrickMedia::class);
         $parameters["user_ connected"] = !empty($userConnected) ? $userConnected : '';
         $parameters["form"] = $form;
         return new Response($this->render("create_trick.twig", $parameters));
@@ -96,21 +96,21 @@ class TrickController extends AbstractController
     ): Response {
         $userConnected = $request->getSession()->get('user_connected');
         $form = $this->createForm(CreateTrick::class);
+        $form->add('mediaForm', CreateTrickMedia::class);
         $form->handleRequest($request);
         $token = $request->request->all()["create_trick"]['token'];
-        if ($form->isValid() && $form->isSubmitted() && $this->isCsrfTokenValid('create_trick', $token)) {
-            $formData = $form->getData();
+        if ($form->isSubmitted() && $form->isValid() && $this->isCsrfTokenValid("create_trick", $token)) {
             $trickEntity = new Trick();
-            $trickEntity->setName($formData->getName());
-            $trickEntity->setDescription($formData->getDescription());
-            $trickEntity->setTrickGroup($formData->getTrickGroup());
+            $trickEntity->setName($form->getData()->getName());
+            $trickEntity->setDescription($form->getData()->getDescription());
+            $trickEntity->setTrickGroup($form->getData()->getTrickGroup());
             $trickEntity->setDate($dateTime);
             $trickEntity->isTrickUpdated(false);
             $mediaEntity = new Media();
-            $mediaEntity->setImages($formData->getImages());
-            $mediaEntity->setBannerFile($formData->getBannerFile());
-            $mediaEntity->setVideos($formData->getVideos());
-            $mediaEntity->setEmbedUrl($formData->getEmbedUrl());
+            $mediaEntity->setImages($form->get('mediaForm')->getData()["images"]);
+            $mediaEntity->setBannerFile($form->get('mediaForm')->getData()["bannerFile"]);
+            $mediaEntity->setVideos($form->get('mediaForm')->getData()["videos"]);
+            $mediaEntity->setEmbedUrl($form->get('mediaForm')->getData()["embedUrl"]);
 
             if (!empty($mediaEntity->getEmbedUrl())) {
                 preg_match('/<iframe[^>]+src="([^"]+)"/i', $mediaEntity->getEmbedUrl(), $matches);
@@ -119,20 +119,17 @@ class TrickController extends AbstractController
             }
 
 
+            $mediaRepository->saveTrickMedias($mediaEntity, $trickEntity);
             $trickRepository->getEntityManager()->persist($trickEntity);
             $trickRepository->getEntityManager()->flush();
-            $tricks = $trickRepository->findAll();
-            $trickSaved = end($tricks);
-            $mediaEntity->setIdTrick($trickSaved->getId());
-            $mediaRepository->saveTrickMedias($mediaEntity);
+
             return $this->redirectToRoute('homepage');
         }
+
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
         $parameters["form"] = $form;
         return new Response($this->render("create_trick.twig", $parameters), 400);
     }
-
-
 
 
     #[Route('/update-trick/{trickname}/{id}', name: 'update_trick_get', methods: ["GET"])]
@@ -148,7 +145,6 @@ class TrickController extends AbstractController
         $trick = current($trickRepository->findBy(["id" => $id]));
         $form = $this->createForm(UpdateTrickContent::class, $trick);
         $medias = $mediaRepository->findBy(["idTrick" => $id]);
-        unset($medias[0]);
         $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $id, "isBanner" => true]));
         $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
         $dateTrick = $trick->getDate();
@@ -209,13 +205,12 @@ class TrickController extends AbstractController
 
         $trick = $trickRepository->find(["id" => $id]);
         $medias = $mediaRepository->findBy(["idTrick" => $id]);
+
         foreach ($medias as $media) {
             if ($media->getMediaType() != "web") {
                 unlink("../public" . $media->getMediaPath());
             }
-            $mediaRepository->getEntityManager()->remove($media);
         }
-        $mediaRepository->getEntityManager()->flush();
         $trickRepository->getEntityManager()->remove($trick);
         $trickRepository->getEntityManager()->flush();
 

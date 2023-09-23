@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Media;
+use App\Entity\Trick;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -30,7 +31,7 @@ class MediaRepository extends ServiceEntityRepository
      * @param Media $media
      * @return void
      */
-    public function saveTrickMedias(Media $media):void
+    public function saveTrickMedias(Media $media,Trick $trick):void
     {
         $images = $media->getImages();
         $videos = $media->getVideos();
@@ -47,44 +48,54 @@ class MediaRepository extends ServiceEntityRepository
         $media->setMediaPath($imgBannerPath);
         $media->setMediaType($fileExt[1]);
         $media->setIsBanner(true);
+        $trick->addMedia($media);
         $this->getEntityManager()->persist($media);
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
         if (!empty($embedUrl)) {
-            $media->setMediaPath($embedUrl);
-            $media->setMediaType("web");
-            $media->setIsBanner(null);
-            $this->getEntityManager()->persist($media);
-            $this->getEntityManager()->flush();
-            $this->getEntityManager()->clear();
+            $newMedia = new Media();
+            $newMedia->setMediaPath($embedUrl);
+            $newMedia->setMediaType("web");
+            $newMedia->setIsBanner();
+            $trick->addMedia($newMedia);
+           $this->getEntityManager()->persist($newMedia);
+
         }
 
-        foreach ($images as $k => $image) {
+        if(!empty($media->getImages()))
+        {
+
+        foreach ($images as $image) {
+            $newMedia = new Media();
             $fileExt = explode('.', $image->getClientOriginalName());
             $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
             $imgPath = "/assets/img/$filename";
             $tmp = $image->getPathname();
-            $media->setMediaPath($imgPath);
-            $media->setMediaType($fileExt[1]);
-            $media->setIsBanner(null);
+            $newMedia->setMediaPath($imgPath);
+            $newMedia->setMediaType($fileExt[1]);
+            $newMedia->setIsBanner(null);
             move_uploaded_file($tmp, "$dirImages/$filename");
-            $this->getEntityManager()->persist($media);
-            $this->getEntityManager()->flush();
-            $this->getEntityManager()->clear();
+            $trick->addMedia($newMedia);
+            $this->getEntityManager()->persist($newMedia);
         }
-        foreach ($videos as $k => $video) {
-            $fileExt = explode('.', $video->getClientOriginalName());
-            $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
-            $videoPath = "/assets/videos/$filename";
-            $tmp = $video->getPathname();
-            $media->setMediaPath($videoPath);
-            $media->setMediaType($fileExt[1]);
-            $media->setIsBanner(null);
-            move_uploaded_file($tmp, "$dirVideos/$filename");
-            $this->getEntityManager()->persist($media);
-            $this->getEntityManager()->flush();
-            $this->getEntityManager()->clear();
         }
+
+        if(!empty($media->getVideos()))
+        {
+            foreach ($videos as   $video) {
+                $newMedia = new Media();
+                $fileExt = explode('.', $video->getClientOriginalName());
+                $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
+                $videoPath = "/assets/videos/$filename";
+                $tmp = $video->getPathname();
+                $newMedia->setMediaPath($videoPath);
+                $newMedia->setMediaType($fileExt[1]);
+                $newMedia->setIsBanner();
+                move_uploaded_file($tmp, "$dirVideos/$filename");
+                $trick->addMedia($newMedia);
+                $this->getEntityManager()->persist($newMedia);
+
+            }
+        }
+
     }
 
 

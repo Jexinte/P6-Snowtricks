@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Repository\MediaRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
 class Media
@@ -49,6 +48,10 @@ class Media
 
 
     private ?UploadedFile $updatedFile = null;
+
+    #[ORM\ManyToOne(inversedBy: 'media')]
+    #[ORM\JoinColumn(name:'id_trick',referencedColumnName: 'id',nullable: false)]
+    private ?Trick $trick = null;
 
     public function getId(): ?int
     {
@@ -157,18 +160,13 @@ class Media
         $this->embedUrl = $embedUrl;
     }
 
-    /**
-     * @return UploadedFile|null
-     */
-    public function getBannerFile(): ?UploadedFile
+    public function getBannerFile():UploadedFile
     {
         return $this->bannerFile;
     }
 
-    /**
-     * @param UploadedFile|null $bannerFile
-     */
-    public function setBannerFile(?UploadedFile $bannerFile): void
+
+    public function setBannerFile( UploadedFile $bannerFile): void
     {
         $this->bannerFile = $bannerFile;
     }
@@ -208,6 +206,18 @@ class Media
     public function setImages(array $images): void
     {
         $this->images = $images;
+    }
+
+    public function getTrick(): ?Trick
+    {
+        return $this->trick;
+    }
+
+    public function setTrick(?Trick $trick): static
+    {
+        $this->trick = $trick;
+
+        return $this;
     }
 
 

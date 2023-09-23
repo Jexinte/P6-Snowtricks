@@ -44,6 +44,10 @@ form .box {
     width: 100%;
 }
 
+#trick .col-form-label{
+    display: none;
+}
+
 @media screen and (max-width: 992px) {
     #trick {
         margin-bottom: 8em;
