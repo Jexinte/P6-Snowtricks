@@ -163,7 +163,7 @@ class Media
 //    /**
 //     * @return UploadedFile|null
 //     */
-    public function getBannerFile()
+    public function getBannerFile():UploadedFile
     {
         return $this->bannerFile;
     }
@@ -171,7 +171,7 @@ class Media
 //    /**
 //     * @param UploadedFile|null $bannerFile
 //     */
-    public function setBannerFile( $bannerFile): void
+    public function setBannerFile(UploadedFile $bannerFile): void
     {
         $this->bannerFile = $bannerFile;
     }
