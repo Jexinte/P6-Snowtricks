@@ -17,9 +17,9 @@
             <a href="{{ path('homepage') }}"><img src="/assets/img/logo/logo.jpg" alt="main logo" height="60"></a>
             <ul>
                 {% if user_connected is defined and user_connected == 1 %}
-                    <li><a href="{{path('logout')}}">Déconnexion</a></li>
+                    <li><a href="{{ path('logout') }}">Déconnexion</a></li>
                 {% else %}
-                    <li><a href="{{path('registration_get')}}">Inscription</a></li>
+                    <li><a href="{{ path('registration_get') }}">Inscription</a></li>
                 {% endif %}
             </ul>
         </nav>
@@ -30,21 +30,26 @@
             {{ form_start(form,{'action':path('login')}) }}
             {{ form_row(form.name) }}
             {{ form_row(form.password) }}
-            <a class="text-center" href="{{ path('forgot_password_get') }}" id="forgot-password">Mot de passe oublié ?</a>
+            <a class="text-center" href="{{ path('forgot_password_get') }}" id="forgot-password">Mot de passe oublié
+                ?</a>
             {{ form_end(form) }}
-
+            <a id="has-no-account" class="text-center" href="{{ path('registration_get') }}">Vous n'avez pas encore de
+                compte ? Inscrivez-vous !</a>
 
         </div>
     </div>
     <footer id="footer">
         <p class="text-center footer-paragraph">Copyright @ 2023</p>
         <nav id="nav-mobile">
-            <a href="{{ path('homepage') }}" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
+            <a href="{{ path('homepage') }}" class="mobile-link" id="homepage-link"><i
+                        class="fa-solid fa-house"></i></a>
             {% if user_connected is defined and user_connected == 1 %}
-                <a href="{{path('logout')}}" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
+                <a href="{{ path('logout') }}" class="mobile-link" id="log-out"><i
+                            class="fa-solid fa-right-from-bracket"></i></a>
                 <a href="{{ path('create_trick_get') }}" class="mobile-link" id="plus"><i class="fa-solid fa-plus"></i></a>
             {% else %}
-                <a href="{{path('registration_get')}}" class="mobile-link" id="sign-up"><i class="fa-solid fa-user-plus"></i></a>
+                <a href="{{ path('registration_get') }}" class="mobile-link" id="sign-up"><i
+                            class="fa-solid fa-user-plus"></i></a>
             {% endif %}
         </nav>
     </footer>

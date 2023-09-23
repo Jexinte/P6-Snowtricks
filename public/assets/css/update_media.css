@@ -232,6 +232,9 @@ header {
 #update_file_save{
     width: 100%;
 }
+#update_embed_url_save{
+    width: 100%;
+}
 
 .box{
     display: flex;
