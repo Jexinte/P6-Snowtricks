@@ -26,23 +26,37 @@ class HomepageController extends AbstractController
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
         $tricks = $trickRepository->findAll();
         $result = [];
-        $medias = $mediaRepository->findAll();
+        $banners = $mediaRepository->findBy(["isBanner" => true]);
 
-        foreach ($tricks as $k => $value) {
-//            if ($medias[$k]->getIsBanner() && $value->getId() == $medias[$k]->getIdTrick()) {
-//                $result[$k] = [
-//                    "name" => $value->getName(),
-//                    "slug" => strtolower($slugger->slug($value->getName())),
-//                    "id" => $value->getId(),
-//                    "main_banner" => $medias[$k]->getMediaPath()
-//                ];
-//            } else {
+        foreach ($tricks as $k => $trick) {
+            if(!empty($banners))
+            {
+                foreach($banners as $banner){
+                    if($banner->getIdTrick() == $trick->getId())
+                    {
+                        $result[$k] = [
+                        "name" => $trick->getName(),
+                        "slug" => strtolower($slugger->slug($trick->getName())),
+                        "id" => $trick->getId(),
+                        "main_banner" => $banner->getMediaPath()
+                    ];
+                    }
+                    else {
+                        $result[$k] = [
+                            "name" => $trick->getName(),
+                            "slug" => strtolower($slugger->slug($trick->getName())),
+                            "id" => $trick->getId(),
+                        ];
+                    }
+                }
+            }
+            else {
                 $result[$k] = [
-                    "name" => $value->getName(),
-                    "slug" => strtolower($slugger->slug($value->getName())),
-                    "id" => $value->getId(),
+                    "name" => $trick->getName(),
+                    "slug" => strtolower($slugger->slug($trick->getName())),
+                    "id" => $trick->getId(),
                 ];
-//            }
+            }
         }
         $parameters["tricks"] = $result;
         return new Response($this->render("homepage.twig", $parameters));

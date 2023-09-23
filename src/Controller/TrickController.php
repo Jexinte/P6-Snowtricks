@@ -42,7 +42,7 @@ class TrickController extends AbstractController
         if (!$trick) {
             throw $this->createNotFoundException();
         }
-        $medias = $mediaRepository->findBy(["idTrick" => $id]);
+        $medias = $mediaRepository->findBy(["idTrick" => $id , "isBanner" => null]);
         $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $id, "isBanner" => true]));
         $trickComments = $commentRepository->getComments($id, $userRepository);
         if ($request->query->get('page') !== null && !empty($request->query->get('page'))) {
@@ -144,7 +144,7 @@ class TrickController extends AbstractController
         $userConnected = $request->getSession()->get('user_connected');
         $trick = current($trickRepository->findBy(["id" => $id]));
         $form = $this->createForm(UpdateTrickContent::class, $trick);
-        $medias = $mediaRepository->findBy(["idTrick" => $id]);
+        $medias = $mediaRepository->findBy(["idTrick" => $id , "isBanner" => null]);
         $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $id, "isBanner" => true]));
         $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
         $dateTrick = $trick->getDate();
