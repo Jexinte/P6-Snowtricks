@@ -29,6 +29,10 @@ class Comment
     private ?string $content = null;
 
     private ?string $username = null;
+
+    #[ORM\ManyToOne(inversedBy: 'comment')]
+    #[ORM\JoinColumn(name:'id_trick',referencedColumnName: 'id',nullable: false)]
+    private ?Trick $trick = null;
     public function getId(): ?int
     {
         return $this->id;
@@ -105,5 +109,21 @@ class Comment
     {
 
         return $this->username;
+    }
+
+    /**
+     * @return Trick|null
+     */
+    public function getTrick(): ?Trick
+    {
+        return $this->trick;
+    }
+
+    /**
+     * @param Trick|null $trick
+     */
+    public function setTrick(?Trick $trick): void
+    {
+        $this->trick = $trick;
     }
 }

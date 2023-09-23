@@ -159,14 +159,19 @@ class Media
     {
         $this->embedUrl = $embedUrl;
     }
-
-    public function getBannerFile():UploadedFile
+//
+//    /**
+//     * @return UploadedFile|null
+//     */
+    public function getBannerFile()
     {
         return $this->bannerFile;
     }
 
-
-    public function setBannerFile( UploadedFile $bannerFile): void
+//    /**
+//     * @param UploadedFile|null $bannerFile
+//     */
+    public function setBannerFile( $bannerFile): void
     {
         $this->bannerFile = $bannerFile;
     }
