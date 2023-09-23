@@ -20,11 +20,6 @@ class CommentController extends AbstractController
 {
 
 
-
-
-
-
-
     #[Route('/add-comment/{id}', name: 'add_comment', methods: ["POST"])]
     public function handleAddComment(
         int $id,
@@ -43,23 +38,21 @@ class CommentController extends AbstractController
         $user = current($userRepository->findBy(["id" => $request->getSession()->get('user_id')]));
         $trick = current($trickRepository->findBy(["id" => $id]));
         $token = $request->request->all()["add_comment"]["_token"];
-        if ($form->isSubmitted() && $form->isValid()) {
-            if ($this->isCsrfTokenValid("add_comment", $token)) {
-                $formData = $form->getData();
-                $commentEntity->setContent($formData->getContent());
-                $commentEntity->setIdUser($user->getId());
-                $commentEntity->setIdTrick($id);
-                $commentEntity->setUserProfileImage($user->getProfileImage());
-                $commentEntity->setDateCreation($dateTime);
-                $trick->addComment($commentEntity);
-                $user->addComment($commentEntity);
-                $commentRepository->getEntityManager()->flush();
-                $trickNameSlug = $slugger->slug($trick->getName())->lower();
-                return $this->redirectToRoute("trick", [
-                    "trickname" => $trickNameSlug,
-                    "id" => $id
-                ]);
-            }
+        if ($form->isSubmitted() && $form->isValid() && $this->isCsrfTokenValid("add_comment", $token)) {
+            $formData = $form->getData();
+            $commentEntity->setContent($formData->getContent());
+            $commentEntity->setIdUser($user->getId());
+            $commentEntity->setIdTrick($id);
+            $commentEntity->setUserProfileImage($user->getProfileImage());
+            $commentEntity->setDateCreation($dateTime);
+            $trick->addComment($commentEntity);
+            $user->addComment($commentEntity);
+            $commentRepository->getEntityManager()->flush();
+            $trickNameSlug = $slugger->slug($trick->getName())->lower();
+            return $this->redirectToRoute("trick", [
+                "trickname" => $trickNameSlug,
+                "id" => $id
+            ]);
         }
         $dateTrick = ucfirst($dateFormatter->format($trick->getDate()));
         $medias = $mediaRepository->findBy(["idTrick" => $id]);

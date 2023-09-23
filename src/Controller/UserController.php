@@ -78,26 +78,23 @@ class UserController extends AbstractController
         $user = new User();
         $form = $this->createForm(SignUp::class, $user);
         $form->handleRequest($request);
+        $token = $request->request->all()["sign_up"]["_token"];
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $token = $request->request->all()["sign_up"]["_token"];
-
-            if ($this->isCsrfTokenValid("sign_up", $token)) {
-                $user->setPassword(password_hash($user->getPassword(), PASSWORD_DEFAULT));
-                $user = $form->getData();
-                $fileExt = explode('.', $user->getFile()->getClientOriginalName());
-                $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
-                $imgPath = "/assets/img/$filename";
-                $user->setProfileImage($imgPath);
-                $user->setStatus(UserStatus::ACCOUNT_NOT_ACTIVATE);
-                $tmp = $user->getFile()->getPathname();
-                $dir = "../public/assets/img";
-                move_uploaded_file($tmp, "$dir/$filename");
-                $userRepository->getEntityManager()->persist($user);
-                $userRepository->getEntityManager()->flush();
-                $user->setCreated(true);
-                $this->sendMailToUser($mailer, $user, $request);
-            }
+        if ($form->isSubmitted() && $form->isValid() && $this->isCsrfTokenValid("sign_up", $token)) {
+            $user->setPassword(password_hash($user->getPassword(), PASSWORD_DEFAULT));
+            $user = $form->getData();
+            $fileExt = explode('.', $user->getFile()->getClientOriginalName());
+            $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
+            $imgPath = "/assets/img/$filename";
+            $user->setProfileImage($imgPath);
+            $user->setStatus(UserStatus::ACCOUNT_NOT_ACTIVATE);
+            $tmp = $user->getFile()->getPathname();
+            $dir = "../public/assets/img";
+            move_uploaded_file($tmp, "$dir/$filename");
+            $userRepository->getEntityManager()->persist($user);
+            $userRepository->getEntityManager()->flush();
+            $user->setCreated(true);
+            $this->sendMailToUser($mailer, $user, $request);
             return $this->redirectToRoute("homepage");
         }
         $userConnected = $request->getSession()->get('user_connected');
