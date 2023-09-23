@@ -250,11 +250,26 @@ header {
     width: 100%;
 }
 
+#see-medias{
+    margin-block: 3em;
+    padding-block: 0.8em;
+    display: none;
+}
+
+
+
 @media screen and (max-width: 992px) {
     .trick-details {
         flex-direction: column;
     }
 
+    #trick-content .medias{
+        display: none;
+    }
+
+    #see-medias{
+        display: block;
+    }
     footer {
         padding-inline: 1em;
         margin-top: 2em;

@@ -19,7 +19,7 @@
                 {% if user_connected is defined and user_connected == 1 %}
                     <li><a href="{{path('logout')}}">Déconnexion</a></li>
                 {% else %}
-                    <li><a href="{{ path('login') }}">Connexion</a></li>
+                    <li><a href="{{ path('login_get') }}">Connexion</a></li>
                 {% endif %}
             </ul>
         </nav>
@@ -38,7 +38,7 @@
             {% if user_connected is defined and user_connected == 1 %}
                 <a href="{{path('logout')}}" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
-                <a href="{{ path('login') }}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
+                <a href="{{ path('login_get') }}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
             {% endif %}
         </nav>
     </footer>

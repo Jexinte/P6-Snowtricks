@@ -30,11 +30,10 @@
                 <img src="/assets/img/banner/banner_homepage.jpg"
                      alt="banner">
             {% endif %}
-
         </div>
+        <button class="btn btn-dark" id="see-medias">Afficher les médias</button>
+
         <div id="trick-content">
-
-
             <div class="medias">
                 {% for media in medias %}
 
@@ -102,8 +101,8 @@
                 <a href="{{ path('logout') }}" class="mobile-link" id="log-out"><i
                             class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
-                <a href="{{ path('login') }}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
-                <a href="{{ path('registration') }}" class="mobile-link" id="sign-up"><i
+                <a href="{{ path('login_get') }}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
+                <a href="{{ path('registration_get') }}" class="mobile-link" id="sign-up"><i
                             class="fa-solid fa-user-plus"></i></a>
             {% endif %}
         </nav>
@@ -113,4 +112,5 @@
     {% block javascript %}
     <script src="/assets/js/media-animation.js"></script>
     <script src="/assets/js/delete-trick-on-update.js"></script>
+    <script src="/assets/js/display-medias.js"></script>
     {% endblock %}

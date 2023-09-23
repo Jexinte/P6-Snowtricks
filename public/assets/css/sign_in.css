@@ -17,7 +17,7 @@ nav a {
     text-decoration: none;
     color:var(--black);
 }
-#submit{
+#login_save{
     width: 100%;
 }
 #login{

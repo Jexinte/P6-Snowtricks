@@ -24,7 +24,7 @@ class UserController extends AbstractController
 {
 
 
-    #[Route(path: '/signup', methods: ["GET"])]
+    #[Route(path: '/signup',name:'registration_get', methods: ["GET"])]
     public function signUpPage(Request $request): Response
     {
         $userConnected = $request->getSession()->get('user_connected');
@@ -35,7 +35,7 @@ class UserController extends AbstractController
         return new Response($this->render("sign_up.twig", $parameters));
     }
 
-    #[Route(path: '/signin', methods: ["GET"])]
+    #[Route(path: '/signin', name:'login_get', methods: ["GET"])]
     public function signInPage(Request $request): Response
     {
         $userConnected = $request->getSession()->get('user_connected');

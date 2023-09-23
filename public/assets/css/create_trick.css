@@ -32,6 +32,8 @@ header {
     display: flex;
     flex-direction: column;
     gap: 2em;
+    position: relative;
+    padding-inline: 0;
 }
 
 form .box {
@@ -47,10 +49,24 @@ form .box {
 #trick .col-form-label{
     display: none;
 }
+#submit {
+    position: absolute;
+    bottom: -70px;
+    width: 100%;
+}
 
+#create_trick_mediaForm{
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+}
 @media screen and (max-width: 992px) {
     #trick {
         margin-bottom: 8em;
+    }
+
+    #form {
+        margin-bottom: 5em;
     }
 
     #banner-trick img {

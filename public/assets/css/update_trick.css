@@ -257,11 +257,29 @@ form {
     flex-direction: column;
     gap: 3em;
 }
+
+#update_trick_content_save{
+    width: 100%;
+}
+#see-medias{
+    margin-block: 3em;
+    padding-block: 0.8em;
+    display: none;
+}
+footer{
+    padding-inline: 1em;
+}
 @media screen and (max-width: 992px)
 {
+    #see-medias{
+        display: block;
+    }
     #trick-content .media-box {
         width: 300px;
         height: 400px;
+    }
+    #trick-content .medias{
+        display: none;
     }
 
     #trick-content .media-box img, iframe, embed {
