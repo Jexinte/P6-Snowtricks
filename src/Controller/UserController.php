@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Enumeration\UserStatus;
 use App\Enumeration\CodeStatus;
 use App\Form\Type\ForgotPassword;
+use App\Form\Type\ResetPassword;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
@@ -25,7 +26,7 @@ class UserController extends AbstractController
 {
 
 
-    #[Route(path: '/signup',name:'registration_get', methods: ["GET"])]
+    #[Route(path: '/signup', name: 'registration_get', methods: ["GET"])]
     public function signUpPage(Request $request): Response
     {
         $userConnected = $request->getSession()->get('user_connected');
@@ -36,7 +37,7 @@ class UserController extends AbstractController
         return new Response($this->render("sign_up.twig", $parameters));
     }
 
-    #[Route(path: '/signin', name:'login_get', methods: ["GET"])]
+    #[Route(path: '/signin', name: 'login_get', methods: ["GET"])]
     public function signInPage(Request $request): Response
     {
         $userConnected = $request->getSession()->get('user_connected');
@@ -47,7 +48,7 @@ class UserController extends AbstractController
         return new Response($this->render("sign_in.twig", $parameters));
     }
 
-    #[Route(path: '/forgot-password', name:'forgot_password_get',methods: ["GET"])]
+    #[Route(path: '/forgot-password', name: 'forgot_password_get', methods: ["GET"])]
     public function forgotPasswordPage(Request $request): Response
     {
         $userConnected = $request->getSession()->get('user_connected');
@@ -63,7 +64,9 @@ class UserController extends AbstractController
         $tokenInSession = $request->getSession()->get('token');
         $userConnected = $request->getSession()->get('user_connected');
         if (!is_null($id) && $id == $tokenInSession) {
+            $form = $this->createForm(ResetPassword::class);
             $parameters["token"] = $id;
+            $parameters["form"] = $form;
             $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
             return new Response($this->render("reset_password.twig", $parameters));
         }
@@ -71,7 +74,7 @@ class UserController extends AbstractController
     }
 
 
-    #[Route(path: '/signup/registration',name:'registration',methods: ['POST'])]
+    #[Route(path: '/signup/registration', name: 'registration', methods: ['POST'])]
     public function signUpValidator(
         Request $request,
         UserRepository $userRepository,
@@ -229,7 +232,7 @@ L'équipe Snowtricks
         return new Response($this->render("sign_in.twig", $parameters), CodeStatus::CLIENT);
     }
 
-    #[Route(path: '/logout',name:'logout',methods: ["GET"])]
+    #[Route(path: '/logout', name: 'logout', methods: ["GET"])]
     public function logout(Request $request): ?RedirectResponse
     {
         $userConnected = $request->getSession()->get('user_connected');
@@ -246,7 +249,6 @@ L'équipe Snowtricks
         MailerInterface $mailer,
         Request $request,
         UserRepository $userRepository,
-        ValidatorInterface $validator
     ): Response {
         $form = $this->createForm(ForgotPassword::class);
         $form->handleRequest($request);
@@ -304,57 +306,43 @@ L'équipe Snowtricks
     public function resetPassword(
         Request $request,
         string $id,
-        ValidatorInterface $validator,
         UserRepository $userRepository
     ): Response {
-        $groupsViolations = [];
         $resetPasswordkAsk = $request->getSession()->get('ask_reset_password');
-
-        if ($resetPasswordkAsk) {
-            $numberOfErrors = 0;
+        $form = $this->createForm(ResetPassword::class);
+        $form->handleRequest($request);
+        $token = $request->request->all()['reset_password']['_token'];
+        if ($form->isValid() && $form->isSubmitted() && $this->isCsrfTokenValid(
+                "reset_password",
+                $token
+            ) && $resetPasswordkAsk) {
             $response = new Response();
             $user = new User();
-            $user->setName($request->request->get("username"));
-            $user->setOldPassword($request->request->get("old-password"));
-            $user->setPassword($request->request->get("password"));
-            $token = $request->request->get('token');
-            $groups = [
-                "username_exception_reset_password",
-                "password_exception_old_reset_password",
-                "password_exception_new_reset_password",
-                "password_exception_wrong_format"
-            ];
-            foreach ($groups as $group) {
-                $errors = $validator->validate($user, null, $group);
-                if (count($errors) >= 1) {
-                    $numberOfErrors++;
-                }
-                foreach ($errors as $error) {
-                    $groupsViolations[$group] = $error->getMessage();
-                }
-            }
-
-            if ($numberOfErrors == 0 && $this->isCsrfTokenValid("reset_password_with_token", $token)) {
-                $userEntity = $userRepository->checkPasswordReset($user);
-                switch (true) {
-                    case $userEntity->getCredentialsValid():
-
-                        $response->headers->clearCookie("token");
-                        $response->send();
-                        $request->getSession()->remove('ask_reset_password');
-                        return $this->redirectToRoute("homepage");
-                    case !$user->getPasswordCorrect() && !is_null($user->getPasswordCorrect()):
-                        $groupsViolations["password_exception_old_reset_password"] = "Oops ! Il semble que le mot de passe saisi est incorrect !";
-                        break;
-                    default:
-                        $groupsViolations["username_exception_reset_password"] = "Oops ! Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations de connexion !";
-                }
+            $user->setName($form->getData()->getName());
+            $user->setOldPassword($form->getData()->getOldPassword());
+            $user->setPassword($form->getData()->getPassword());
+            $userEntity = $userRepository->checkPasswordReset($user);
+            switch (true) {
+                case $userEntity->getCredentialsValid():
+                    $response->headers->clearCookie("token");
+                    $response->send();
+                    $request->getSession()->remove('ask_reset_password');
+                    return $this->redirectToRoute("homepage");
+                case !$user->getPasswordCorrect() && !is_null($user->getPasswordCorrect()):
+                    $error = new FormError('Oops ! Il semble que le mot de passe saisi est incorrect !');
+                    $form->get('oldPassword')->addError($error);
+                    break;
+                default:
+                    $error = new FormError(
+                        'Oops ! Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations de connexion !'
+                    );
+                    $form->get('name')->addError($error);
             }
         }
         $userConnected = $request->getSession()->get('user_connected');
         $parameters["token"] = $id;
+        $parameters["form"] = $form;
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        $parameters["exceptions"] = $groupsViolations;
         return new Response($this->render("reset_password.twig", $parameters), CodeStatus::CLIENT);
     }
 

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Form\Type;
+
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -73,15 +74,15 @@ class SignUp extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-     $resolver->setDefaults([
-         'data_class'      => User::class,
+        $resolver->setDefaults([
+            'data_class' => User::class,
 
-         'csrf_protection' => true,
+            'csrf_protection' => true,
 
-         'csrf_field_name' => '_token',
+            'csrf_field_name' => '_token',
 
-         'csrf_token_id'   => 'sign_up',
-     ]);
+            'csrf_token_id' => 'sign_up',
+        ]);
     }
 }
 
