@@ -52,6 +52,7 @@ class CommentController extends AbstractController
                 $commentEntity->setUserProfileImage($user->getProfileImage());
                 $commentEntity->setDateCreation($dateTime);
                 $trick->addComment($commentEntity);
+                $user->addComment($commentEntity);
                 $commentRepository->getEntityManager()->flush();
                 $trickNameSlug = $slugger->slug($trick->getName())->lower();
                 return $this->redirectToRoute("trick", [
