@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Enumeration\UserStatus;
 use App\Enumeration\CodeStatus;
+use App\Form\Type\ForgotPassword;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
@@ -50,7 +51,9 @@ class UserController extends AbstractController
     public function forgotPasswordPage(Request $request): Response
     {
         $userConnected = $request->getSession()->get('user_connected');
+        $form = $this->createForm(ForgotPassword::class);
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["form"] = $form;
         return new Response($this->render("forgot_password.twig", $parameters));
     }
 
@@ -245,28 +248,16 @@ L'équipe Snowtricks
         UserRepository $userRepository,
         ValidatorInterface $validator
     ): Response {
-        $user = new User();
-        $user->setName($request->request->get('username'));
-        $numberOfErrors = 0;
+        $form = $this->createForm(ForgotPassword::class);
+        $form->handleRequest($request);
         $code = CodeStatus::CLIENT;
-        $token = $request->request->get('token');
-        $groups = [
-            "username_exception_forgot_password",
-        ];
-        $groupsViolations = [];
+        $token = $request->request->all()["forgot_password"]["_token"];
 
-        foreach ($groups as $group) {
-            $errors = $validator->validate($user, null, $group);
-            if (count($errors) >= 1) {
-                $numberOfErrors++;
-            }
-            foreach ($errors as $error) {
-                $groupsViolations[$group] = $error->getMessage();
-            }
-        }
-
-        if ($numberOfErrors == 0 && $this->isCsrfTokenValid("reset_password_with_link", $token)) {
+        if ($form->isValid() && $form->isSubmitted() && $this->isCsrfTokenValid("reset_password_with_link", $token)) {
+            $user = new User();
+            $user->setName($form->getData()->getName());
             $userFound = current($userRepository->findBy(["name" => $user->getName()]));
+
             if ($userFound) {
                 $this->setToken();
                 $token = $request->getSession()->get("token");;
@@ -297,13 +288,14 @@ L'équipe Snowtricks
                 $parameters["token"] = $token;
                 $code = CodeStatus::REQUEST_SUCCEED;
             } else {
-                $groupsViolations["username_exception_forgot_password"] = "Oops ! Identifiant incorrect. Veuillez vérifier vos informations !";
+                $error = new FormError('Oops ! Identifiant incorrect. Veuillez vérifier vos informations !');
+                $form->get('name')->addError($error);
             }
         }
 
-        $parameters["exceptions"] = $groupsViolations;
         $userConnected = $request->getSession()->get('user_connected');
         $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["form"] = $form;
         return new Response($this->render("forgot_password.twig", $parameters), $code);
     }
 
