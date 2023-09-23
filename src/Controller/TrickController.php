@@ -36,13 +36,13 @@ class TrickController extends AbstractController
         IntlDateFormatter $dateFormatter,
         Request $request
     ): Response {
-        $form = $this->createForm(AddComment::class);
         $userConnected = $request->getSession()->get('user_connected');
         $trick = current($trickRepository->findBy(["id" => $id]));
-        if (!$trick) {
+        if (!$trick || $trick->getName() != ucfirst($trickname)) {
             throw $this->createNotFoundException();
         }
-        $medias = $mediaRepository->findBy(["idTrick" => $id , "isBanner" => null]);
+        $form = $this->createForm(AddComment::class);
+        $medias = $mediaRepository->findBy(["idTrick" => $id, "isBanner" => null]);
         $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $id, "isBanner" => true]));
         $trickComments = $commentRepository->getComments($id, $userRepository);
         if ($request->query->get('page') !== null && !empty($request->query->get('page'))) {
@@ -69,7 +69,7 @@ class TrickController extends AbstractController
         $parameters["banner"] = $mainBannerOfTrick;
         $parameters["medias"] = $medias;
         $parameters["trick_date"] = $dateTrick;
-        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["user_connected"] = $userConnected;
 
         return new Response($this->render("trick.twig", $parameters));
     }
@@ -79,9 +79,12 @@ class TrickController extends AbstractController
     public function createTrickPage(Request $request): Response
     {
         $userConnected = $request->getSession()->get('user_connected');
+        if (!$userConnected) {
+            return $this->redirectToRoute('forbidden');
+        }
         $form = $this->createForm(CreateTrick::class);
         $form->add('mediaForm', CreateTrickMedia::class);
-        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["user_connected"] = $userConnected;
         $parameters["form"] = $form;
         return new Response($this->render("create_trick.twig", $parameters));
     }
@@ -126,7 +129,7 @@ class TrickController extends AbstractController
             return $this->redirectToRoute('homepage');
         }
 
-        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["user_connected"] = $userConnected;
         $parameters["form"] = $form;
         return new Response($this->render("create_trick.twig", $parameters), 400);
     }
@@ -142,9 +145,12 @@ class TrickController extends AbstractController
         IntlDateFormatter $dateFormatter
     ): Response {
         $userConnected = $request->getSession()->get('user_connected');
+        if (!$userConnected) {
+            return $this->redirectToRoute('forbidden');
+        }
         $trick = current($trickRepository->findBy(["id" => $id]));
         $form = $this->createForm(UpdateTrickContent::class, $trick);
-        $medias = $mediaRepository->findBy(["idTrick" => $id , "isBanner" => null]);
+        $medias = $mediaRepository->findBy(["idTrick" => $id, "isBanner" => null]);
         $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $id, "isBanner" => true]));
         $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
         $dateTrick = $trick->getDate();
@@ -154,7 +160,7 @@ class TrickController extends AbstractController
         $parameters["medias"] = $medias;
         $parameters["trick_date"] = $date;
         $parameters["form"] = $form;
-        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["user_connected"] = $userConnected;
         return new Response($this->render("update_trick.twig", $parameters));
     }
 
@@ -185,7 +191,7 @@ class TrickController extends AbstractController
         }
 
         $userConnected = $request->getSession()->get('user_connected');
-        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["user_connected"] = $userConnected;
         $parameters["medias"] = $media;
         $parameters["form"] = $form;
         $parameters["trick"] = $trick;

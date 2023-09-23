@@ -23,7 +23,7 @@ class HomepageController extends AbstractController
     ): Response {
         $parameters = [];
         $userConnected = $request->getSession()->get('user_connected');
-        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["user_connected"] = $userConnected;
         $tricks = $trickRepository->findAll();
         $result = [];
         $banners = $mediaRepository->findBy(["isBanner" => true]);

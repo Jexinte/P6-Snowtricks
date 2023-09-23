@@ -32,7 +32,7 @@ class UserController extends AbstractController
         $userConnected = $request->getSession()->get('user_connected');
         $user = new User();
         $form = $this->createForm(SignUp::class, $user);
-        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["user_connected"] = $userConnected;
         $parameters["form"] = $form;
         return new Response($this->render("sign_up.twig", $parameters));
     }
@@ -43,7 +43,7 @@ class UserController extends AbstractController
         $userConnected = $request->getSession()->get('user_connected');
         $user = new User();
         $form = $this->createForm(Login::class, $user);
-        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["user_connected"] = $userConnected;
         $parameters["form"] = $form;
         return new Response($this->render("sign_in.twig", $parameters));
     }
@@ -53,7 +53,7 @@ class UserController extends AbstractController
     {
         $userConnected = $request->getSession()->get('user_connected');
         $form = $this->createForm(ForgotPassword::class);
-        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["user_connected"] = $userConnected;
         $parameters["form"] = $form;
         return new Response($this->render("forgot_password.twig", $parameters));
     }
@@ -67,7 +67,7 @@ class UserController extends AbstractController
             $form = $this->createForm(ResetPassword::class);
             $parameters["token"] = $id;
             $parameters["form"] = $form;
-            $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+            $parameters["user_connected"] = $userConnected;
             return new Response($this->render("reset_password.twig", $parameters));
         }
         throw $this->createNotFoundException();
@@ -104,7 +104,7 @@ class UserController extends AbstractController
             return $this->redirectToRoute("homepage");
         }
         $userConnected = $request->getSession()->get('user_connected');
-        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["user_connected"] = $userConnected;
 
         $parameters["form"] = $form;
         return new Response($this->render("sign_up.twig", $parameters), CodeStatus::CLIENT);
@@ -173,7 +173,7 @@ L'équipe Snowtricks
             }
         }
         $userConnected = $request->getSession()->get('user_connected');
-        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["user_connected"] = $userConnected;
         return new Response(
             $this->render(
                 "account_validation.twig",
@@ -296,7 +296,7 @@ L'équipe Snowtricks
         }
 
         $userConnected = $request->getSession()->get('user_connected');
-        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["user_connected"] = $userConnected;
         $parameters["form"] = $form;
         return new Response($this->render("forgot_password.twig", $parameters), $code);
     }
@@ -342,7 +342,7 @@ L'équipe Snowtricks
         $userConnected = $request->getSession()->get('user_connected');
         $parameters["token"] = $id;
         $parameters["form"] = $form;
-        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+        $parameters["user_connected"] = $userConnected;
         return new Response($this->render("reset_password.twig", $parameters), CodeStatus::CLIENT);
     }
 

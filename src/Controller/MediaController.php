@@ -18,12 +18,17 @@ class MediaController extends AbstractController
     #[Route('/update-trick-media/{id}', name: 'update_trick_media_page', methods: ["GET"])]
     public function updateTrickMediaPage(int $id, MediaRepository $mediaRepository, Request $request): Response
     {
+        $userConnected = $request->getSession()->get('user_connected');
+        if(!$userConnected)
+        {
+            return  $this->redirectToRoute('forbidden');
+        }
         $media = current($mediaRepository->findBy(["id" => $id]));
         $form = $media->getMediaType() == "web" ? $this->createForm(UpdateEmbedUrl::class) : $this->createForm(
             UpdateFile::class
         );
-        $userConnected = $request->getSession()->get('user_connected');
-        $parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
+
+        $parameters["user_connected"] = $userConnected;
         $parameters["form"] = $form;
         $parameters["media"] = $media;
         return new Response($this->render("update_media.twig", $parameters));

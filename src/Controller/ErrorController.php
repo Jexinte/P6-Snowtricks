@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -18,7 +17,6 @@ class ErrorController extends AbstractController
     {
         return match (true) {
             $exception instanceof NotFoundHttpException => $this->redirectToRoute('ressource_not_found'),
-            $exception instanceof AccessDeniedException => $this->redirectToRoute("forbidden"),
             default => $this->redirectToRoute("server_down"),
         };
     }
