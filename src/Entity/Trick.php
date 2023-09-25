@@ -35,10 +35,12 @@ class Trick
     private Collection $media;
 
     private mixed $mediaForm;
-
+    #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Comment::class, cascade: ['persist', 'remove'])]
+    private Collection $comment;
     public function __construct()
     {
         $this->media = new ArrayCollection();
+        $this->comment = new ArrayCollection();
     }
 
     private string $nameUpdated;
@@ -121,6 +123,20 @@ class Trick
         if (!$this->media->contains($media)) {
             $this->media->add($media);
             $media->setTrick($this);
+        }
+
+        return $this;
+    }
+    public function getComment(): Collection
+    {
+        return $this->comment;
+    }
+
+    public function addComment(Comment $comment): static
+    {
+        if (!$this->comment->contains($comment)) {
+            $this->comment->add($comment);
+            $comment->setTrick($this);
         }
 
         return $this;
