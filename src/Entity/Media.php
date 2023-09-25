@@ -30,58 +30,24 @@ class Media
     /**
      * @var array<string>
      */
-    #[Assert\All([
-        new Assert\File(
-            maxSize: '3000K',
-            groups: ['illustration_exception'],
-            extensions: ['jpg', 'png', 'webp'],
-            extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
-        ),
 
-    ])]
 
-    private array $illustrations;
+    private array $images;
     /**
      * @var array<string>
      */
-    #[Assert\All([
-        new Assert\File(
-            maxSize: '3000K',
-            groups: ['video_exception'],
-            extensions: ['mp4'],
-            extensionsMessage: 'Seuls les fichiers mp4 sont acceptés !'
-        ),
-    ])]
+
 
     private array $videos;
 
 
-    #[Assert\Regex(
-        pattern: '/<iframe[^>]+src="([^"]+)"/i',
-        message: "Oops ! Il semblerait que le format de votre url n'est pas bon, merci de vérifier ce qu'il en est",
-        match: true,
-        groups: ['url_exception']
-    )]
     private ?string $embedUrl = null;
 
-    #[Assert\File(
-        maxSize: '3000K',
-        groups: ['banner_exception'],
-        extensions: ['jpg', 'png', 'webp'],
-        extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
-    )]
-    #[Assert\NotBlank(
-        message: 'Veuillez sélectionner un fichier !',
-        groups: ['banner_exception']
-    )]
+
+
     private ?UploadedFile $bannerFile;
 
-    #[Assert\File(
-        maxSize: '3000K',
-        groups: ['update_file_exception'],
-        extensions: ['jpg', 'png', 'webp','mp4'],
-        extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg,png,webp et mp4 sont acceptés !'
-    )]
+
     private ?UploadedFile $updatedFile = null;
 
     public function getId(): ?int
@@ -207,21 +173,7 @@ class Media
         $this->bannerFile = $bannerFile;
     }
 
-    /**
-     * @return array<string>
-     */
-    public function getIllustrations(): array
-    {
-        return $this->illustrations;
-    }
 
-    /**
-     * @param array<string> $illustrations
-     */
-    public function setIllustrations(array $illustrations): void
-    {
-        $this->illustrations = $illustrations;
-    }
 
     /**
      * @return UploadedFile|null
@@ -237,6 +189,25 @@ class Media
     public function setUpdatedFile(?UploadedFile $updatedFile): void
     {
         $this->updatedFile = $updatedFile;
+    }
+
+
+    /**
+     * @return string[]
+     */
+    public function getImages(): array
+    {
+        return $this->images;
+    }
+
+
+    /**
+     * @param array<string> $images
+     * @return void
+     */
+    public function setImages(array $images): void
+    {
+        $this->images = $images;
     }
 
 

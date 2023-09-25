@@ -163,7 +163,7 @@ L'équipe Snowtricks
                 $parameters["token_authenticated"] = 1;
                 return new Response(
                     $this->render(
-                        $template,
+                        "account_validation.twig",
                         $parameters
                     )
                 );
