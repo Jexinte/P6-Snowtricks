@@ -44,14 +44,13 @@ class MediaController extends AbstractController
         $form = $media->getMediaType() == "web" ? $this->createForm(UpdateEmbedUrl::class) : $this->createForm(
             UpdateFile::class
         );
-        $token = array_key_exists("update_file", $request->request->all()) ? $request->request->all(
-        )["update_file"]["_token"] : $request->request->all()["update_embed_url"]["_token"];
-        $form->handleRequest($request);
-        $mediaEntity = new Media();
 
-        if ($form->isValid() && $form->isSubmitted() && $this->isCsrfTokenValid("update_media", $token)) {
-            $file = !empty($form->getData()->getUpdatedFile()) ? $form->getData()->getUpdatedFile() : '';
-            $embedUrl = !empty($form->getData()->getEmbedUrl()) ? $form->getData()->getEmbedUrl() : '';
+        $form->handleRequest($request);
+
+        if ($form->isValid() && $form->isSubmitted()) {
+            $mediaEntity = $form->getData();
+            $file = !empty($mediaEntity->getUpdatedFile()) ? $mediaEntity->getUpdatedFile() : '';
+            $embedUrl = !empty($mediaEntity->getEmbedUrl()) ? $mediaEntity->getEmbedUrl() : '';
             switch (true) {
                 case !empty($file):
                     $mediaEntity->setUpdatedFile($file);

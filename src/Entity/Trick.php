@@ -3,12 +3,16 @@
 namespace App\Entity;
 
 use App\Repository\TrickRepository;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TrickRepository::class)]
+#[UniqueEntity(fields: 'name',message: 'Désolé, le trick que vous avez demandé n\'est actuellement pas disponible, veuillez en définir un autre !')]
 class Trick
 {
     #[ORM\Id]
@@ -17,19 +21,36 @@ class Trick
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:'Ce champ ne peut être vide !')]
+    #[Assert\Regex(
+        pattern: "/^[A-ZÀ-ÿ][A-Za-zÀ-ÿ, .'\-\n]*$/u",
+        message: 'Oops! Le format de votre saisie est incorrect, le nom du trick doit commencer par une lettre majuscule',
+        match: true,
+        groups: ['updateTrickContent','createTrick']
+    )]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:'Ce champ ne peut être vide !')]
+    #[Assert\Regex(
+        pattern: "/^[A-ZÀ-ÿ][A-Za-zÀ-ÿ, .'\-\n]*$/u",
+        message: 'Oops! Le format de votre saisie est incorrect, votre description doit commencer par une lettre majuscule',
+        match: true,
+        groups: ['updateTrickContent','createTrick']
+    )]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:'Ce champ ne peut être vide !')]
     private ?string $trickGroup = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $date = null;
+    private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE,nullable: true)]
+    private ?\DateTimeInterface $updated_at = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?bool $trickUpdated = null;
+
+
 
     #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Media::class, cascade: ['persist', 'remove'])]
     private Collection $media;
@@ -37,13 +58,16 @@ class Trick
     private mixed $mediaForm;
     #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Comment::class, cascade: ['persist', 'remove'])]
     private Collection $comment;
+
     public function __construct()
     {
         $this->media = new ArrayCollection();
         $this->comment = new ArrayCollection();
+
     }
 
     private string $nameUpdated;
+
 
     public function getId(): ?int
     {
@@ -86,29 +110,9 @@ class Trick
         return $this;
     }
 
-    public function getDate(): ?\DateTimeInterface
-    {
-        return $this->date;
-    }
 
-    public function setDate(\DateTimeInterface $date): static
-    {
-        $this->date = $date;
 
-        return $this;
-    }
 
-    public function getTrickUpdated(): ?bool
-    {
-        return $this->trickUpdated;
-    }
-
-    public function isTrickUpdated(?bool $trickUpdated): static
-    {
-        $this->trickUpdated = $trickUpdated;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Media>
@@ -174,4 +178,44 @@ class Trick
     {
         $this->nameUpdated = $nameUpdated;
     }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->created_at;
+    }
+
+    /**
+     * @param \DateTimeInterface|null $created_at
+     */
+    public function setCreatedAt(?\DateTimeInterface $created_at): void
+    {
+        $this->created_at = $created_at;
+    }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updated_at;
+    }
+
+    /**
+     * @param \DateTimeInterface|null $updated_at
+     */
+    public function setUpdatedAt(?\DateTimeInterface $updated_at): void
+    {
+        $this->updated_at = $updated_at;
+    }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+
+
+
+
 }

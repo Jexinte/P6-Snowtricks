@@ -32,19 +32,18 @@ class CommentController extends AbstractController
         DateTime $dateTime,
         TrickRepository $trickRepository,
     ): Response {
-        $commentEntity = new Comment();
-        $form = $this->createForm(AddComment::class, $commentEntity);
+        $form = $this->createForm(AddComment::class);
         $form->handleRequest($request);
         $user = current($userRepository->findBy(["id" => $request->getSession()->get('user_id')]));
         $trick = current($trickRepository->findBy(["id" => $id]));
-        $token = $request->request->all()["add_comment"]["_token"];
-        if ($form->isSubmitted() && $form->isValid() && $this->isCsrfTokenValid("add_comment", $token)) {
-            $formData = $form->getData();
-            $commentEntity->setContent($formData->getContent());
+        $medias = $mediaRepository->findBy(["idTrick" => $id]);
+        $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $id, "isBanner" => true]));
+        if ($form->isSubmitted() && $form->isValid()) {
+            $commentEntity = $form->getData();
             $commentEntity->setIdUser($user->getId());
             $commentEntity->setIdTrick($id);
             $commentEntity->setUserProfileImage($user->getProfileImage());
-            $commentEntity->setDateCreation($dateTime);
+            $commentEntity->setCreatedAt($dateTime);
             $trick->addComment($commentEntity);
             $user->addComment($commentEntity);
             $commentRepository->getEntityManager()->flush();
@@ -54,13 +53,9 @@ class CommentController extends AbstractController
                 "id" => $id
             ]);
         }
-        $dateTrick = ucfirst($dateFormatter->format($trick->getDate()));
-        $medias = $mediaRepository->findBy(["idTrick" => $id]);
+        $dateTrick = is_null($trick->getUpdatedAt()) ? ucfirst($dateFormatter->format($trick->getCreatedAt())) : ucfirst($dateFormatter->format($trick->getUpdatedAt()));
+
         $trickComments = $commentRepository->getComments($id, $userRepository);
-        $parameters["trick"] = $trick;
-        $parameters["trick_date"] = $dateTrick;
-        $parameters["medias"] = $medias;
-        $parameters["user_connected"] = $request->getSession()->get('user_connected');
 
 
         if ($request->query->get('page') !== null && !empty($request->query->get('page'))) {
@@ -73,10 +68,21 @@ class CommentController extends AbstractController
         $pages = ceil($nbComments / $commentsPerPage);
         $firstPage = ($currentPage * $commentsPerPage) - $commentsPerPage;
         $commentsPerPageRequest = $commentRepository->getCommentsPerPage($id, $firstPage, $commentsPerPage);
+        foreach ($commentsPerPageRequest as $comment) {
+            $comment->date = ucfirst($dateFormatter->format($comment->getCreatedAt()));
+        }
+
         $parameters["comments"] = $commentsPerPageRequest;
         $parameters["pages"] = $pages;
         $parameters["currentPage"] = $currentPage;
         $parameters["form"] = $form;
+        $parameters["totalComments"] = $nbComments;
+        $parameters["trick"] = $trick;
+        $parameters["trick_date"] = $dateTrick;
+        $parameters["medias"] = $medias;
+        $parameters["banner"] = $mainBannerOfTrick;
+        $parameters["user_connected"] = $request->getSession()->get('user_connected');
+
         return new Response($this->render("trick.twig", $parameters), 400);
     }
 

@@ -17,13 +17,7 @@ class UpdateEmbedUrl extends AbstractType
         $builder->add("embedUrl", TextType::class, options: [
             'label' => 'Url Vidéo Dailymotion / Youtube',
             'required' => false,
-            'constraints' => [
-                new Regex(
-                    pattern: '/<iframe[^>]+src="([^"]+)"/i',
-                    message: "Oops ! Il semblerait que le format de votre url n'est pas bon, merci de vérifier ce qu'il en est",
-                    match: true,
-                ),
-            ]
+
         ])
             ->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']])
             ->setMethod('PUT');
@@ -32,6 +26,8 @@ class UpdateEmbedUrl extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Media::class,
+
+            'validation_groups' => 'createTrick',
 
             'csrf_protection' => true,
 

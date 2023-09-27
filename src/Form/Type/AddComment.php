@@ -18,16 +18,6 @@ class AddComment extends AbstractType
         $builder->add("content", TextType::class, options: [
             'label' => "Ajouter un commentaire",
             'required' => false,
-            "constraints" => [
-                new NotBlank(null, 'Ce champ ne peut être vide !'),
-                new Regex(
-                    pattern: '/^[A-ZÀ-ÿ][A-ZÀ-ÿa-zÀ-ÿ0-9\s\-\_\!\@\#\$\%\&\'\(\)\*\+\,\.\:\/\;\=\?\[\]\^\`\{\|\}\~]{0,498}[A-ZÀ-ÿa-zÀ-ÿ0-9\s\-\_\!\@\#\$\%\&\'\(\)\*\+\,\.\:\/\;\=\?\[\]\^\`\{\|\}\~]$/',
-                    message: 'Un commentaire 
-    doit commencer par une lettre majuscule
-     et ne peut excéder 500 caractères',
-                    match: true,
-                )
-            ],
             "attr" => ["placeholder" => "Exprimez-vous !"]
         ])->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']]);
     }

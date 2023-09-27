@@ -7,7 +7,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ForgotPassword extends AbstractType
 {
@@ -16,10 +15,7 @@ class ForgotPassword extends AbstractType
         $builder->add('name',TextType::class,options:[
             'label' => 'Utilisateur',
             'required' => false,
-            'constraints' => [
-                new NotBlank(null,'Ce champ ne peut être vide !'),
 
-            ],
             'attr' => ['placeholder' => 'John']
         ])->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']])
             ->setMethod('POST');
@@ -28,7 +24,9 @@ class ForgotPassword extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
      $resolver->setDefaults([
-        "data_class" => User::class,
+        'data_class' => User::class,
+        'validation_groups' => 'forgotPassword',
+
          'csrf_protection' => true,
 
          'csrf_field_name' => '_token',

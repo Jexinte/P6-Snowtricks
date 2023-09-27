@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Media;
+use App\Enumeration\CodeStatus;
 use App\Form\Type\AddComment;
 use App\Form\Type\CreateTrick;
 use App\Form\Type\CreateTrickMedia;
@@ -28,8 +29,7 @@ class TrickController extends AbstractController
     #[Route('/{trickname}/details/{id}', name: 'trick', methods: ["GET"])]
     public function getTrickPage(
         string $trickname,
-        int $id,
-        TrickRepository $trickRepository,
+        Trick $trick,
         UserRepository $userRepository,
         CommentRepository $commentRepository,
         MediaRepository $mediaRepository,
@@ -37,10 +37,7 @@ class TrickController extends AbstractController
         Request $request
     ): Response {
         $userConnected = $request->getSession()->get('user_connected');
-        $trick = current($trickRepository->findBy(["id" => $id]));
-        if (!$trick || $trick->getName() != ucfirst($trickname)) {
-            throw $this->createNotFoundException();
-        }
+        $id = $trick->getId();
         $form = $this->createForm(AddComment::class);
         $medias = $mediaRepository->findBy(["idTrick" => $id, "isBanner" => null]);
         $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $id, "isBanner" => true]));
@@ -56,13 +53,13 @@ class TrickController extends AbstractController
         $firstPage = ($currentPage * $commentsPerPage) - $commentsPerPage;
         $commentsPerPageRequest = $commentRepository->getCommentsPerPage($id, $firstPage, $commentsPerPage);
         foreach ($commentsPerPageRequest as $comment) {
-            $comment->date = ucfirst($dateFormatter->format($comment->getDateCreation()));
+            $comment->date = ucfirst($dateFormatter->format($comment->getCreatedAt()));
         }
         $parameters["comments"] = $commentsPerPageRequest;
         $parameters["pages"] = $pages;
         $parameters["currentPage"] = $currentPage;
         $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
-        $dateTrick = ucfirst($dateFormatter->format($trick->getDate()));
+        $dateTrick = ucfirst($dateFormatter->format($trick->getCreatedAt()));
         $parameters["form"] = $form;
         $parameters["trick"] = $trick;
         $parameters["totalComments"] = $nbComments;
@@ -100,21 +97,12 @@ class TrickController extends AbstractController
         $userConnected = $request->getSession()->get('user_connected');
         $form = $this->createForm(CreateTrick::class);
         $form->add('mediaForm', CreateTrickMedia::class);
-        $form->handleRequest($request);
-        $token = $request->request->all()["create_trick"]['token'];
-        if ($form->isSubmitted() && $form->isValid() && $this->isCsrfTokenValid("create_trick", $token)) {
-            $trickEntity = new Trick();
-            $trickEntity->setName($form->getData()->getName());
-            $trickEntity->setDescription($form->getData()->getDescription());
-            $trickEntity->setTrickGroup($form->getData()->getTrickGroup());
-            $trickEntity->setDate($dateTime);
-            $trickEntity->isTrickUpdated(false);
-            $mediaEntity = new Media();
-            $mediaEntity->setImages($form->get('mediaForm')->getData()["images"]);
-            $mediaEntity->setBannerFile($form->get('mediaForm')->getData()["bannerFile"]);
-            $mediaEntity->setVideos($form->get('mediaForm')->getData()["videos"]);
-            $mediaEntity->setEmbedUrl($form->get('mediaForm')->getData()["embedUrl"]);
 
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $trickEntity = $form->getData();
+            $trickEntity->setCreatedAt($dateTime);
+            $mediaEntity = $form->get('mediaForm')->getData();
             if (!empty($mediaEntity->getEmbedUrl())) {
                 preg_match('/<iframe[^>]+src="([^"]+)"/i', $mediaEntity->getEmbedUrl(), $matches);
                 $urlCleaned = $matches[1];
@@ -131,7 +119,7 @@ class TrickController extends AbstractController
 
         $parameters["user_connected"] = $userConnected;
         $parameters["form"] = $form;
-        return new Response($this->render("create_trick.twig", $parameters), 400);
+        return new Response($this->render("create_trick.twig", $parameters), CodeStatus::CLIENT);
     }
 
 
@@ -153,7 +141,7 @@ class TrickController extends AbstractController
         $medias = $mediaRepository->findBy(["idTrick" => $id, "isBanner" => null]);
         $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $id, "isBanner" => true]));
         $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
-        $dateTrick = $trick->getDate();
+        $dateTrick = $trick->getCreatedAt();
         $date = $dateFormatter->format($dateTrick);
         $parameters["trick"] = $trick;
         $parameters["banner"] = $mainBannerOfTrick;
@@ -171,21 +159,18 @@ class TrickController extends AbstractController
         string $trickname,
         Request $request,
         TrickRepository $trickRepository,
-        MediaRepository $mediaRepository
+        MediaRepository $mediaRepository,
+        DateTime $dateTime
     ): Response {
         $trick = current($trickRepository->findBy(["id" => $id]));
         $media = $mediaRepository->findBy(["idTrick" => $id]);
         $form = $this->createForm(UpdateTrickContent::class, $trick);
         $form->handleRequest($request);
-        $trickEntity = new Trick();
-        $token = $request->request->all()["update_trick_content"]["_token"];
 
-        if ($form->isValid() && $form->isSubmitted() && $this->isCsrfTokenValid('update_trick_content', $token)) {
-            $trickEntity->setNameUpdated($form->getData()->getName());
-            $trickEntity->setDescription($form->getData()->getDescription());
-            $trickEntity->setTrickGroup($form->getData()->getTrickGroup());
-            $trickEntity->isTrickUpdated(true);
-            $trickRepository->updateTrick($id, $trickEntity);
+        if ($form->isValid() && $form->isSubmitted()) {
+            $trickEntity = $form->getData();
+            $trickEntity->setUpdatedAt($dateTime);
+            $trickRepository->getEntityManager()->flush();
             $this->addFlash("success", "Votre trick a été mis à jour avec succès !");
             return $this->redirectToRoute('homepage');
         }

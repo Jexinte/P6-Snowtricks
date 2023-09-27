@@ -51,7 +51,7 @@ class CommentRepository extends ServiceEntityRepository
      */
     public function getCommentsPerPage(int $id, int $firstPage, int $commentPerPage): array
     {
-        $orderBy = ['dateCreation' => 'DESC'];
+        $orderBy = ['createdAt' => 'DESC'];
 
         $offset = $firstPage;
         $limit = $commentPerPage;

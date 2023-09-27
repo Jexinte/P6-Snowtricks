@@ -9,7 +9,6 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class UpdateTrickContent extends AbstractType
@@ -19,25 +18,10 @@ class UpdateTrickContent extends AbstractType
         $builder->add("name", TextType::class, options: [
             'label' => 'Nom du trick',
             'required' => false,
-            'constraints' => [
-                new Regex(
-                    pattern: "/^[A-ZÀ-ÿ][A-Za-zÀ-ÿ, .'\-\n]*$/u",
-                    message: 'Oops! Le format de votre saisie est incorrect, le nom du trick doit commencer par une lettre majuscule',
-                    match: true,
-                )
-            ],
         ])
             ->add('description', TextareaType::class, options: [
                 'label' => 'Description',
                 'required' => false,
-                'constraints' =>
-                    [
-                        new Regex(
-                            pattern: "/^[A-ZÀ-ÿ][A-Za-zÀ-ÿ, .'\-\n]*$/u",
-                            message: 'Oops! Le format de votre saisie est incorrect, votre description doit commencer par une lettre majuscule',
-                            match: true,
-                        )
-                    ],
             ])
             ->add('trickGroup', ChoiceType::class, options: [
                 'label' => 'Sélectionner un groupe',
@@ -58,6 +42,8 @@ class UpdateTrickContent extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Trick::class,
+
+            'validation_groups' => 'updateTrickContent',
 
             'csrf_protection' => true,
 

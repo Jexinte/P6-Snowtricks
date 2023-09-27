@@ -5,7 +5,7 @@ namespace App\Entity;
 use App\Repository\MediaRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-
+use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
 class Media
 {
@@ -43,7 +43,12 @@ class Media
     private ?string $embedUrl = null;
 
 
-
+#[Assert\File(
+    maxSize: '3000K',
+    extensions: ['jpg', 'png', 'webp', 'mp4'],
+    extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png ,webp et mp4 sont acceptés !',
+    groups: ['update_trick','createTrick']
+)]
     private ?UploadedFile $bannerFile;
 
 

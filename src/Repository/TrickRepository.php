@@ -27,21 +27,5 @@ class TrickRepository extends ServiceEntityRepository
         return parent::getEntityManager();
     }
 
-    public function updateTrick(int $id, Trick $trick): void
-    {
-        $trickNameFromForm = $trick->getNameUpdated();
-        $trickDescription = $trick->getDescription();
-        $trickGroup = $trick->getTrickGroup();
-        $dataToUpdate = $this->getEntityManager()->getRepository(Trick::class)->findBy(["id" => $id]);
 
-
-        foreach ($dataToUpdate as $record) {
-            $record->setName($trickNameFromForm);
-            $record->setDescription($trickDescription);
-            $record->setTrickGroup($trickGroup);
-            $record->isTrickUpdated($trick->getTrickUpdated());
-        }
-
-        $this->getEntityManager()->flush();
-    }
 }

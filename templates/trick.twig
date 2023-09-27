@@ -28,8 +28,9 @@
             <button class="btn btn-dark" id="see-medias">Afficher les médias</button>
             <div class="medias">
                 {% for media in medias %}
+                    {% if media.isBanner is null %}
 
-                    {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp" %}
+                    {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp"  %}
                         <div class="media-box">
                             <img src="{{ media is defined ? media.mediaPath : '' }}" alt="test" width="200" height="200"
                                  class="image">
@@ -44,8 +45,11 @@
                             <iframe width="200" src="{{ media.mediaPath }}"></iframe>
                         </div>
                     {% endif %}
+                    {% endif %}
 
                 {% endfor %}
+
+
 
 
             </div>

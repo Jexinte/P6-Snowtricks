@@ -2,6 +2,7 @@
 
 namespace App\Form\Type;
 
+use App\Entity\Media;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -74,10 +75,10 @@ class CreateTrickMedia extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-
+            'data_class' => Media::class,
             'csrf_protection' => true,
             'csrf_field_name' => 'token',
-            'csrf_token_id' => 'create_trick',
+            'csrf_token_id' => 'create_trick_media',
         ]);
     }
 }

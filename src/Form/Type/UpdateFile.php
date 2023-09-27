@@ -8,7 +8,6 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\File;
 
 class UpdateFile extends AbstractType
 {
@@ -17,13 +16,6 @@ class UpdateFile extends AbstractType
         $builder->add("updatedFile", FileType::class, options: [
             'label' => 'Sélectionner un fichier',
             'required' => false,
-            'constraints' => [
-                new File(
-                    maxSize: '3000K',
-                    extensions: ['jpg', 'png', 'webp', 'mp4'],
-                    extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png ,webp et mp4 sont acceptés !',
-                ),
-            ]
         ])
             ->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']])
             ->setMethod('PUT');
@@ -32,6 +24,8 @@ class UpdateFile extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Media::class,
+
+            'validation_groups' => 'update_trick',
 
             'csrf_protection' => true,
 

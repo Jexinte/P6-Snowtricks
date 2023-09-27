@@ -6,12 +6,14 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 
-
+#[UniqueEntity(fields: 'name',message: 'Oops ! Le nom d\'utilisateur n\'est pas disponible, veuillez en définir un autre !',groups: ['signUp'])]
+#[UniqueEntity(fields: 'email',message: 'Oops ! L\'adresse email n\'est pas disponible, veuillez en définir un autre !',groups: ['signUp'])]
 class User
 {
     #[ORM\Id]
@@ -21,18 +23,13 @@ class User
 
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
-        groups: [
-            'username_exception',
-            "username_exception_sign_in",
-            "username_exception_forgot_password",
-            "username_exception_reset_password"
-        ]
+        groups:['signUp','login','forgotPassword','resetPassword'],
     )]
     #[Assert\Regex(
         pattern: '/^(?=[A-Z])([A-Za-z0-9]{1,10})$/',
         message: 'Le nom d\'utilisateur doit commencer par une majuscule , ne peut contenir que des chiffres et ne doit excéder 10 caractères !',
         match: true,
-        groups: ['username_exception']
+        groups:['signUp'],
     )]
     #[ORM\Column(length: 255,unique:true)]
     private ?string $name = null;
@@ -42,22 +39,27 @@ class User
     private ?string $profileImage;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(
+      message:'Ce champ ne peut être vide !',
+        groups:['signUp'],
+    )]
+    #[Assert\Regex(
+        pattern: '/^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$/',
+        message: 'Oops! Le format de votre saisie est incorrect,merci de suivre le format requis : nomadressemail@domaine.extension',
+        match: true,
+        groups:['signUp'],
+    )]
     private ?string $email = null;
 
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
-        groups: [
-            'password_exception',
-            "password_exception_sign_in",
-            "password_exception_old_reset_password",
-            "password_exception_new_reset_password"
-        ]
+        groups:['signUp','login','resetPassword'],
     )]
     #[Assert\Regex(
         pattern: '/^(?=.*[A-Z])(?=.*\d).{8,}$/',
         message: 'Oops! Le format de votre mot de passe est incorrect, il doit être composé d\'une lettre majuscule , d\'un chiffre et 8 caractères minimum !',
         match: true,
-        groups: ['password_exception', "password_exception_forgot_password", "password_exception_wrong_format"]
+        groups:['signUp','resetPassword'],
     )]
     #[ORM\Column(length: 255)]
     private ?string $password = null;
@@ -66,11 +68,19 @@ class User
     private ?bool $status = null;
 
     private ?bool $created;
-
+#[Assert\File(
+    maxSize: '3000K',
+    extensions: ['jpg', 'png', 'webp'],
+    extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !',
+)]
+#[Assert\NotBlank(message: 'Veuillez sélectionner un fichier !',groups: ['signUp'])]
     private UploadedFile $file;
 
     private ?int $userId = null;
-
+    #[Assert\NotBlank(
+        message: 'Ce champ ne peut être vide !',
+        groups:['resetPassword'],
+    )]
     private string $oldPassword;
 
     private ?bool $credentialsValid = null;
@@ -78,6 +88,7 @@ class User
     private ?bool $nameExist = null;
     private ?bool $passwordIsCorrect = null;
     private ?bool $accountIsActivate = null;
+
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Comment::class, cascade: ['persist'])]
     private Collection $comment;
     public function __construct()
@@ -277,5 +288,37 @@ class User
 
         return $this;
     }
+
+//    /**
+//     * @return string
+//     */
+//    public function getPasswordLogin(): string
+//    {
+//        return $this->passwordLogin;
+//    }
+//
+//    /**
+//     * @param string $passwordLogin
+//     */
+//    public function setPasswordLogin(string $passwordLogin): void
+//    {
+//        $this->passwordLogin = $passwordLogin;
+//    }
+//
+//    /**
+//     * @return string
+//     */
+//    public function getNameLogin(): string
+//    {
+//        return $this->nameLogin;
+//    }
+//
+//    /**
+//     * @param string $nameLogin
+//     */
+//    public function setNameLogin(string $nameLogin): void
+//    {
+//        $this->nameLogin = $nameLogin;
+//    }
 
 }

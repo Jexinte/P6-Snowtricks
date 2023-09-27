@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\CommentRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
 class Comment
@@ -22,10 +23,18 @@ class Comment
     private ?string $userProfileImage = null;
 
     #[ORM\Column(type: 'date')]
-    private ?\DateTimeInterface $dateCreation = null;
+    private ?\DateTimeInterface $createdAt = null;
 
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:'Ce champ ne peut être vide !')]
+    #[Assert\Regex(
+        pattern: '/^[A-ZÀ-ÿ][A-ZÀ-ÿa-zÀ-ÿ0-9\s\-\_\!\@\#\$\%\&\'\(\)\*\+\,\.\:\/\;\=\?\[\]\^\`\{\|\}\~]{0,498}[A-ZÀ-ÿa-zÀ-ÿ0-9\s\-\_\!\@\#\$\%\&\'\(\)\*\+\,\.\:\/\;\=\?\[\]\^\`\{\|\}\~]$/',
+        message: 'Un commentaire 
+    doit commencer par une lettre majuscule
+     et ne peut excéder 500 caractères',
+        match: true,
+    )]
     private ?string $content = null;
 
     private ?string $username = null;
@@ -65,17 +74,7 @@ private ?User $user = null;
         return $this;
     }
 
-    public function getDateCreation(): ?\DateTimeInterface
-    {
-        return $this->dateCreation;
-    }
 
-    public function setDateCreation(\DateTimeInterface $dateCreation): static
-    {
-        $this->dateCreation = $dateCreation;
-
-        return $this;
-    }
 
     public function getContent(): ?string
     {
@@ -137,5 +136,21 @@ private ?User $user = null;
     public function setUser(?User $user): void
     {
         $this->user = $user;
+    }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTimeInterface|null $createdAt
+     */
+    public function setCreatedAt(?\DateTimeInterface $createdAt): void
+    {
+        $this->createdAt = $createdAt;
     }
 }
