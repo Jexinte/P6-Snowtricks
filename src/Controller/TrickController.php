@@ -125,9 +125,8 @@ class TrickController extends AbstractController
 
     #[Route('/update-trick/{trickname}/{id}', name: 'update_trick_get', methods: ["GET"])]
     public function updateTrickPage(
-        int $id,
         string $trickname,
-        TrickRepository $trickRepository,
+        Trick $trick,
         MediaRepository $mediaRepository,
         Request $request,
         IntlDateFormatter $dateFormatter
@@ -136,10 +135,9 @@ class TrickController extends AbstractController
         if (!$userConnected) {
             return $this->redirectToRoute('forbidden');
         }
-        $trick = current($trickRepository->findBy(["id" => $id]));
         $form = $this->createForm(UpdateTrickContent::class, $trick);
-        $medias = $mediaRepository->findBy(["idTrick" => $id, "isBanner" => null]);
-        $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $id, "isBanner" => true]));
+        $medias = $mediaRepository->findBy(["idTrick" => $trick->getId(), "isBanner" => null]);
+        $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $trick->getId(), "isBanner" => true]));
         $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
         $dateTrick = $trick->getCreatedAt();
         $date = $dateFormatter->format($dateTrick);
@@ -155,15 +153,14 @@ class TrickController extends AbstractController
 
     #[Route('/update-trick-content/{trickname}/{id}', name: 'update_trick_content_put', methods: ["PUT"])]
     public function updateTrickContentValidator(
-        int $id,
+        Trick $trick,
         string $trickname,
         Request $request,
         TrickRepository $trickRepository,
         MediaRepository $mediaRepository,
         DateTime $dateTime
     ): Response {
-        $trick = current($trickRepository->findBy(["id" => $id]));
-        $media = $mediaRepository->findBy(["idTrick" => $id]);
+        $media = $mediaRepository->findBy(["idTrick" => $trick->getId()]);
         $form = $this->createForm(UpdateTrickContent::class, $trick);
         $form->handleRequest($request);
 
@@ -185,17 +182,16 @@ class TrickController extends AbstractController
 
     #[Route('/trick/delete/{trickname}/{id}', name: 'delete_trick', methods: ["DELETE"])]
     public function deleteTrick(
-        ?int $id,
         string $trickname,
+        Trick $trick,
         TrickRepository $trickRepository,
         MediaRepository $mediaRepository
     ): Response|RedirectResponse {
-        if (is_null($id)) {
+        if (is_null($trick->getId())) {
             throw $this->createNotFoundException();
         }
 
-        $trick = $trickRepository->find(["id" => $id]);
-        $medias = $mediaRepository->findBy(["idTrick" => $id]);
+        $medias = $mediaRepository->findBy(["idTrick" => $trick->getId()]);
 
         foreach ($medias as $media) {
             if ($media->getMediaType() != "web") {

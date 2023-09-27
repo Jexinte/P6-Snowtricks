@@ -16,14 +16,13 @@ class MediaController extends AbstractController
 
 
     #[Route('/update-trick-media/{id}', name: 'update_trick_media_page', methods: ["GET"])]
-    public function updateTrickMediaPage(int $id, MediaRepository $mediaRepository, Request $request): Response
+    public function updateTrickMediaPage(Media $media, MediaRepository $mediaRepository, Request $request): Response
     {
         $userConnected = $request->getSession()->get('user_connected');
         if(!$userConnected)
         {
             return  $this->redirectToRoute('forbidden');
         }
-        $media = current($mediaRepository->findBy(["id" => $id]));
         $form = $media->getMediaType() == "web" ? $this->createForm(UpdateEmbedUrl::class) : $this->createForm(
             UpdateFile::class
         );
@@ -36,11 +35,10 @@ class MediaController extends AbstractController
 
     #[Route('/update-trick-media/{id},', name: 'update_trick_media_form', methods: ["PUT"])]
     public function updateTrickMediaValidator(
-        int $id,
+    Media $media,
         Request $request,
         MediaRepository $mediaRepository
     ): Response {
-        $media = current($mediaRepository->findBy(["id" => $id]));
         $form = $media->getMediaType() == "web" ? $this->createForm(UpdateEmbedUrl::class) : $this->createForm(
             UpdateFile::class
         );
@@ -54,7 +52,7 @@ class MediaController extends AbstractController
             switch (true) {
                 case !empty($file):
                     $mediaEntity->setUpdatedFile($file);
-                    $fileUpdated = $mediaRepository->updateTrickMedia($id, $mediaEntity);
+                    $fileUpdated = $mediaRepository->updateTrickMedia($media->getId(), $mediaEntity);
                     if ($fileUpdated) {
                         $this->addFlash("success", "Votre fichier a bien été mis à jour !");
                         return $this->redirectToRoute('homepage');
@@ -65,7 +63,7 @@ class MediaController extends AbstractController
                     preg_match('/<iframe[^>]+src="([^"]+)"/i', $mediaEntity->getEmbedUrl(), $matches);
                     $urlCleaned = $matches[1];
                     $mediaEntity->setEmbedUrl($urlCleaned);
-                    $urlUpdated = $mediaRepository->updateTrickMedia($id, $mediaEntity);
+                    $urlUpdated = $mediaRepository->updateTrickMedia($media->getId(), $mediaEntity);
 
                     if ($urlUpdated) {
                         $this->addFlash("success", "Le lien a bien été mis à jour !");
@@ -85,9 +83,8 @@ class MediaController extends AbstractController
     }
 
     #[Route('/delete-trick-media/{id}', name: 'delete_trick_media', methods: ["GET"])]
-    public function deleteTrickMedia(int $id, MediaRepository $mediaRepository): Response
+    public function deleteTrickMedia(Media $media, MediaRepository $mediaRepository): Response
     {
-        $media = current($mediaRepository->findBy(["id" => $id]));
         if ($media->getMediaType() != "web") {
             unlink("../public" . $media->getMediaPath());
         }

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Comment;
+use App\Entity\Trick;
 use App\Form\Type\AddComment;
 use App\Repository\CommentRepository;
 use App\Repository\MediaRepository;
@@ -19,10 +20,9 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class CommentController extends AbstractController
 {
 
-
     #[Route('/add-comment/{id}', name: 'add_comment', methods: ["POST"])]
     public function handleAddComment(
-        int $id,
+//        int $id,
         Request $request,
         CommentRepository $commentRepository,
         UserRepository $userRepository,
@@ -30,18 +30,17 @@ class CommentController extends AbstractController
         IntlDateFormatter $dateFormatter,
         SluggerInterface $slugger,
         DateTime $dateTime,
-        TrickRepository $trickRepository,
+        Trick $trick,
     ): Response {
         $form = $this->createForm(AddComment::class);
         $form->handleRequest($request);
         $user = current($userRepository->findBy(["id" => $request->getSession()->get('user_id')]));
-        $trick = current($trickRepository->findBy(["id" => $id]));
-        $medias = $mediaRepository->findBy(["idTrick" => $id]);
-        $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $id, "isBanner" => true]));
+        $medias = $mediaRepository->findBy(["idTrick" => $trick->getId()]);
+        $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $trick->getId(), "isBanner" => true]));
         if ($form->isSubmitted() && $form->isValid()) {
             $commentEntity = $form->getData();
             $commentEntity->setIdUser($user->getId());
-            $commentEntity->setIdTrick($id);
+            $commentEntity->setIdTrick($trick->getId());
             $commentEntity->setUserProfileImage($user->getProfileImage());
             $commentEntity->setCreatedAt($dateTime);
             $trick->addComment($commentEntity);
@@ -50,12 +49,12 @@ class CommentController extends AbstractController
             $trickNameSlug = $slugger->slug($trick->getName())->lower();
             return $this->redirectToRoute("trick", [
                 "trickname" => $trickNameSlug,
-                "id" => $id
+                "id" => $trick->getId()
             ]);
         }
         $dateTrick = is_null($trick->getUpdatedAt()) ? ucfirst($dateFormatter->format($trick->getCreatedAt())) : ucfirst($dateFormatter->format($trick->getUpdatedAt()));
 
-        $trickComments = $commentRepository->getComments($id, $userRepository);
+        $trickComments = $commentRepository->getComments($trick->getId(), $userRepository);
 
 
         if ($request->query->get('page') !== null && !empty($request->query->get('page'))) {
@@ -67,7 +66,7 @@ class CommentController extends AbstractController
         $commentsPerPage = 10;
         $pages = ceil($nbComments / $commentsPerPage);
         $firstPage = ($currentPage * $commentsPerPage) - $commentsPerPage;
-        $commentsPerPageRequest = $commentRepository->getCommentsPerPage($id, $firstPage, $commentsPerPage);
+        $commentsPerPageRequest = $commentRepository->getCommentsPerPage($trick->getId(), $firstPage, $commentsPerPage);
         foreach ($commentsPerPageRequest as $comment) {
             $comment->date = ucfirst($dateFormatter->format($comment->getCreatedAt()));
         }
