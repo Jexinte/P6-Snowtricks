@@ -70,9 +70,9 @@
                 <div class="trick-options">
                     {% if user_connected is defined and user_connected == 1 %}
 
-                    <a href="{{ path('update_trick_get',{'id':trick.id,'trickname':trick.name}) }}"
+                    <a href="{{ path('update_trick_get',{slug:trick.slug,id:trick.id}) }}"
                        class="options-button" id="update"><i class="fa-solid fa-pencil"></i></a>
-                    <form action="{{ path('delete_trick',{trickname:trick.name,id:trick.id}) }}" method="post">
+                    <form action="{{ path('delete_trick',{slug:trick.slug,id:trick.id}) }}" method="post">
                         <input type="hidden" name="_method" value="DELETE">
                         <button type="submit" class="options-button" id="delete"><i class="fa-solid fa-trash">
                             </i></button>
@@ -103,6 +103,7 @@
                 {% if totalComments > 10 %}
                     <ul class="pagination">
                         <li class="page-item {{  currentPage == 1 ? "disabled" : '' }}" id="previous">
+
                             <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{currentPage - 1 }}" class="page-link">Précédent</a>
                         </li>
                         {% for page in 1..pages %}

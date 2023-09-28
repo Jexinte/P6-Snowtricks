@@ -26,9 +26,8 @@ class TrickController extends AbstractController
 {
 
 
-    #[Route('/{trickname}/details/{id}', name: 'trick', methods: ["GET"])]
+    #[Route('/{slug}/{id}', name: 'trick', methods: ["GET"])]
     public function getTrickPage(
-        string $trickname,
         Trick $trick,
         UserRepository $userRepository,
         CommentRepository $commentRepository,
@@ -58,7 +57,6 @@ class TrickController extends AbstractController
         $parameters["comments"] = $commentsPerPageRequest;
         $parameters["pages"] = $pages;
         $parameters["currentPage"] = $currentPage;
-        $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
         $dateTrick = ucfirst($dateFormatter->format($trick->getCreatedAt()));
         $parameters["form"] = $form;
         $parameters["trick"] = $trick;
@@ -123,9 +121,8 @@ class TrickController extends AbstractController
     }
 
 
-    #[Route('/update-trick/{trickname}/{id}', name: 'update_trick_get', methods: ["GET"])]
+    #[Route('/update-trick/{slug}/{id}', name: 'update_trick_get', methods: ["GET"])]
     public function updateTrickPage(
-        string $trickname,
         Trick $trick,
         MediaRepository $mediaRepository,
         Request $request,
@@ -138,7 +135,6 @@ class TrickController extends AbstractController
         $form = $this->createForm(UpdateTrickContent::class, $trick);
         $medias = $mediaRepository->findBy(["idTrick" => $trick->getId(), "isBanner" => null]);
         $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $trick->getId(), "isBanner" => true]));
-        $trick->setName(str_replace('-', ' ', ucfirst($trickname)));
         $dateTrick = $trick->getCreatedAt();
         $date = $dateFormatter->format($dateTrick);
         $parameters["trick"] = $trick;
@@ -151,16 +147,16 @@ class TrickController extends AbstractController
     }
 
 
-    #[Route('/update-trick-content/{trickname}/{id}', name: 'update_trick_content_put', methods: ["PUT"])]
+    #[Route('/update-trick-content/{slug}/{id}', name: 'update_trick_content_put', methods: ["PUT"])]
     public function updateTrickContentValidator(
         Trick $trick,
-        string $trickname,
         Request $request,
         TrickRepository $trickRepository,
         MediaRepository $mediaRepository,
         DateTime $dateTime
     ): Response {
-        $media = $mediaRepository->findBy(["idTrick" => $trick->getId()]);
+        $media = $mediaRepository->findBy(["idTrick" => $trick->getId(),"isBanner" => null]);
+        $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $trick->getId(), "isBanner" => true]));
         $form = $this->createForm(UpdateTrickContent::class, $trick);
         $form->handleRequest($request);
 
@@ -177,12 +173,12 @@ class TrickController extends AbstractController
         $parameters["medias"] = $media;
         $parameters["form"] = $form;
         $parameters["trick"] = $trick;
+        $parameters["banner"] = $mainBannerOfTrick;
         return new Response($this->render("update_trick.twig", $parameters), 400);
     }
 
-    #[Route('/trick/delete/{trickname}/{id}', name: 'delete_trick', methods: ["DELETE"])]
+    #[Route('/trick/delete/{slug}/{id}', name: 'delete_trick', methods: ["DELETE"])]
     public function deleteTrick(
-        string $trickname,
         Trick $trick,
         TrickRepository $trickRepository,
         MediaRepository $mediaRepository

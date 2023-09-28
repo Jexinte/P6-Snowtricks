@@ -3,13 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\TrickRepository;
-use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: TrickRepository::class)]
 #[UniqueEntity(fields: 'name',message: 'Désolé, le trick que vous avez demandé n\'est actuellement pas disponible, veuillez en définir un autre !')]
@@ -67,7 +67,9 @@ class Trick
     }
 
     private string $nameUpdated;
-
+    #[ORM\Column(length: 128)]
+    #[Gedmo\Slug(fields:['name'])]
+    private string $slug;
 
     public function getId(): ?int
     {
@@ -109,8 +111,6 @@ class Trick
 
         return $this;
     }
-
-
 
 
 
@@ -212,8 +212,14 @@ class Trick
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return string
      */
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+
 
 
 

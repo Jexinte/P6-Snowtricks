@@ -50,18 +50,18 @@
                                          height="200" alt="">
                                 </div>
                                 <div class="trick-options">
-                                    <a href="{{ path('trick',{ trickname:trick.slug,id:trick.id }) }}"
+                                    <a href="{{ path('trick',{ slug:trick.slug,id:trick.id }) }}"
                                        class="trick-name">{{ trick.name }}</a>
                                     <div class="options">
                                         {% if user_connected is defined and user_connected == 1 %}
 
-                                            <a href="{{ path('update_trick_get',{trickname:trick.slug,id:trick.id}) }}"
+                                            <a href="{{ path('update_trick_get',{slug:trick.slug,id:trick.id}) }}"
                                                class="update-trick">
                                                 <i class="fa-solid fa-pencil">
                                                 </i>
                                             </a>
 
-                                            <form action="{{ path('delete_trick',{trickname:trick.slug,id:trick.id}) }}"
+                                            <form action="{{ path('delete_trick',{slug:trick.slug,id:trick.id}) }}"
                                                   method="post">
                                                 <input type="hidden" name="_method" value="DELETE">
                                                 <button type="submit" class="delete-trick"><i class="fa-solid fa-trash">
