@@ -289,36 +289,6 @@ class User
         return $this;
     }
 
-//    /**
-//     * @return string
-//     */
-//    public function getPasswordLogin(): string
-//    {
-//        return $this->passwordLogin;
-//    }
-//
-//    /**
-//     * @param string $passwordLogin
-//     */
-//    public function setPasswordLogin(string $passwordLogin): void
-//    {
-//        $this->passwordLogin = $passwordLogin;
-//    }
-//
-//    /**
-//     * @return string
-//     */
-//    public function getNameLogin(): string
-//    {
-//        return $this->nameLogin;
-//    }
-//
-//    /**
-//     * @param string $nameLogin
-//     */
-//    public function setNameLogin(string $nameLogin): void
-//    {
-//        $this->nameLogin = $nameLogin;
-//    }
+
 
 }
