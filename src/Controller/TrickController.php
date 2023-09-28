@@ -26,7 +26,7 @@ class TrickController extends AbstractController
 {
 
 
-    #[Route('/{slug}/{id}', name: 'trick', methods: ["GET"])]
+    #[Route('/{slug}/details/{id}', name: 'trick', methods: ["GET"])]
     public function getTrickPage(
         Trick $trick,
         UserRepository $userRepository,
@@ -121,7 +121,7 @@ class TrickController extends AbstractController
     }
 
 
-    #[Route('/update-trick/{slug}/{id}', name: 'update_trick_get', methods: ["GET"])]
+    #[Route('/update-trick/{slug}/details/{id}', name: 'update_trick_get', methods: ["GET"])]
     public function updateTrickPage(
         Trick $trick,
         MediaRepository $mediaRepository,
@@ -147,7 +147,7 @@ class TrickController extends AbstractController
     }
 
 
-    #[Route('/update-trick-content/{slug}/{id}', name: 'update_trick_content_put', methods: ["PUT"])]
+    #[Route('/update-trick-content/{slug}/details/{id}', name: 'update_trick_content_put', methods: ["PUT"])]
     public function updateTrickContentValidator(
         Trick $trick,
         Request $request,
