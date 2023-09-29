@@ -13,10 +13,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-
-#[UniqueEntity(fields: 'username',message: 'Oops ! Le nom d\'utilisateur n\'est pas disponible, veuillez en définir un autre !',groups: ['signUp'])]
-#[UniqueEntity(fields: 'email',message: 'Oops ! L\'adresse email n\'est pas disponible, veuillez en définir un autre !',groups: ['signUp'])]
-class User implements UserInterface,PasswordAuthenticatedUserInterface
+#[UniqueEntity(fields: 'username', message: 'Oops ! Le nom d\'utilisateur n\'est pas disponible, veuillez en définir un autre !', groups: ['signUp'])]
+#[UniqueEntity(fields: 'email', message: 'Oops ! L\'adresse email n\'est pas disponible, veuillez en définir un autre !', groups: ['signUp'])]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -25,15 +24,15 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
 
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
-        groups:['signUp','login','forgotPassword','resetPassword'],
+        groups: ['signUp', 'forgotPassword', 'resetPassword'],
     )]
     #[Assert\Regex(
         pattern: '/^(?=[A-Z])([A-Za-z0-9]{1,10})$/',
         message: 'Le nom d\'utilisateur doit commencer par une majuscule , ne peut contenir que des chiffres et ne doit excéder 10 caractères !',
         match: true,
-        groups:['signUp'],
+        groups: ['signUp'],
     )]
-    #[ORM\Column(length: 255,unique:true)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $username = null;
 
 
@@ -42,26 +41,26 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(
-      message:'Ce champ ne peut être vide !',
-        groups:['signUp'],
+        message: 'Ce champ ne peut être vide !',
+        groups: ['signUp'],
     )]
     #[Assert\Regex(
         pattern: '/^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$/',
         message: 'Oops! Le format de votre saisie est incorrect,merci de suivre le format requis : nomadressemail@domaine.extension',
         match: true,
-        groups:['signUp'],
+        groups: ['signUp'],
     )]
     private ?string $email = null;
 
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
-        groups:['signUp','login','resetPassword'],
+        groups: ['signUp', 'resetPassword'],
     )]
     #[Assert\Regex(
         pattern: '/^(?=.*[A-Z])(?=.*\d).{8,}$/',
         message: 'Oops! Le format de votre mot de passe est incorrect, il doit être composé d\'une lettre majuscule , d\'un chiffre et 8 caractères minimum !',
         match: true,
-        groups:['signUp','resetPassword'],
+        groups: ['signUp', 'resetPassword'],
     )]
     #[ORM\Column(length: 255)]
     private ?string $password = null;
@@ -75,18 +74,18 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'json')]
     private array $roles = [];
     private ?bool $created;
-#[Assert\File(
-    maxSize: '3000K',
-    extensions: ['jpg', 'png', 'webp'],
-    extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !',
-)]
-#[Assert\NotBlank(message: 'Veuillez sélectionner un fichier !',groups: ['signUp'])]
+    #[Assert\File(
+        maxSize: '3000K',
+        extensions: ['jpg', 'png', 'webp'],
+        extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !',
+    )]
+    #[Assert\NotBlank(message: 'Veuillez sélectionner un fichier !', groups: ['signUp'])]
     private UploadedFile $file;
 
     private ?int $userId = null;
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
-        groups:['resetPassword'],
+        groups: ['resetPassword'],
     )]
     private string $oldPassword;
 
@@ -98,6 +97,7 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Comment::class, cascade: ['persist'])]
     private Collection $comment;
+
     public function __construct()
     {
         $this->comment = new ArrayCollection();
@@ -125,7 +125,7 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->username;
+        return (string)$this->username;
     }
 
     /**
@@ -134,7 +134,6 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
@@ -146,14 +145,14 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
     /**
      * @see UserInterface
      */
     public function eraseCredentials(): void
     {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
     }
+
     public function getProfileImage(): ?string
     {
         return $this->profileImage;
@@ -189,6 +188,7 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
     /**
      * @see PasswordAuthenticatedUserInterface
      */
@@ -205,7 +205,7 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
     }
 
 
-    public  function getStatus():?bool
+    public function getStatus(): ?bool
     {
         return $this->status;
     }
@@ -229,12 +229,12 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
         $this->created = $created;
     }
 
-    public function getOldPassword():string
+    public function getOldPassword(): string
     {
         return $this->oldPassword;
     }
 
-    public function setOldPassword(string $oldPassword):void
+    public function setOldPassword(string $oldPassword): void
     {
         $this->oldPassword = $oldPassword;
     }
@@ -280,7 +280,7 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
         $this->passwordIsCorrect = $passwordIsCorrect;
     }
 
-    public function getPasswordCorrect():?bool
+    public function getPasswordCorrect(): ?bool
     {
         return $this->passwordIsCorrect;
     }
@@ -304,7 +304,7 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
     /**
      * @return int
      */
-    public function getUserId():?int
+    public function getUserId(): ?int
     {
         return $this->userId;
     }
@@ -331,7 +331,6 @@ class User implements UserInterface,PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
 
 
 }
