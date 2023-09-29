@@ -4,11 +4,9 @@ namespace App\Controller;
 
 use App\Repository\MediaRepository;
 use App\Repository\TrickRepository;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 class HomepageController extends AbstractController
 {
@@ -20,7 +18,7 @@ class HomepageController extends AbstractController
         MediaRepository $mediaRepository,
     ): Response {
         $parameters = [];
-        $userConnected = current($this->getUser()->getRoles());
+        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
         $parameters["user_connected"] = $userConnected;
         $tricks = $trickRepository->findAll();
         $result = [];

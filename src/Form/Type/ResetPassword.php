@@ -14,7 +14,7 @@ class ResetPassword extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('name',TextType::class,options:[
+        $builder->add('username',TextType::class,options:[
             'label' => 'Utilisateur',
             'required' => false,
             'attr' => ['placeholder' => 'John']

@@ -81,7 +81,7 @@
 
             <div class="about">
                 <div class="row">
-                    {% if user_connected is defined and user_connected == 1 %}
+                    {% if user_connected is defined and user_connected == "ROLE_USER" %}
                         {{ form_start(form,{'action':path('update_trick_content_put',{'slug':trick.slug,'id':trick.id})}) }}
                         {{ form_end(form) }}
                     {% endif %}
@@ -97,11 +97,11 @@
             <a href="{{ path('homepage') }}" class="mobile-link" id="homepage-link"><i
                         class="fa-solid fa-house"></i></a>
             <a href="{{ path('create_trick_get') }}" class="mobile-link" id="plus"><i class="fa-solid fa-plus"></i></a>
-            {% if user_connected is defined and user_connected == 1 %}
+            {% if user_connected is defined and user_connected == "ROLE_USER" %}
                 <a href="{{ path('logout') }}" class="mobile-link" id="log-out"><i
                             class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
-                <a href="{{ path('login_get') }}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
+                <a href="{{ path('login') }}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
                 <a href="{{ path('registration_get') }}" class="mobile-link" id="sign-up"><i
                             class="fa-solid fa-user-plus"></i></a>
             {% endif %}

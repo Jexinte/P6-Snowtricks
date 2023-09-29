@@ -43,35 +43,6 @@ class UserRepository extends ServiceEntityRepository
     }
 
 
-    public function login(User $user): ?User
-    {
-        $usernameFromForm = $user->getUsername();
-        $passwordFromForm = $user->getPassword();
-
-        $userInDb = current($this->findBy(["username" => $usernameFromForm]));
-        switch (true) {
-            case !$userInDb:
-                $user->isNameExist(false);
-                break;
-
-            case $userInDb->getUsername() == $usernameFromForm &&
-                password_verify(
-                    $passwordFromForm,
-                    $userInDb->getPassword()
-                ):
-                if ($userInDb->getStatus() == UserStatus::ACCOUNT_ACTIVATE) {
-                    $user->isCredentialsValid(true);
-                    $user->setUserId($userInDb->getId());
-                    break;
-                }
-                $user->isAccountActivate(false);
-                break;
-            default:
-                $user->isPasswordCorrect(false);
-                break;
-        }
-        return $user;
-    }
 
 
     public function checkPasswordReset(User $user): User

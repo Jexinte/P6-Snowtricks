@@ -28,9 +28,9 @@ class UserController extends AbstractController
 
 
     #[Route(path: '/signup', name: 'registration_get', methods: ["GET"])]
-    public function signUpPage(Request $request): Response
+    public function signUpPage(): Response
     {
-        $userConnected = $request->getSession()->get('user_connected');
+        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
         $form = $this->createForm(SignUp::class);
         $parameters["user_connected"] = $userConnected;
         $parameters["form"] = $form;
@@ -38,14 +38,13 @@ class UserController extends AbstractController
     }
 
     #[Route(path: '/signin', name: 'login')]
-   public function signInPage(AuthenticationUtils $authenticationUtils): Response
+    public function signIn(AuthenticationUtils $authenticationUtils): Response
     {
         $form = $this->createForm(Login::class);
         $error = $authenticationUtils->getLastAuthenticationError();
-        $parameters["errorLogs"] =  $error;
+        $parameters["errorLogs"] = $error;
         $parameters["form"] = $form;
-        if($error)
-        {
+        if ($error) {
             $field = $form->get('username');
             $error = new FormError(
                 'Oops ! Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations de connexion !'
@@ -59,9 +58,9 @@ class UserController extends AbstractController
     }
 
     #[Route(path: '/forgot-password', name: 'forgot_password_get', methods: ["GET"])]
-    public function forgotPasswordPage(Request $request): Response
+    public function forgotPasswordPage(): Response
     {
-        $userConnected = $request->getSession()->get('user_connected');
+        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
         $form = $this->createForm(ForgotPassword::class);
         $parameters["user_connected"] = $userConnected;
         $parameters["form"] = $form;
@@ -72,7 +71,7 @@ class UserController extends AbstractController
     public function resetPasswordPage(Request $request, string $id = null): Response|RedirectResponse
     {
         $tokenInSession = $request->getSession()->get('token');
-        $userConnected = $request->getSession()->get('user_connected');
+        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
         if (!is_null($id) && $id == $tokenInSession) {
             $form = $this->createForm(ResetPassword::class);
             $parameters["token"] = $id;
@@ -80,7 +79,7 @@ class UserController extends AbstractController
             $parameters["user_connected"] = $userConnected;
             return new Response($this->render("reset_password.twig", $parameters));
         }
-        throw $this->createNotFoundException();
+        throw $this->createAccessDeniedException();
     }
 
 
@@ -97,7 +96,7 @@ class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $form->getData();
-            $hashedPassword = $passwordHasher->hashPassword($user,$user->getPassword());
+            $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
             $user->setPassword($hashedPassword);
             $fileExt = explode('.', $user->getFile()->getClientOriginalName());
             $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
@@ -114,7 +113,7 @@ class UserController extends AbstractController
             $this->sendMailToUser($mailer, $user, $request);
             return $this->redirectToRoute("homepage");
         }
-        $userConnected = $request->getSession()->get('user_connected');
+        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
         $parameters["user_connected"] = $userConnected;
 
         $parameters["form"] = $form;
@@ -183,7 +182,7 @@ L'équipe Snowtricks
                 );
             }
         }
-        $userConnected = $request->getSession()->get('user_connected');
+        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
         $parameters["user_connected"] = $userConnected;
         return new Response(
             $this->render(
@@ -206,7 +205,7 @@ L'équipe Snowtricks
 
         if ($form->isValid() && $form->isSubmitted()) {
             $user = $form->getData();
-            $userFound = current($userRepository->findBy(["name" => $user->getUsername()]));
+            $userFound = current($userRepository->findBy(["username" => $user->getUsername()]));
 
             if ($userFound) {
                 $this->setToken();
@@ -239,11 +238,11 @@ L'équipe Snowtricks
                 $code = CodeStatus::REQUEST_SUCCEED;
             } else {
                 $error = new FormError('Oops ! Identifiant incorrect. Veuillez vérifier vos informations !');
-                $form->get('name')->addError($error);
+                $form->get('username')->addError($error);
             }
         }
 
-        $userConnected = $request->getSession()->get('user_connected');
+        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
         $parameters["user_connected"] = $userConnected;
         $parameters["form"] = $form;
         return new Response($this->render("forgot_password.twig", $parameters), $code);
@@ -277,10 +276,10 @@ L'équipe Snowtricks
                     $error = new FormError(
                         'Oops ! Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations de connexion !'
                     );
-                    $form->get('name')->addError($error);
+                    $form->get('username')->addError($error);
             }
         }
-        $userConnected = $request->getSession()->get('user_connected');
+        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
         $parameters["token"] = $id;
         $parameters["form"] = $form;
         $parameters["user_connected"] = $userConnected;

@@ -16,10 +16,10 @@
         <nav>
             <a href="{{ path('homepage') }}"><img src="/assets/img/logo/logo.jpg" alt="main logo" height="60"></a>
             <ul>
-                {% if user_connected is defined and user_connected == 1 %}
+                {% if user_connected is defined and user_connected == "ROLE_USER" %}
                     <li><a href="{{path('logout')}}">Déconnexion</a></li>
                 {% else %}
-                    <li><a href="{{ path('login_get') }}">Connexion</a></li>
+                    <li><a href="{{ path('login') }}">Connexion</a></li>
                 {% endif %}
             </ul>
         </nav>
@@ -29,17 +29,17 @@
         <h1 class="text-center">Inscription</h1>
         <div class="row">
             {{ form(form) }}
-            <a id="has-account" class="text-center" href="{{ path('login_get') }}">Vous avez déjà un compte ? Connectez-vous !</a>
+            <a id="has-account" class="text-center" href="{{ path('login') }}">Vous avez déjà un compte ? Connectez-vous !</a>
         </div>
     </div>
     <footer id="footer">
         <p class="text-center footer-paragraph">Copyright @ 2023</p>
         <nav id="nav-mobile">
             <a href="{{ path('homepage') }}" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
-            {% if user_connected is defined and user_connected == 1 %}
+            {% if user_connected is defined and user_connected == "ROLE_USER" %}
                 <a href="{{path('logout')}}" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
-                <a href="{{ path('login_get') }}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
+                <a href="{{ path('login') }}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
             {% endif %}
         </nav>
     </footer>

@@ -17,7 +17,7 @@
     <div class="container-fluid" id="validation">
         {% if token_authenticated is defined and token_authenticated == 1 %}
             <div class="bg-success box">
-                <p>Votre compte a été validé avec succès , vous pouvez dès à présent vous <a href="{{ path('login_get') }}">connectez
+                <p>Votre compte a été validé avec succès , vous pouvez dès à présent vous <a href="{{ path('login') }}">connectez
                         !</a></p>
             </div>
         {% else %}

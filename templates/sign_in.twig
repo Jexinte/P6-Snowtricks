@@ -16,8 +16,8 @@
         <nav>
             <a href="{{ path('homepage') }}"><img src="/assets/img/logo/logo.jpg" alt="main logo" height="60"></a>
             <ul>
-                {% if user_connected is defined and user_connected == 1 %}
-                    <li><a href="{{ path('app_logout') }}">Déconnexion</a></li>
+                {% if user_connected is defined and user_connected == "ROLE_USER" %}
+                    <li><a href="{{ path('logout') }}">Déconnexion</a></li>
                 {% else %}
                     <li><a href="{{ path('registration_get') }}">Inscription</a></li>
                 {% endif %}
@@ -44,7 +44,7 @@
         <nav id="nav-mobile">
             <a href="{{ path('homepage') }}" class="mobile-link" id="homepage-link"><i
                         class="fa-solid fa-house"></i></a>
-            {% if user_connected is defined and user_connected == 1 %}
+            {% if user_connected is defined and user_connected == "ROLE_USER" %}
                 <a href="{{ path('app_logout') }}" class="mobile-link" id="log-out"><i
                             class="fa-solid fa-right-from-bracket"></i></a>
                 <a href="{{ path('create_trick_get') }}" class="mobile-link" id="plus"><i class="fa-solid fa-plus"></i></a>
