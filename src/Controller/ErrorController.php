@@ -30,11 +30,6 @@ class ErrorController extends AbstractController
         );
     }
 
-    #[Route('/error/403', name: 'forbidden', methods: ["GET"])]
-    public function error403(): Response
-    {
-        return new Response($this->render('/bundles/TwigBundle/Exception/error403.html.twig'), CodeStatus::FORBIDDEN);
-    }
 
     #[Route('/error/500', name: 'server_down', methods: ["GET"])]
     public function error500(): Response

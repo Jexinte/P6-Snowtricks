@@ -201,6 +201,7 @@ class TrickController extends AbstractController
         IntlDateFormatter $dateFormatter
     ): Response {
         $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
+
         $form = $this->createForm(UpdateTrickContent::class, $trick);
         $medias = $mediaRepository->findBy(["idTrick" => $trick->getId(), "isBanner" => null]);
         $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $trick->getId(), "isBanner" => true]));
