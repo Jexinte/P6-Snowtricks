@@ -8,13 +8,15 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 
-#[UniqueEntity(fields: 'name',message: 'Oops ! Le nom d\'utilisateur n\'est pas disponible, veuillez en définir un autre !',groups: ['signUp'])]
+#[UniqueEntity(fields: 'username',message: 'Oops ! Le nom d\'utilisateur n\'est pas disponible, veuillez en définir un autre !',groups: ['signUp'])]
 #[UniqueEntity(fields: 'email',message: 'Oops ! L\'adresse email n\'est pas disponible, veuillez en définir un autre !',groups: ['signUp'])]
-class User
+class User implements UserInterface,PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -32,7 +34,7 @@ class User
         groups:['signUp'],
     )]
     #[ORM\Column(length: 255,unique:true)]
-    private ?string $name = null;
+    private ?string $username = null;
 
 
     #[ORM\Column(length: 255)]
@@ -67,6 +69,11 @@ class User
     #[ORM\Column(length: 1)]
     private ?bool $status = null;
 
+    /**
+     * @var array<string>
+     */
+    #[ORM\Column(type: 'json')]
+    private array $roles = [];
     private ?bool $created;
 #[Assert\File(
     maxSize: '3000K',
@@ -101,18 +108,52 @@ class User
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getUsername(): ?string
     {
-        return $this->name;
+        return $this->username;
     }
 
-    public function setName(string $name): static
+    public function setUsername(string $username): static
     {
-        $this->name = $name;
+        $this->username = $username;
 
         return $this;
     }
 
+    /**
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->username;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
+    }
     public function getProfileImage(): ?string
     {
         return $this->profileImage;
@@ -148,7 +189,9 @@ class User
 
         return $this;
     }
-
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -215,7 +258,7 @@ class User
     /**
      * @return bool|null
      */
-    public function getNameExist(): ?bool
+    public function getUsernameExist(): ?bool
     {
         return $this->nameExist;
     }

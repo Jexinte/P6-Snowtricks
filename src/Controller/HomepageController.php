@@ -17,17 +17,14 @@ class HomepageController extends AbstractController
     #[Route(path: '/', name: 'homepage', methods: ["GET"])]
     public function homepage(
         TrickRepository $trickRepository,
-        Request $request,
         MediaRepository $mediaRepository,
-        SluggerInterface $slugger
     ): Response {
         $parameters = [];
-        $userConnected = $request->getSession()->get('user_connected');
+        $userConnected = current($this->getUser()->getRoles());
         $parameters["user_connected"] = $userConnected;
         $tricks = $trickRepository->findAll();
         $result = [];
         $banners = $mediaRepository->findBy(["isBanner" => true]);
-
         foreach ($tricks as $k => $trick) {
             if(!empty($banners))
             {
@@ -36,16 +33,16 @@ class HomepageController extends AbstractController
                     {
                         $result[$k] = [
                         "name" => $trick->getName(),
-                        "slug" => strtolower($slugger->slug($trick->getName())),
                         "id" => $trick->getId(),
+                        "slug" => $trick->getSlug(),
                         "main_banner" => $banner->getMediaPath()
                     ];
                     }
                     else {
                         $result[$k] = [
                             "name" => $trick->getName(),
-                            "slug" => strtolower($slugger->slug($trick->getName())),
                             "id" => $trick->getId(),
+                            "slug" => $trick->getSlug(),
                         ];
                     }
                 }
@@ -53,8 +50,8 @@ class HomepageController extends AbstractController
             else {
                 $result[$k] = [
                     "name" => $trick->getName(),
-                    "slug" => strtolower($slugger->slug($trick->getName())),
                     "id" => $trick->getId(),
+                    "slug" => $trick->getSlug(),
                 ];
             }
         }

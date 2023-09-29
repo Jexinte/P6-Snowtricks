@@ -33,7 +33,7 @@ class UserRepository extends ServiceEntityRepository
     {
         $usernameInSession = $request->getSession()->get('username');
         $entityManager = $this->getEntityManager();
-        $dataToUpdate = $entityManager->getRepository(User::class)->findBy(["name" => $usernameInSession]);
+        $dataToUpdate = $entityManager->getRepository(User::class)->findBy(["username" => $usernameInSession]);
         foreach ($dataToUpdate as $record) {
             $record->setStatus(UserStatus::ACCOUNT_ACTIVATE);
         }
@@ -45,16 +45,16 @@ class UserRepository extends ServiceEntityRepository
 
     public function login(User $user): ?User
     {
-        $usernameFromForm = $user->getName();
+        $usernameFromForm = $user->getUsername();
         $passwordFromForm = $user->getPassword();
 
-        $userInDb = current($this->findBy(["name" => $usernameFromForm]));
+        $userInDb = current($this->findBy(["username" => $usernameFromForm]));
         switch (true) {
             case !$userInDb:
                 $user->isNameExist(false);
                 break;
 
-            case $userInDb->getName() == $usernameFromForm &&
+            case $userInDb->getUsername() == $usernameFromForm &&
                 password_verify(
                     $passwordFromForm,
                     $userInDb->getPassword()
@@ -76,13 +76,13 @@ class UserRepository extends ServiceEntityRepository
 
     public function checkPasswordReset(User $user): User
     {
-        $userDataFromDb = current($this->findBy(["name" => $user->getName()]));
+        $userDataFromDb = current($this->findBy(["username" => $user->getUsername()]));
         $oldPasswordFromForm = $user->getOldPassword();
         $newPasswordFromForm = $user->getPassword();
         if (is_object($userDataFromDb)) {
             if (password_verify($oldPasswordFromForm, $userDataFromDb->getPassword())) {
                 $dataToUpdate = $this->getEntityManager()->getRepository(User::class)->findBy(
-                    ["name" => $userDataFromDb->getName()]
+                    ["username" => $userDataFromDb->getUsername()]
                 );
                 foreach ($dataToUpdate as $record) {
                     $record->setPassword(password_hash($newPasswordFromForm, PASSWORD_DEFAULT));

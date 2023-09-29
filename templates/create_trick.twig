@@ -39,7 +39,7 @@
             {% if user_connected is defined and user_connected == 1 %}
                 <a href="{{ path('logout') }}" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
-                <a href="{{ path('login_get') }}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
+                <a href="{{ path('login') }}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
                 <a href="{{ path('registration_get') }}" class="mobile-link" id="sign-up"><i class="fa-solid fa-user-plus"></i></a>
             {% endif %}
         </nav>

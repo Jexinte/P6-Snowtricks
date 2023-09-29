@@ -15,11 +15,13 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use App\Form\Type\SignUp;
 use App\Form\Type\Login;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class UserController extends AbstractController
 {
@@ -35,13 +37,24 @@ class UserController extends AbstractController
         return new Response($this->render("sign_up.twig", $parameters));
     }
 
-    #[Route(path: '/signin', name: 'login_get', methods: ["GET"])]
-    public function signInPage(Request $request): Response
+    #[Route(path: '/signin', name: 'login')]
+   public function signInPage(AuthenticationUtils $authenticationUtils): Response
     {
-        $userConnected = $request->getSession()->get('user_connected');
         $form = $this->createForm(Login::class);
-        $parameters["user_connected"] = $userConnected;
+        $error = $authenticationUtils->getLastAuthenticationError();
+        $parameters["errorLogs"] =  $error;
         $parameters["form"] = $form;
+        if($error)
+        {
+            $field = $form->get('username');
+            $error = new FormError(
+                'Oops ! Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations de connexion !'
+            );
+            $field->addError($error);
+            return new Response($this->render("sign_in.twig", $parameters), CodeStatus::CLIENT);
+        }
+
+
         return new Response($this->render("sign_in.twig", $parameters));
     }
 
@@ -76,6 +89,7 @@ class UserController extends AbstractController
         Request $request,
         UserRepository $userRepository,
         MailerInterface $mailer,
+        UserPasswordHasherInterface $passwordHasher
 
     ): ?Response {
         $form = $this->createForm(SignUp::class);
@@ -83,7 +97,8 @@ class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $form->getData();
-            $user->setPassword(password_hash($user->getPassword(), PASSWORD_DEFAULT));
+            $hashedPassword = $passwordHasher->hashPassword($user,$user->getPassword());
+            $user->setPassword($hashedPassword);
             $fileExt = explode('.', $user->getFile()->getClientOriginalName());
             $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
             $imgPath = "/assets/img/$filename";
@@ -92,6 +107,7 @@ class UserController extends AbstractController
             $tmp = $user->getFile()->getPathname();
             $dir = "../public/assets/img";
             move_uploaded_file($tmp, "$dir/$filename");
+            $user->setRoles(['ROLE_USER']);
             $userRepository->getEntityManager()->persist($user);
             $userRepository->getEntityManager()->flush();
             $user->setCreated(true);
@@ -129,13 +145,13 @@ class UserController extends AbstractController
     {
         if ($user->isCreated()) {
             $this->setToken();
-            $request->getSession()->set("username", $user->getName());
+            $request->getSession()->set("username", $user->getUsername());
             $email = (new Email())
                 ->from("snowtricks@gmail.com")
                 ->to($user->getEmail())
                 ->subject('Confirmation d\'inscription')
                 ->text(
-                    body: "Bonjour " . $user->getName() . ",\n
+                    body: "Bonjour " . $user->getUsername() . ",\n
 Nous vous remercions de vous être inscrit(e) sur notre plateforme. Avant de pouvoir accéder à toutes les fonctionnalités, nous vous prions de bien vouloir valider votre compte en cliquant sur le lien ci-dessous :\n 
 http://127.0.0.1:8000/signup/account-validation\n
 Si vous ne pouvez pas cliquer sur le lien, veuillez copier et coller l'URL dans la barre d'adresse de votre navigateur.\n
@@ -177,62 +193,6 @@ L'équipe Snowtricks
         );
     }
 
-    #[Route(path: '/signin/validation', name: 'login', methods: ["POST"])]
-    public function signInValidator(
-        Request $request,
-        UserRepository $userRepository,
-    ): ?Response {
-        $parameters = [];
-        $form = $this->createForm(Login::class);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $userData = $form->getData();
-            $result = $userRepository->login($userData);
-
-            switch (true) {
-                case $result->getCredentialsValid():
-                    $request->getSession()->set("user_id", $result->getUserId());
-                    $request->getSession()->set("user_connected", 1);
-                    return $this->redirectToRoute('homepage');
-
-                case !$result->getNameExist() && !is_null($result->getNameExist()):
-                    $field = $form->get('name');
-                    $error = new FormError(
-                        'Oops ! Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations de connexion !'
-                    );
-                    $field->addError($error);
-                    break;
-                case !$result->getAccountIsActivate() && !is_null($result->getAccountIsActivate()):
-                    $field = $form->get('name');
-                    $error = new FormError(
-                        'L\'accès à votre compte est en attente d\'activation. Pour toute demande, notre support est à votre disposition.'
-                    );
-                    $field->addError($error);
-                    break;
-                case !$result->getPasswordCorrect() && !is_null($result->getPasswordCorrect()):
-                    $field = $form->get('password');
-                    $error = new FormError('Oops ! Il semblerait que le mot de passe soit incorrect !');
-                    $field->addError($error);
-                    break;
-            }
-        }
-        $parameters["form"] = $form;
-
-        return new Response($this->render("sign_in.twig", $parameters), CodeStatus::CLIENT);
-    }
-
-    #[Route(path: '/logout', name: 'logout', methods: ["GET"])]
-    public function logout(Request $request): ?RedirectResponse
-    {
-        $userConnected = $request->getSession()->get('user_connected');
-        if (!$userConnected) {
-            $this->createNotFoundException();
-        }
-        $request->getSession()->clear();
-
-        return $this->redirectToRoute('homepage');
-    }
 
     #[Route(path: '/reset-password/', name: 'send_reset_password_link', methods: ["POST"])]
     public function sendPasswordResetLink(
@@ -246,7 +206,7 @@ L'équipe Snowtricks
 
         if ($form->isValid() && $form->isSubmitted()) {
             $user = $form->getData();
-            $userFound = current($userRepository->findBy(["name" => $user->getName()]));
+            $userFound = current($userRepository->findBy(["name" => $user->getUsername()]));
 
             if ($userFound) {
                 $this->setToken();
@@ -258,7 +218,7 @@ L'équipe Snowtricks
                     ->to($userFound->getEmail())
                     ->subject('Réinitialisation de votre mot de passe')
                     ->text(
-                        body: "Bonjour " . $user->getName() . ",\n
+                        body: "Bonjour " . $user->getUsername() . ",\n
 Nous avons bien reçu votre demande de réinitialisation de mot de passe pour votre compte. Voici les étapes à suivre :\n
 
 Cliquez sur le lien ci-dessous pour accéder à la page de réinitialisation : \n
