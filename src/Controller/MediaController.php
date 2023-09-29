@@ -16,13 +16,10 @@ class MediaController extends AbstractController
 
 
     #[Route('/update-trick-media/{id}', name: 'update_trick_media_page', methods: ["GET"])]
-    public function updateTrickMediaPage(Media $media, MediaRepository $mediaRepository, Request $request): Response
+    public function updateTrickMediaPage(Media $media): Response
     {
-        $userConnected = $request->getSession()->get('user_connected');
-        if(!$userConnected)
-        {
-            return  $this->redirectToRoute('forbidden');
-        }
+        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
+
         $form = $media->getMediaType() == "web" ? $this->createForm(UpdateEmbedUrl::class) : $this->createForm(
             UpdateFile::class
         );
@@ -35,7 +32,7 @@ class MediaController extends AbstractController
 
     #[Route('/update-trick-media/{id},', name: 'update_trick_media_form', methods: ["PUT"])]
     public function updateTrickMediaValidator(
-    Media $media,
+        Media $media,
         Request $request,
         MediaRepository $mediaRepository
     ): Response {
@@ -44,32 +41,22 @@ class MediaController extends AbstractController
         );
 
         $form->handleRequest($request);
-
         if ($form->isValid() && $form->isSubmitted()) {
-            $mediaEntity = $form->getData();
-            $file = !empty($mediaEntity->getUpdatedFile()) ? $mediaEntity->getUpdatedFile() : '';
-            $embedUrl = !empty($mediaEntity->getEmbedUrl()) ? $mediaEntity->getEmbedUrl() : '';
+            $file = !empty($form->getData()->getUpdatedFile()) ? $form->getData()->getUpdatedFile() : '';
+            $embedUrl = !empty($form->getData()->getEmbedUrl()) ? $form->getData()->getEmbedUrl() : '';
             switch (true) {
                 case !empty($file):
-                    $mediaEntity->setUpdatedFile($file);
-                    $fileUpdated = $mediaRepository->updateTrickMedia($media->getId(), $mediaEntity);
-                    if ($fileUpdated) {
-                        $this->addFlash("success", "Votre fichier a bien été mis à jour !");
-                        return $this->redirectToRoute('homepage');
-                    }
-                    break;
+                    $media->setUpdatedFile($file);
+                    $this->updateTrickFile($media, $mediaRepository);
+                    $this->addFlash("success", "Votre fichier a bien été mis à jour !");
+                    return $this->redirectToRoute('homepage');
                 case !empty($embedUrl):
-                    $mediaEntity->setEmbedUrl($embedUrl);
-                    preg_match('/<iframe[^>]+src="([^"]+)"/i', $mediaEntity->getEmbedUrl(), $matches);
+                    preg_match('/<iframe[^>]+src="([^"]+)"/i', $embedUrl, $matches);
                     $urlCleaned = $matches[1];
-                    $mediaEntity->setEmbedUrl($urlCleaned);
-                    $urlUpdated = $mediaRepository->updateTrickMedia($media->getId(), $mediaEntity);
-
-                    if ($urlUpdated) {
-                        $this->addFlash("success", "Le lien a bien été mis à jour !");
-                        return $this->redirectToRoute('homepage');
-                    }
-                    break;
+                    $media->setEmbedUrl($urlCleaned);
+                    $this->updateEmbedUrl($media, $mediaRepository);
+                    $this->addFlash("success", "Le lien a bien été mis à jour !");
+                    return $this->redirectToRoute('homepage');
                 default:
                     $this->addFlash("success", "Votre fichier a bien été mis à jour !");
                     return $this->redirectToRoute('homepage');
@@ -80,6 +67,44 @@ class MediaController extends AbstractController
         $parameters["media"] = $media;
         $parameters["form"] = $form;
         return new Response($this->render("update_media.twig", $parameters), 400);
+    }
+
+    public function updateTrickFile(Media $media, MediaRepository $mediaRepository): bool
+    {
+        $fileExt = explode('.', $media->getUpdatedFile()->getClientOriginalName());
+        $filePathInDb = current($mediaRepository->findBy(["id" => $media->getId()]));
+        $dir = "";
+        $filePath = "";
+        $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
+        if (in_array($fileExt[1], array("jpg", 'webp', "png")) && !$filePathInDb->getIsBanner()) {
+            $dir = "../public/assets/img";
+            $filePath = "/assets/img/$filename";
+        } elseif ($fileExt[1] == "mp4") {
+            $dir = "../public/assets/videos";
+            $filePath = "/assets/videos/$filename";
+        } else {
+            $dir = "../public/assets/img/banner";
+            $filePath = "/assets/img/banner/$filename";
+        }
+        unlink("../public" . $filePathInDb->getMediaPath());
+
+
+        $media->setMediaPath($filePath);
+        $media->setMediaType($fileExt[1]);
+        $mediaRepository->getEntityManager()->flush();
+
+        $tmp = $media->getUpdatedFile()->getPathname();
+        move_uploaded_file($tmp, "$dir/$filename");
+        return true;
+    }
+
+    public function updateEmbedUrl(Media $media, MediaRepository $mediaRepository): bool
+    {
+        $embedUrl = $media->getEmbedUrl();
+        $media->setMediaPath($embedUrl);
+        $media->setMediaType("web");
+        $mediaRepository->getEntityManager()->flush();
+        return true;
     }
 
     #[Route('/delete-trick-media/{id}', name: 'delete_trick_media', methods: ["GET"])]
