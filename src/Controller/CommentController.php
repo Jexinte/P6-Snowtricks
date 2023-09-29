@@ -2,12 +2,10 @@
 
 namespace App\Controller;
 
-use App\Entity\Comment;
 use App\Entity\Trick;
 use App\Form\Type\AddComment;
 use App\Repository\CommentRepository;
 use App\Repository\MediaRepository;
-use App\Repository\TrickRepository;
 use App\Repository\UserRepository;
 use IntlDateFormatter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,26 +13,24 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use DateTime;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 class CommentController extends AbstractController
 {
 
     #[Route('/add-comment/{id}', name: 'add_comment', methods: ["POST"])]
     public function handleAddComment(
-//        int $id,
         Request $request,
         CommentRepository $commentRepository,
         UserRepository $userRepository,
         MediaRepository $mediaRepository,
         IntlDateFormatter $dateFormatter,
-        SluggerInterface $slugger,
         DateTime $dateTime,
         Trick $trick,
     ): Response {
+        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
         $form = $this->createForm(AddComment::class);
         $form->handleRequest($request);
-        $user = current($userRepository->findBy(["id" => $request->getSession()->get('user_id')]));
+        $user = $this->getUser();
         $medias = $mediaRepository->findBy(["idTrick" => $trick->getId()]);
         $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $trick->getId(), "isBanner" => true]));
         if ($form->isSubmitted() && $form->isValid()) {
@@ -46,9 +42,9 @@ class CommentController extends AbstractController
             $trick->addComment($commentEntity);
             $user->addComment($commentEntity);
             $commentRepository->getEntityManager()->flush();
-            $trickNameSlug = $slugger->slug($trick->getName())->lower();
+            $trickname = $trick->getSlug();
             return $this->redirectToRoute("trick", [
-                "trickname" => $trickNameSlug,
+                "slug" => $trickname,
                 "id" => $trick->getId()
             ]);
         }
@@ -80,8 +76,7 @@ class CommentController extends AbstractController
         $parameters["trick_date"] = $dateTrick;
         $parameters["medias"] = $medias;
         $parameters["banner"] = $mainBannerOfTrick;
-        $parameters["user_connected"] = $request->getSession()->get('user_connected');
-
+        $parameters["user_connected"] = $userConnected;
         return new Response($this->render("trick.twig", $parameters), 400);
     }
 
