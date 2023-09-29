@@ -26,7 +26,7 @@ class Trick
         pattern: "/^[A-ZÀ-ÿ][A-Za-zÀ-ÿ, .'\-\n]*$/u",
         message: 'Oops! Le format de votre saisie est incorrect, le nom du trick doit commencer par une lettre majuscule',
         match: true,
-        groups: ['updateTrickContent','createTrick']
+        groups: ['updateTrickContent']
     )]
     private ?string $name = null;
 
@@ -36,7 +36,7 @@ class Trick
         pattern: "/^[A-ZÀ-ÿ][A-Za-zÀ-ÿ, .'\-\n]*$/u",
         message: 'Oops! Le format de votre saisie est incorrect, votre description doit commencer par une lettre majuscule',
         match: true,
-        groups: ['updateTrickContent','createTrick']
+        groups: ['updateTrickContent']
     )]
     private ?string $description = null;
 
@@ -66,7 +66,6 @@ class Trick
 
     }
 
-    private string $nameUpdated;
     #[ORM\Column(length: 128)]
     #[Gedmo\Slug(fields:['name'])]
     private string $slug;
@@ -163,21 +162,7 @@ class Trick
         $this->mediaForm = $mediaForm;
     }
 
-    /**
-     * @return string
-     */
-    public function getNameUpdated(): string
-    {
-        return $this->nameUpdated;
-    }
 
-    /**
-     * @param string $nameUpdated
-     */
-    public function setNameUpdated(string $nameUpdated): void
-    {
-        $this->nameUpdated = $nameUpdated;
-    }
 
     /**
      * @return \DateTimeInterface|null

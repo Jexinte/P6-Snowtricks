@@ -27,7 +27,6 @@ class UpdateEmbedUrl extends AbstractType
         $resolver->setDefaults([
             'data_class' => Media::class,
 
-            'validation_groups' => 'createTrick',
 
             'csrf_protection' => true,
 

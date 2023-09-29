@@ -46,7 +46,6 @@ class CreateTrick extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Trick::class,
-            'validation_groups' => 'createTrick',
             'csrf_protection' => true,
             'csrf_field_name' => 'token',
             'csrf_token_id' => 'create_trick_text',

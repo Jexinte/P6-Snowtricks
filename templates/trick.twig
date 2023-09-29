@@ -59,7 +59,7 @@
                     {{ trick is defined ? trick.description : '' }}
                 </p>
                 <div class="trick-details">
-                    {% if trick.trickUpdated is defined and trick.trickUpdated == 1 %}
+                    {% if trick.updatedAt is defined and trick.updatedAt is not null and trick.updatedAt != trick.createdAt %}
                         <p class="trick-date">Modifiée le {{ trick_date is defined ? trick_date : '' }} </p>
                         {% else %}
                             <p class="trick-date">{{ trick_date is defined ? trick_date : '' }} </p>

@@ -35,7 +35,7 @@ class TrickController extends AbstractController
         IntlDateFormatter $dateFormatter,
         Request $request
     ): Response {
-        $userConnected = $request->getSession()->get('user_connected');
+        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
         $id = $trick->getId();
         $form = $this->createForm(AddComment::class);
         $medias = $mediaRepository->findBy(["idTrick" => $id, "isBanner" => null]);
@@ -71,9 +71,9 @@ class TrickController extends AbstractController
 
 
     #[Route('/create-trick', name: 'create_trick_get', methods: ["GET"])]
-    public function createTrickPage(Request $request): Response
+    public function createTrickPage(): Response
     {
-        $userConnected = $request->getSession()->get('user_connected');
+        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
 
         $form = $this->createForm(CreateTrick::class);
         $form->add('mediaForm', CreateTrickMedia::class);
@@ -90,24 +90,27 @@ class TrickController extends AbstractController
         MediaRepository $mediaRepository,
         DateTime $dateTime
     ): Response {
-        $userConnected = $request->getSession()->get('user_connected');
+        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
         $form = $this->createForm(CreateTrick::class);
         $form->add('mediaForm', CreateTrickMedia::class);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $trickEntity = $form->getData();
-            $trickEntity->setCreatedAt($dateTime);
-            $mediaEntity = $form->get('mediaForm')->getData();
-            if (!empty($mediaEntity->getEmbedUrl())) {
-                preg_match('/<iframe[^>]+src="([^"]+)"/i', $mediaEntity->getEmbedUrl(), $matches);
+            $trick = $form->getData();
+            $trick->setCreatedAt($dateTime);
+            $media = $form->get('mediaForm')->getData();
+            if (!empty($media->getEmbedUrl())) {
+                preg_match('/<iframe[^>]+src="([^"]+)"/i', $media->getEmbedUrl(), $matches);
                 $urlCleaned = $matches[1];
-                $mediaEntity->setEmbedUrl($urlCleaned);
+                $media->setEmbedUrl($urlCleaned);
             }
 
+            $this->createTrickSaveBanner($media, $trick, $mediaRepository);
+            $this->createTrickSaveEmbedUrl($media, $trick, $mediaRepository);
+            $this->createTrickSaveImages($media, $trick, $mediaRepository);
+            $this->createTrickSaveVideos($media, $trick, $mediaRepository);
 
-            $mediaRepository->saveTrickMedias($mediaEntity, $trickEntity);
-            $trickRepository->getEntityManager()->persist($trickEntity);
+            $trickRepository->getEntityManager()->persist($trick);
             $trickRepository->getEntityManager()->flush();
             $this->addFlash("success", "Votre nouveau trick a été créé avec succès !");
             return $this->redirectToRoute('homepage');
@@ -118,18 +121,86 @@ class TrickController extends AbstractController
         return new Response($this->render("create_trick.twig", $parameters), CodeStatus::CLIENT);
     }
 
+    public function createTricksaveBanner(Media $media, Trick $trick, MediaRepository $mediaRepository): void
+    {
+        $dirImagesBanner = "../public/assets/img/banner";
+        $bannerFile = $media->getBannerFile();
+        $fileExt = explode('.', $bannerFile->getClientOriginalName());
+        $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
+        $imgBannerPath = "/assets/img/banner/$filename";
+        $tmp = $bannerFile->getPathname();
+        move_uploaded_file($tmp, "$dirImagesBanner/$filename");
+        $media->setMediaPath($imgBannerPath);
+        $media->setMediaType($fileExt[1]);
+        $media->setIsBanner(true);
+        $trick->addMedia($media);
+        $mediaRepository->getEntityManager()->persist($media);
+    }
+
+    public function createTricksaveEmbedUrl(Media $media, Trick $trick, MediaRepository $mediaRepository): void
+    {
+        $embedUrl = $media->getEmbedUrl();
+
+        if (!empty($embedUrl)) {
+            $newMedia = new Media();
+            $newMedia->setMediaPath($embedUrl);
+            $newMedia->setMediaType("web");
+            $newMedia->setIsBanner();
+            $trick->addMedia($newMedia);
+            $mediaRepository->getEntityManager()->persist($newMedia);
+        }
+    }
+
+    public function createTricksaveImages(Media $media, Trick $trick, MediaRepository $mediaRepository): void
+    {
+        $images = $media->getImages();
+        $dirImages = "../public/assets/img";
+        if (!empty($media->getImages())) {
+            foreach ($images as $image) {
+                $newMedia = new Media();
+                $fileExt = explode('.', $image->getClientOriginalName());
+                $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
+                $imgPath = "/assets/img/$filename";
+                $tmp = $image->getPathname();
+                $newMedia->setMediaPath($imgPath);
+                $newMedia->setMediaType($fileExt[1]);
+                $newMedia->setIsBanner(null);
+                move_uploaded_file($tmp, "$dirImages/$filename");
+                $trick->addMedia($newMedia);
+                $mediaRepository->getEntityManager()->persist($newMedia);
+            }
+        }
+    }
+
+    public function createTricksaveVideos(Media $media, Trick $trick, MediaRepository $mediaRepository): void
+    {
+        $videos = $media->getVideos();
+        $dirVideos = "../public/assets/videos";
+
+        if (!empty($media->getVideos())) {
+            foreach ($videos as $video) {
+                $newMedia = new Media();
+                $fileExt = explode('.', $video->getClientOriginalName());
+                $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
+                $videoPath = "/assets/videos/$filename";
+                $tmp = $video->getPathname();
+                $newMedia->setMediaPath($videoPath);
+                $newMedia->setMediaType($fileExt[1]);
+                $newMedia->setIsBanner();
+                move_uploaded_file($tmp, "$dirVideos/$filename");
+                $trick->addMedia($newMedia);
+                $mediaRepository->getEntityManager()->persist($newMedia);
+            }
+        }
+    }
 
     #[Route('/update-trick/{slug}/details/{id}', name: 'update_trick_get', methods: ["GET"])]
     public function updateTrickPage(
         Trick $trick,
         MediaRepository $mediaRepository,
-        Request $request,
         IntlDateFormatter $dateFormatter
     ): Response {
-        $userConnected = $request->getSession()->get('user_connected');
-        if (!$userConnected) {
-            return $this->redirectToRoute('forbidden');
-        }
+        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
         $form = $this->createForm(UpdateTrickContent::class, $trick);
         $medias = $mediaRepository->findBy(["idTrick" => $trick->getId(), "isBanner" => null]);
         $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $trick->getId(), "isBanner" => true]));
@@ -153,7 +224,7 @@ class TrickController extends AbstractController
         MediaRepository $mediaRepository,
         DateTime $dateTime
     ): Response {
-        $media = $mediaRepository->findBy(["idTrick" => $trick->getId(),"isBanner" => null]);
+        $media = $mediaRepository->findBy(["idTrick" => $trick->getId(), "isBanner" => null]);
         $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $trick->getId(), "isBanner" => true]));
         $form = $this->createForm(UpdateTrickContent::class, $trick);
         $form->handleRequest($request);
@@ -166,7 +237,7 @@ class TrickController extends AbstractController
             return $this->redirectToRoute('homepage');
         }
 
-        $userConnected = $request->getSession()->get('user_connected');
+        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
         $parameters["user_connected"] = $userConnected;
         $parameters["medias"] = $media;
         $parameters["form"] = $form;
@@ -181,10 +252,6 @@ class TrickController extends AbstractController
         TrickRepository $trickRepository,
         MediaRepository $mediaRepository
     ): Response|RedirectResponse {
-        if (is_null($trick->getId())) {
-            throw $this->createNotFoundException();
-        }
-
         $medias = $mediaRepository->findBy(["idTrick" => $trick->getId()]);
 
         foreach ($medias as $media) {
