@@ -37,8 +37,8 @@ class CommentRepository extends ServiceEntityRepository
     {
         $comments = $this->findBy(["idTrick" => $id], );
 
-        foreach ($comments as $k => $object) {
-            $comments[$k]->setUsername($userRepository->find(["id" => $object->getIdUser()])->getUsername());
+        foreach ($comments as $comment) {
+            $comment->setUsername($userRepository->find(["id" => $comment->getIdUser()])->getUsername());
         }
         return $comments;
     }

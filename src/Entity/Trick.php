@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use AllowDynamicProperties;
 use App\Repository\TrickRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -13,6 +14,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: TrickRepository::class)]
 #[UniqueEntity(fields: 'name', message: 'Désolé, le trick que vous avez demandé n\'est actuellement pas disponible, veuillez en définir un autre !')]
+#[AllowDynamicProperties]
 class Trick
 {
     #[ORM\Id]

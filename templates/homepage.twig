@@ -46,7 +46,7 @@
                         {% for trick in tricks %}
                             <div class="trick">
                                 <div class="trick-banner">
-                                    <img src="{{ trick.main_banner is defined and trick.main_banner is not empty ? trick.main_banner : '/assets/img/banner/banner_homepage.jpg' }}"
+                                    <img src="{{ trick.banner is defined and trick.banner is not empty ? trick.banner : '/assets/img/banner/banner_homepage.jpg' }}"
                                          height="200" alt="">
                                 </div>
                                 <div class="trick-options">

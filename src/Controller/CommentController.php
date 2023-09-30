@@ -29,7 +29,7 @@ class CommentController extends AbstractController
         $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
         $form = $this->createForm(AddComment::class);
         $form->handleRequest($request);
-        $user = $this->getUser();
+        $user = current($userRepository->findBy(["username" => $this->getUser()->getUserIdentifier()]));
         $medias = $mediaRepository->findBy(["idTrick" => $trick->getId()]);
         $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $trick->getId(), "isBanner" => true]));
         if ($form->isSubmitted() && $form->isValid()) {
