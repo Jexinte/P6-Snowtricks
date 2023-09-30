@@ -37,27 +37,3 @@ class UpdateEmbedUrl extends AbstractType
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

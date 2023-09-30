@@ -10,8 +10,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class HomepageController extends AbstractController
 {
-
-
     #[Route(path: '/', name: 'homepage', methods: ["GET"])]
     public function homepage(
         TrickRepository $trickRepository,
@@ -24,19 +22,16 @@ class HomepageController extends AbstractController
         $result = [];
         $banners = $mediaRepository->findBy(["isBanner" => true]);
         foreach ($tricks as $k => $trick) {
-            if(!empty($banners))
-            {
-                foreach($banners as $banner){
-                    if($banner->getIdTrick() == $trick->getId())
-                    {
+            if(!empty($banners)) {
+                foreach($banners as $banner) {
+                    if($banner->getIdTrick() == $trick->getId()) {
                         $result[$k] = [
                         "name" => $trick->getName(),
                         "id" => $trick->getId(),
                         "slug" => $trick->getSlug(),
                         "main_banner" => $banner->getMediaPath()
                     ];
-                    }
-                    else {
+                    } else {
                         $result[$k] = [
                             "name" => $trick->getName(),
                             "id" => $trick->getId(),
@@ -44,8 +39,7 @@ class HomepageController extends AbstractController
                         ];
                     }
                 }
-            }
-            else {
+            } else {
                 $result[$k] = [
                     "name" => $trick->getName(),
                     "id" => $trick->getId(),

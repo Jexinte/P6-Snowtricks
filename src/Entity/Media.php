@@ -6,6 +6,7 @@ use App\Repository\MediaRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
+
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
 class Media
 {
@@ -22,7 +23,7 @@ class Media
 
     #[ORM\Column(length: 255)]
     private ?string $mediaType = null;
-    #[ORM\Column(length: 255,nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?bool $isBanner = null;
 
 
@@ -43,19 +44,19 @@ class Media
     private ?string $embedUrl = null;
 
 
-#[Assert\File(
-    maxSize: '3000K',
-    extensions: ['jpg', 'png', 'webp', 'mp4'],
-    extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png ,webp et mp4 sont acceptés !',
-    groups: ['update_trick','createTrick']
-)]
+    #[Assert\File(
+        maxSize: '3000K',
+        extensions: ['jpg', 'png', 'webp', 'mp4'],
+        extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png ,webp et mp4 sont acceptés !',
+        groups: ['update_trick','createTrick']
+    )]
     private ?UploadedFile $bannerFile;
 
 
     private ?UploadedFile $updatedFile = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
-    #[ORM\JoinColumn(name:'id_trick',referencedColumnName: 'id',nullable: false)]
+    #[ORM\JoinColumn(name:'id_trick', referencedColumnName: 'id', nullable: false)]
     private ?Trick $trick = null;
 
     public function getId(): ?int
@@ -164,18 +165,18 @@ class Media
     {
         $this->embedUrl = $embedUrl;
     }
-//
-//    /**
-//     * @return UploadedFile|null
-//     */
-    public function getBannerFile():UploadedFile
+    //
+    //    /**
+    //     * @return UploadedFile|null
+    //     */
+    public function getBannerFile(): UploadedFile
     {
         return $this->bannerFile;
     }
 
-//    /**
-//     * @param UploadedFile|null $bannerFile
-//     */
+    //    /**
+    //     * @param UploadedFile|null $bannerFile
+    //     */
     public function setBannerFile(UploadedFile $bannerFile): void
     {
         $this->bannerFile = $bannerFile;

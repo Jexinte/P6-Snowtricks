@@ -4,7 +4,7 @@ namespace App\Enumeration;
 
 enum UserStatus: int
 {
-    const ACCOUNT_NOT_ACTIVATE = false;
-    const ACCOUNT_ACTIVATE = true;
+    public const ACCOUNT_NOT_ACTIVATE = false;
+    public const ACCOUNT_ACTIVATE = true;
 
 }

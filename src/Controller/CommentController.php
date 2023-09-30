@@ -16,7 +16,6 @@ use DateTime;
 
 class CommentController extends AbstractController
 {
-
     #[Route('/add-comment/{id}', name: 'add_comment', methods: ["POST"])]
     public function handleAddComment(
         Request $request,

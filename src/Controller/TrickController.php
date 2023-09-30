@@ -21,11 +21,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Trick;
 
-
 class TrickController extends AbstractController
 {
-
-
     #[Route('/{slug}/details/{id}', name: 'trick', methods: ["GET"])]
     public function getTrickPage(
         Trick $trick,

@@ -11,8 +11,6 @@ use App\Enumeration\CodeStatus;
 
 class ErrorController extends AbstractController
 {
-
-
     public function errorExceptions(\Throwable $exception): ?RedirectResponse
     {
         return match (true) {

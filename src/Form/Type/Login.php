@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Form\Type;
+
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -17,7 +18,10 @@ class Login extends AbstractType
             'label' => 'Utilisateur',
             'required' => false,
         ])
-            ->add('password', PasswordType::class, options: [
+            ->add(
+                'password',
+                PasswordType::class,
+                options: [
                 'label' => 'Mot de passe',
                 'required' => false,
             ]
@@ -26,7 +30,7 @@ class Login extends AbstractType
             ->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']]);
 
     }
-        public function configureOptions(OptionsResolver $resolver): void
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class'      => User::class,
@@ -40,4 +44,4 @@ class Login extends AbstractType
             'csrf_token_id'   => 'login',
         ]);
     }
-    }
+}

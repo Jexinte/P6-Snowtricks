@@ -13,8 +13,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MediaController extends AbstractController
 {
-
-
     #[Route('/update-trick-media/{id}', name: 'update_trick_media_page', methods: ["GET"])]
     public function updateTrickMediaPage(Media $media): Response
     {
