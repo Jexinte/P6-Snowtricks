@@ -186,4 +186,12 @@ footer {
         font-size: 2em;
         left:54%;
     }
+
+    .trick-banner img {
+        height: 300px;
+    }
+
+    .trick-options{
+        margin-top: 1em;
+    }
 }

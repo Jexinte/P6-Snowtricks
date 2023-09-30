@@ -55,10 +55,10 @@ class MediaController extends AbstractController
                     $urlCleaned = $matches[1];
                     $media->setEmbedUrl($urlCleaned);
                     $this->updateEmbedUrl($media, $mediaRepository);
-                    $this->addFlash("success", "Le lien a bien été mis à jour !");
+                    $this->addFlash("success", "Votre lien vidéo a bien été mis à jour !");
                     return $this->redirectToRoute('homepage');
                 default:
-                    $this->addFlash("success", "Votre fichier a bien été mis à jour !");
+                    $this->addFlash("success", "Votre média a bien été mis à jour !");
                     return $this->redirectToRoute('homepage');
             }
         }
@@ -115,7 +115,7 @@ class MediaController extends AbstractController
         }
         $mediaRepository->getEntityManager()->remove($media);
         $mediaRepository->getEntityManager()->flush();
-        $this->addFlash("success", "La suppression du média a bien été prise en compte !");
+        $this->addFlash("success", "La suppression de votre média a bien été prise en compte !");
         return $this->redirectToRoute('homepage');
     }
 }

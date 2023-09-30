@@ -13,10 +13,10 @@
             <ul>
                 {% if user_connected is defined and user_connected == "ROLE_USER" %}
                     <a href={{ path('create_trick_get') }}>Créer un trick</a>
-                    <a href="{{path('logout')}}">Déconnexion</a>
+                    <a href="{{ path('logout') }}">Déconnexion</a>
                 {% else %}
-                    <a href="{{path('login')}}">Connexion</a>
-                    <a href="{{path('registration_get')}}">Inscription</a>
+                    <a href="{{ path('login') }}">Connexion</a>
+                    <a href="{{ path('registration_get') }}">Inscription</a>
                 {% endif %}
             </ul>
         </nav>
@@ -87,13 +87,16 @@
     <footer id="footer">
         <p class="text-center footer-paragraph">Copyright @ 2023</p>
         <nav id="nav-mobile">
-            <a href="{{ path('homepage') }}" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
+            <a href="{{ path('homepage') }}" class="mobile-link" id="homepage-link"><i
+                        class="fa-solid fa-house"></i></a>
             {% if user_connected is defined and user_connected == "ROLE_USER" %}
-                <a href="{{path('create_trick_get')}}" class="mobile-link" id="plus"><i class="fa-solid fa-plus"></i></a>
-                <a href="{{path('logout')}}" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
+                <a href="{{ path('create_trick_get') }}" class="mobile-link" id="plus"><i class="fa-solid fa-plus"></i></a>
+                <a href="{{ path('logout') }}" class="mobile-link" id="log-out"><i
+                            class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
-                <a href="{{path('login')}}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
-                <a href="{{path('registration_get')}}" class="mobile-link" id="sign-up"><i class="fa-solid fa-user-plus"></i></a>
+                <a href="{{ path('login') }}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
+                <a href="{{ path('registration_get') }}" class="mobile-link" id="sign-up"><i
+                            class="fa-solid fa-user-plus"></i></a>
             {% endif %}
         </nav>
     </footer>

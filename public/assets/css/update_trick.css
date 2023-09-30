@@ -52,6 +52,7 @@ header {
     gap: 8em;
     margin-block: 4em;
     justify-content: center;
+    padding-bottom: 4em;
 }
 
 #trick-content .media-box {
@@ -228,9 +229,7 @@ header {
     gap: 2em;
 }
 
-.about{
-    margin-top: 7em;
-}
+
 
 #submit
 {
@@ -284,6 +283,7 @@ footer{
 
     #trick-content .media-box img, iframe, embed {
         width: 100%;
+        image-rendering: pixelated;
     }
 
     .media-box .image {
@@ -296,5 +296,21 @@ footer{
 
     #trick-content{
         margin-bottom: 3em;
+    }
+    #banner-trick{
+        height: 600px;
+        image-rendering: pixelated;
+        min-height: 0;
+    }
+
+
+
+    #trick-content form {
+        margin-top: 4em;
+    }
+    #banner-trick img {
+        min-height: 0;
+        height: 600px;
+        image-rendering: pixelated;
     }
 }

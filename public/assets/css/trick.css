@@ -290,11 +290,16 @@ header {
     }
 
     #trick-content .media-box img, iframe, embed {
-
+        image-rendering: pixelated;
         width: 100%;
     }
 
     .media-box .image {
         height: 100%;
+    }
+    #banner-trick img {
+        min-height: 0;
+        height: 600px;
+        image-rendering: pixelated;
     }
 }
