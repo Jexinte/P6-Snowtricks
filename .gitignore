@@ -4,7 +4,6 @@ legacy_code.md
 notes.md
 .env
 .idea
-.php-cs-fixer.cache
 tools
 ###> symfony/framework-bundle ###
 /.env.local
