@@ -19,6 +19,14 @@ class ErrorController extends AbstractController
         };
     }
 
+
+    #[Route('/error/401', name: 'unauthorized', methods: ["GET"])]
+    public function error401(): Response
+    {
+        return new Response($this->render('/bundles/TwigBundle/Exception/error401.html.twig'), CodeStatus::UNAUTHORIZED);
+    }
+
+
     #[Route('/error/404', name: 'ressource_not_found', methods: ["GET"])]
     public function error404(): Response
     {
