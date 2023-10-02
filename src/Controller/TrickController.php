@@ -71,7 +71,6 @@ class TrickController extends AbstractController
     public function createTrickPage(): Response
     {
         $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
-
         $form = $this->createForm(CreateTrick::class);
         $form->add('mediaForm', CreateTrickMedia::class);
         $parameters["user_connected"] = $userConnected;
