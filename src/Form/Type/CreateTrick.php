@@ -38,7 +38,10 @@ class CreateTrick extends AbstractType
                     'Old School' => 'Old School',
                 ],
 
-            ]);
+            ])
+
+
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

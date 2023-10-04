@@ -30,7 +30,6 @@ class HomepageController extends AbstractController
         }
 
 
-
         $parameters["tricks"] = $tricks;
         $parameters["user_connected"] = $userConnected;
         return new Response($this->render("homepage.twig", $parameters));

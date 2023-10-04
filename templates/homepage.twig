@@ -42,11 +42,10 @@
                         <h2 class="text-center">Aucun trick de disponible pour le moment !</h2>
                     {% endif %}
 
-                    {% if tricks is defined %}
                         {% for trick in tricks %}
                             <div class="trick">
                                 <div class="trick-banner">
-                                    <img src="{{ trick.banner is defined and trick.banner is not empty ? trick.banner : '/assets/img/banner/banner_homepage.jpg' }}"
+                                    <img src="{{ trick.banner is defined  ? trick.banner : '/assets/img/banner/banner_homepage.jpg' }}"
                                          height="200" alt="">
                                 </div>
                                 <div class="trick-options">
@@ -75,7 +74,6 @@
                                 </div>
                             </div>
                         {% endfor %}
-                    {% endif %}
                 </div>
             </div>
 
