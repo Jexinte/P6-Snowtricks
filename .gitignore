@@ -1,5 +1,5 @@
-#public/assets/img
-#public/assets/videos
+public/assets/img
+public/assets/videos
 legacy_code.md
 notes.md
 .env
