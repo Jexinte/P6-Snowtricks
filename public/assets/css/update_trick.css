@@ -109,7 +109,6 @@ header {
 
 #banner-trick img {
     width: 100%;
-    min-height: 100vh;
 }
 
 #comments {
@@ -272,6 +271,7 @@ footer{
 {
     #see-medias{
         display: block;
+        margin-inline: 1em;
     }
     #trick-content .media-box {
         width: 300px;
@@ -283,7 +283,6 @@ footer{
 
     #trick-content .media-box img, iframe, embed {
         width: 100%;
-        image-rendering: pixelated;
     }
 
     .media-box .image {
@@ -299,8 +298,8 @@ footer{
     }
     #banner-trick{
         height: 600px;
-        image-rendering: pixelated;
         min-height: 0;
+        transition: all 700ms ease-in-out ;
     }
 
 
@@ -310,7 +309,26 @@ footer{
     }
     #banner-trick img {
         min-height: 0;
-        height: 600px;
-        image-rendering: pixelated;
+        height: 500px;
+        transition: all 700ms ease-in-out ;
+    }
+    #trick {
+        width: 100%;
+        margin-top: -2em;
+        transition: all 700ms ease-in-out ;
+    }
+
+    .about .row {
+        margin-inline: 0;
+    }
+}
+
+@media screen and (max-width: 455px)
+{
+    #banner-trick img {
+        height: 550px;
+        transition: all 700ms ease-in-out;
+        padding: 6em 1em;
+        transition: all 700ms ease-in-out ;
     }
 }
