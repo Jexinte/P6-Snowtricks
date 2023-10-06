@@ -19,7 +19,7 @@
                 <img src="{{ banner.mediaPath }}"
                      alt="banner">
             {% else %}
-                <img src="/assets/img/banner/banner_homepage.jpg"
+                <img src="/assets/img/banner/banner-homepage.jpg"
                      alt="banner">
             {% endif %}
         </div>
@@ -30,26 +30,25 @@
                 {% for media in medias %}
                     {% if media.isBanner is null %}
 
-                    {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp"  %}
-                        <div class="media-box">
-                            <img src="{{ media is defined ? media.mediaPath : '' }}" alt="test" width="200" height="200"
-                                 class="image">
-                        </div>
-                    {% elseif media.mediaType == "mp4" %}
-                        <div class="media-box">
-                            <embed autoplay="false" width="200" src="{{ media is defined ? media.mediaPath : '' }}"
-                                   type="video/{{ media.mediaType }}">
-                        </div>
-                    {% elseif media.mediaType == "web" %}
-                        <div class="media-box">
-                            <iframe width="200" src="{{ media.mediaPath }}"></iframe>
-                        </div>
-                    {% endif %}
+                        {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp" %}
+                            <div class="media-box">
+                                <img src="{{ media is defined ? media.mediaPath : '' }}" alt="test" width="200"
+                                     height="200"
+                                     class="image">
+                            </div>
+                        {% elseif media.mediaType == "mp4" %}
+                            <div class="media-box">
+                                <embed autoplay="false" width="200" src="{{ media is defined ? media.mediaPath : '' }}"
+                                       type="video/{{ media.mediaType }}">
+                            </div>
+                        {% elseif media.mediaType == "web" %}
+                            <div class="media-box">
+                                <iframe width="200" src="{{ media.mediaPath }}"></iframe>
+                            </div>
+                        {% endif %}
                     {% endif %}
 
                 {% endfor %}
-
-
 
 
             </div>
@@ -61,8 +60,8 @@
                 <div class="trick-details">
                     {% if trick.updatedAt is defined and trick.updatedAt is not null and trick.updatedAt != trick.createdAt %}
                         <p class="trick-date">Modifiée le {{ trick_date is defined ? trick_date : '' }} </p>
-                        {% else %}
-                            <p class="trick-date">{{ trick_date is defined ? trick_date : '' }} </p>
+                    {% else %}
+                        <p class="trick-date">{{ trick_date is defined ? trick_date : '' }} </p>
                     {% endif %}
                     <p class="trick-group">{{ trick is defined ? trick.trickGroup }}</p>
                 </div>
@@ -83,56 +82,63 @@
         </div>
         <div id="form">
             {{ form_start(form,{'action':path('add_comment',{id:trick.id})}) }} {{ form_end(form) }}
-        {% else %}
-            <h2 class="user-not-logged">Afin d'ajouter un commentaire,merci de vous <a href="/signin">connectez !</a>
-            </h2>
-        {% endif %}
+            {% else %}
+                <h2 class="user-not-logged">Afin d'ajouter un commentaire,merci de vous <a href="/signin">connectez
+                        !</a>
+                </h2>
+            {% endif %}
         </div>
 
         <div id="comments">
             <h2>Commentaires</h2>
             {% if comments is defined  and comments is not empty %}
 
-            {% for comment in  comments %}
-            <div class="user-box">
-                <img src="{{ comment.userProfileImage }}" alt="" width="200">
-                <p>{{ comment.username }}, le {{ comment.date }}</p>
-                <p class="comment">{{ comment.content }}</p>
-            </div>
-        {% endfor %}
+                {% for comment in  comments %}
+                    <div class="user-box">
+                        <img src="{{ comment.userProfileImage }}" alt="" width="200">
+                        <p>{{ comment.username }}, le {{ comment.date }}</p>
+                        <p class="comment">{{ comment.content }}</p>
+                    </div>
+                {% endfor %}
                 {% if totalComments > 10 %}
                     <ul class="pagination">
-                        <li class="page-item {{  currentPage == 1 ? "disabled" : '' }}" id="previous">
+                        <li class="page-item {{ currentPage == 1 ? "disabled" : '' }}" id="previous">
 
-                            <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{currentPage - 1 }}" class="page-link">Précédent</a>
+                            <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{ currentPage - 1 }}"
+                               class="page-link">Précédent</a>
                         </li>
                         {% for page in 1..pages %}
-                            <li class="page-item {{ currentPage == page ? "active" : ''}} page-number">
-                                <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{ page }} " class="page-link">{{ page }}</a>
+                            <li class="page-item {{ currentPage == page ? "active" : '' }} page-number">
+                                <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{ page }} "
+                                   class="page-link">{{ page }}</a>
                             </li>
                         {% endfor %}
-                        <li class="page-item {{ currentPage == pages ? "disabled" : ''}} " id="next">
-                            <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{  currentPage + 1 }}" class="page-link">Suivant</a>
+                        <li class="page-item {{ currentPage == pages ? "disabled" : '' }} " id="next">
+                            <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{ currentPage + 1 }}"
+                               class="page-link">Suivant</a>
                         </li>
                     </ul>
                 {% endif %}
 
-    {% else %}
-        <h2>Soyez le premier commentaire !</h2>
-        {% endif %}
+            {% else %}
+                <h2>Soyez le premier commentaire !</h2>
+            {% endif %}
 
-    </div>
+        </div>
     </div>
     <footer id="footer">
         <p class="text-center footer-paragraph">Copyright @ 2023</p>
         <nav id="nav-mobile">
-            <a href="{{ path('homepage') }}" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
+            <a href="{{ path('homepage') }}" class="mobile-link" id="homepage-link"><i
+                        class="fa-solid fa-house"></i></a>
             <a href="{{ path('create_trick_get') }}" class="mobile-link" id="plus"><i class="fa-solid fa-plus"></i></a>
             {% if user_connected is defined and user_connected == "ROLE_USER" %}
-                <a href="{{ path('logout') }}" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
+                <a href="{{ path('logout') }}" class="mobile-link" id="log-out"><i
+                            class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
                 <a href="{{ path('login') }}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
-                <a href="{{ path('registration_get')}}" class="mobile-link" id="sign-up"><i class="fa-solid fa-user-plus"></i></a>
+                <a href="{{ path('registration_get') }}" class="mobile-link" id="sign-up"><i
+                            class="fa-solid fa-user-plus"></i></a>
             {% endif %}
         </nav>
     </footer>

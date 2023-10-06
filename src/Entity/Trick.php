@@ -9,10 +9,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Symfony\Component\Validator\Constraints\File;
 
 #[ORM\Entity(repositoryClass: TrickRepository::class)]
 #[UniqueEntity(fields: 'name', message: 'Désolé, le trick que vous avez demandé n\'est actuellement pas disponible, veuillez en définir un autre !')]

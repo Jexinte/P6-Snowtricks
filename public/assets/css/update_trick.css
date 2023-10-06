@@ -305,7 +305,8 @@ footer{
 
 
     #trick-content form {
-        margin-top: 4em;
+        width: 70%;
+        margin: 4em  auto 0;
     }
     #banner-trick img {
         min-height: 0;
