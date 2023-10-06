@@ -36,7 +36,7 @@
         <p class="text-center footer-paragraph">Copyright @ 2023</p>
         <nav id="nav-mobile">
             <a href="{{ path('homepage') }}" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
-            {% if user_connected is defined and user_connected == "ROLE_USER" %}
+            {% if user_connected is defined and user_connected is not empty ? user_connected.roles[0]  : '' %}
                 <a href="{{ path('logout') }}" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
                 <a href="{{ path('login') }}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>

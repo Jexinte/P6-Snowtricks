@@ -11,7 +11,7 @@
         <nav>
             <a href="{{ path('homepage') }}"><img src="/assets/img/logo/logo.jpg" alt="main logo" height="60"></a>
             <ul>
-                {% if user_connected is defined and user_connected == "ROLE_USER" %}
+                {% if user_connected is defined and user_connected is not empty ? user_connected.roles[0]  : '' %}
                     <a href={{ path('create_trick_get') }}>Créer un trick</a>
                     <a href="{{ path('logout') }}">Déconnexion</a>
                 {% else %}
@@ -52,7 +52,7 @@
                                     <a href="{{ path('trick',{ slug:trick.slug,id:trick.id }) }}"
                                        class="trick-name">{{ trick.name }}</a>
                                     <div class="options">
-                                        {% if user_connected is defined and user_connected == "ROLE_USER" %}
+                                        {% if user_connected is defined and user_connected is not empty ? user_connected.roles[0]  : '' %}
 
                                             <a href="{{ path('update_trick_get',{slug:trick.slug,id:trick.id}) }}"
                                                class="update-trick">
@@ -87,7 +87,7 @@
         <nav id="nav-mobile">
             <a href="{{ path('homepage') }}" class="mobile-link" id="homepage-link"><i
                         class="fa-solid fa-house"></i></a>
-            {% if user_connected is defined and user_connected == "ROLE_USER" %}
+            {% if user_connected is defined and user_connected is not empty ? user_connected.roles[0]  : '' %}
                 <a href="{{ path('create_trick_get') }}" class="mobile-link" id="plus"><i class="fa-solid fa-plus"></i></a>
                 <a href="{{ path('logout') }}" class="mobile-link" id="log-out"><i
                             class="fa-solid fa-right-from-bracket"></i></a>

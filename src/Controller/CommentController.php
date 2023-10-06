@@ -26,7 +26,7 @@ class CommentController extends AbstractController
         DateTime $dateTime,
         Trick $trick,
     ): Response {
-        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
+        $userConnected = $this->getUser() ?: '';
         $form = $this->createForm(AddComment::class);
         $form->handleRequest($request);
         $user = current($userRepository->findBy(["username" => $this->getUser()->getUserIdentifier()]));

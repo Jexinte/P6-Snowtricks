@@ -28,7 +28,7 @@ class UserController extends AbstractController
     #[Route(path: '/signup', name: 'registration_get', methods: ["GET"])]
     public function signUpPage(): Response
     {
-        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
+        $userConnected = $this->getUser() ?: '';
         $form = $this->createForm(SignUp::class);
         $parameters["user_connected"] = $userConnected;
         $parameters["form"] = $form;
@@ -64,7 +64,7 @@ class UserController extends AbstractController
             $this->sendMailToUser($mailer, $user, $request);
             return $this->redirectToRoute("homepage");
         }
-        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
+        $userConnected = $this->getUser() ?: '';
         $parameters["user_connected"] = $userConnected;
 
         $parameters["form"] = $form;
@@ -94,7 +94,7 @@ class UserController extends AbstractController
     #[Route(path: '/forgot-password', name: 'forgot_password_get', methods: ["GET"])]
     public function forgotPasswordPage(): Response
     {
-        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
+        $userConnected = $this->getUser() ?: '';
         $form = $this->createForm(ForgotPassword::class);
         $parameters["user_connected"] = $userConnected;
         $parameters["form"] = $form;
@@ -151,7 +151,7 @@ L'équipe Snowtricks
             }
         }
 
-        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
+        $userConnected = $this->getUser() ?: '';
         $parameters["user_connected"] = $userConnected;
         $parameters["form"] = $form;
         return new Response($this->render("forgot_password.twig", $parameters), $code);
@@ -161,7 +161,7 @@ L'équipe Snowtricks
     public function resetPasswordPage(Request $request, string $id = null): Response|RedirectResponse
     {
         $tokenInSession = $request->getSession()->get('token');
-        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
+        $userConnected = $this->getUser() ?: '';
         if (!is_null($id) && $id == $tokenInSession) {
             $form = $this->createForm(ResetPassword::class);
             $parameters["token"] = $id;
@@ -202,7 +202,7 @@ L'équipe Snowtricks
                     $form->get('username')->addError($error);
             }
         }
-        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
+        $userConnected = $this->getUser() ?: '';
         $parameters["token"] = $id;
         $parameters["form"] = $form;
         $parameters["user_connected"] = $userConnected;
@@ -271,7 +271,7 @@ L'équipe Snowtricks
                 );
             }
         }
-        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
+        $userConnected = $this->getUser() ?: '';
         $parameters["user_connected"] = $userConnected;
         return new Response(
             $this->render(

@@ -16,7 +16,7 @@ class HomepageController extends AbstractController
         MediaRepository $mediaRepository,
     ): Response {
         $parameters = [];
-        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
+        $userConnected = $this->getUser() ?: '';
         $tricks = $trickRepository->findAll();
 
         $banners = $mediaRepository->findBy(["isBanner" => true]);

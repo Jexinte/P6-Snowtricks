@@ -16,7 +16,7 @@ class MediaController extends AbstractController
     #[Route('/update-trick-media/{id}', name: 'update_trick_media_page', methods: ["GET"])]
     public function updateTrickMediaPage(Media $media): Response
     {
-        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
+        $userConnected = $this->getUser() ?: '';
 
         $form = $media->getMediaType() == "web" ? $this->createForm(UpdateEmbedUrl::class) : $this->createForm(
             UpdateFile::class

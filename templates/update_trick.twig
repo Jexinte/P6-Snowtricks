@@ -36,9 +36,9 @@
         <div id="trick-content">
             <div class="medias">
                 {% for media in medias %}
+                <div class="media-box">
 
                     {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp" %}
-                        <div class="media-box">
                             <img src="{{ media is defined ? media.mediaPath : '' }}" alt="test" width="200"
                                  class="image">
                             <div class="options-box">
@@ -51,7 +51,6 @@
 
 
                     {% elseif media.mediaType == "mp4" %}
-                        <div class="media-box">
                             <embed autoplay="false" width="200" src="{{ media is defined ? media.mediaPath : '' }}"
                                    type="video/{{ media.mediaType }}">
                             <div class="options-box">
@@ -63,7 +62,6 @@
                         </div>
 
                     {% elseif media.mediaType == "web" %}
-                        <div class="media-box">
                             <iframe autoplay="0" width="200" src="{{ media.mediaPath }}"></iframe>
                             <div class="options-box">
                                 <a href="{{ path('update_trick_media_page',{'id':media.id}) }}" class="options-media"
@@ -81,7 +79,7 @@
 
             <div class="about">
                 <div class="row">
-                    {% if user_connected is defined and user_connected == "ROLE_USER" %}
+                    {% if user_connected is defined and user_connected is not empty ? user_connected.roles[0]  : '' %}
                         {{ form_start(form,{'action':path('update_trick_content_put',{'slug':trick.slug,'id':trick.id})}) }}
                         {{ form_end(form) }}
                     {% endif %}
@@ -97,7 +95,7 @@
             <a href="{{ path('homepage') }}" class="mobile-link" id="homepage-link"><i
                         class="fa-solid fa-house"></i></a>
             <a href="{{ path('create_trick_get') }}" class="mobile-link" id="plus"><i class="fa-solid fa-plus"></i></a>
-            {% if user_connected is defined and user_connected == "ROLE_USER" %}
+            {% if user_connected is defined and user_connected is not empty ? user_connected.roles[0]  : '' %}
                 <a href="{{ path('logout') }}" class="mobile-link" id="log-out"><i
                             class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
