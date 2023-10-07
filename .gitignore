@@ -2,7 +2,7 @@
 public/assets/videos
 legacy_code.md
 notes.md
-
+.env
 .idea
 tools
 .php-cs-fixer.cache
