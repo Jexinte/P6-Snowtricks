@@ -2,100 +2,82 @@
 
 namespace App\Controller;
 
-use App\Entity\Comment;
-use App\Entity\User;
+use App\Entity\Trick;
+use App\Form\Type\AddComment;
 use App\Repository\CommentRepository;
 use App\Repository\MediaRepository;
-use App\Repository\TrickRepository;
 use App\Repository\UserRepository;
+use IntlDateFormatter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\Slugger\AsciiSlugger;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use DateTime;
 
 class CommentController extends AbstractController
 {
-    public string $template = "";
-    /**
-     * @var array <string,int>
-     */
-    public array $parameters = [];
-
-
-    #[Route('/comment', methods: ["POST"])]
-    public function handleSendComment(
+    #[Route('/add-comment/{id}', name: 'add_comment', methods: ["POST"])]
+    public function handleAddComment(
         Request $request,
         CommentRepository $commentRepository,
         UserRepository $userRepository,
-        ValidatorInterface $validator,
-        MediaRepository $mediaRepository
+        MediaRepository $mediaRepository,
+        IntlDateFormatter $dateFormatter,
+        DateTime $dateTime,
+        Trick $trick,
     ): Response {
-        $this->template = "trick.twig";
-        $this->parameters["trick"] = $request->getSession()->get('trick');
-        $this->parameters["trick_date"] = $request->getSession()->get('trick_date');
-        $this->parameters["medias"] = $mediaRepository->getTrickMedia($request->getSession()->get('trick')->getId());
-        $this->parameters["user_connected"] = $request->getSession()->get('user_connected');
-        $cookie = $this->getToken($request);
-        $tokenInSession = $request->getSession()->get('token');
-        $comment = new Comment();
-        $actualDate = new DateTime();
-        $slug = new AsciiSlugger();
-        $numberOfErrors = 0;
-        $groups = [
-            "content_exception",
-            "content_wrong_format_exception"
-        ];
-
-        $groupsViolations = [];
-        $comment->setContent($request->request->get('comment'));
-        $comment->setIdUser($request->getSession()->get('user_id'));
-        $comment->setIdTrick($request->getSession()->get('trick')->getId());
-        $comment->setUserProfileImage($request->getSession()->get("profile_image"));
-        $comment->setDateCreation($actualDate);
-        foreach ($groups as $group) {
-            $errors = $validator->validate($comment, null, $group);
-            if (count($errors) >= 1) {
-                $numberOfErrors++;
-            }
-            foreach ($errors as $error) {
-                $groupsViolations[$group] = $error->getMessage();
-            }
+        $userConnected = $this->getUser() ?: '';
+        $form = $this->createForm(AddComment::class);
+        $form->handleRequest($request);
+        $user = current($userRepository->findBy(["username" => $this->getUser()->getUserIdentifier()]));
+        $medias = $mediaRepository->findBy(["idTrick" => $trick->getId()]);
+        $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $trick->getId(), "isBanner" => true]));
+        if ($form->isSubmitted() && $form->isValid()) {
+            $commentEntity = $form->getData();
+            $commentEntity->setIdUser($user->getId());
+            $commentEntity->setIdTrick($trick->getId());
+            $commentEntity->setUserProfileImage($user->getProfileImage());
+            $commentEntity->setCreatedAt($dateTime);
+            $trick->addComment($commentEntity);
+            $user->addComment($commentEntity);
+            $commentRepository->getEntityManager()->flush();
+            $trickname = $trick->getSlug();
+            return $this->redirectToRoute("trick", [
+                "slug" => $trickname,
+                "id" => $trick->getId()
+            ]);
         }
-        if ($numberOfErrors == 0 && $cookie == $tokenInSession) {
-            $commentRepository->saveComment($comment);
-            $trickNameSlug = $slug->slug($request->getSession()->get('trick')->getName())->lower();
+        $dateTrick = is_null($trick->getUpdatedAt()) ? ucfirst($dateFormatter->format($trick->getCreatedAt())) : ucfirst($dateFormatter->format($trick->getUpdatedAt()));
 
-            return $this->redirectToRoute("trick",["trickname" => $trickNameSlug,
-                "id" => $request->getSession()->get('trick')->getId()]);
+        $trickComments = $commentRepository->getComments($trick->getId(), $userRepository);
+
+
+        if ($request->query->get('page') !== null && !empty($request->query->get('page'))) {
+            $currentPage = $request->query->get('page');
+        } else {
+            $currentPage = 1;
         }
-        $this->parameters["exceptions"] = $groupsViolations;
-        $this->parameters["comments"] = $commentRepository->getComments($comment->getIdTrick(),$userRepository);
-        return new Response($this->render($this->template, $this->parameters), 400);
+        $nbComments = count($trickComments);
+        $commentsPerPage = 10;
+        $pages = ceil($nbComments / $commentsPerPage);
+        $firstPage = ($currentPage * $commentsPerPage) - $commentsPerPage;
+        $commentsPerPageRequest = $commentRepository->getCommentsPerPage($trick->getId(), $firstPage, $commentsPerPage);
+        foreach ($commentsPerPageRequest as $comment) {
+            $comment->date = ucfirst($dateFormatter->format($comment->getCreatedAt()));
+        }
+
+        $parameters["comments"] = $commentsPerPageRequest;
+        $parameters["pages"] = $pages;
+        $parameters["currentPage"] = $currentPage;
+        $parameters["form"] = $form;
+        $parameters["totalComments"] = $nbComments;
+        $parameters["trick"] = $trick;
+        $parameters["trick_date"] = $dateTrick;
+        $parameters["medias"] = $medias;
+        $parameters["banner"] = $mainBannerOfTrick;
+        $parameters["user_connected"] = $userConnected;
+        return new Response($this->render("trick.twig", $parameters), 400);
     }
 
 
-    public function getToken(Request $request): ?string
-    {
-        $cookie = $request->cookies->get("token");
-        if (!empty($cookie)) {
-            return $cookie;
-        }
-        return null;
-    }
-
-    public function setToken(): void
-    {
-        $session = new Session();
-        if (!$session->isStarted()) {
-            $response = new Response();
-            $response->headers->setCookie(new Cookie("token", bin2hex(random_bytes(20))));
-            $session->set("token", current($response->headers->getCookies())->getValue());
-            $response->send();
-        }
-    }
 }

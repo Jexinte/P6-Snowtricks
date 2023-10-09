@@ -1,12 +1,10 @@
-
-
 {% extends "layout.twig" %}
 
 {% block icon_img %}
     <link rel="icon" type="image/png" href="/favicon.ico"/>
 {% endblock %}
 {% block title %}
-    <title> Erreur 404 | {{ parent ()}}  </title>
+    <title> Erreur 404 | {{ parent () }}  </title>
 {% endblock %}
 
 {% block css_page %}
@@ -19,12 +17,12 @@
     <div class="container-fluid" id="error">
         <div class="row">
             <div class="col-xs-12 col-md-12 col-lg-12" id="errors">
-                        <img src="/assets/img/code_error/404.jpg" alt="404 code error">
-                        <p>La page recherchée n'a pas été trouvée !</p>
+                <img src="/assets/img/code_error/404.png" alt="404 code error">
+                <p>Il semblerait que notre cher Ursoc n'ait pas trouvé ce que vous demandez, il a donc décidé de se la couler douce ça reste un ours non ?</p>
 
-                    <a href="/">Retour vers la page d'accueil</a>
-                </div>
+                <a href="/">Retour vers la page d'accueil</a>
             </div>
-
         </div>
+
+    </div>
 {% endblock %}

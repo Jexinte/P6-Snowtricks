@@ -4,11 +4,9 @@ namespace App\Enumeration;
 
 enum CodeStatus: int
 {
-    const REDIRECT = 302;
-    const CLIENT = 400;
-    const REQUEST_SUCCEED = 200;
-    const SERVER = 500;
-    const RESSOURCE_NOT_FOUND = 404;
-    const UNAUTHORIZED = 401;
-    const FORBIDDEN = 403;
+    public const CLIENT = 400;
+    public const UNAUTHORIZED = 401;
+    public const REQUEST_SUCCEED = 200;
+    public const SERVER = 500;
+    public const RESSOURCE_NOT_FOUND = 404;
 }

@@ -6,6 +6,7 @@ nav {
     display: flex;
     justify-content: space-between;
 }
+
 nav a {
     text-decoration: none;
     color: var(--black);
@@ -24,13 +25,15 @@ header {
     flex-direction: column;
     gap: 2em;
     width: 80%;
-    margin:0 auto;
+    margin: 0 auto;
 }
 
 #form form {
     display: flex;
     flex-direction: column;
     gap: 2em;
+    position: relative;
+    padding-inline: 0;
 }
 
 form .box {
@@ -41,4 +44,43 @@ form .box {
 
 #banner-trick img {
     width: 100%;
+}
+#banner-trick{
+    margin-bottom: 2em;
+}
+#trick .col-form-label{
+    display: none;
+}
+#submit {
+    position: absolute;
+    bottom: -70px;
+    width: 100%;
+}
+
+#create_trick_mediaForm{
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+}
+@media screen and (max-width: 992px) {
+    #trick {
+        margin-bottom: 8em;
+    }
+
+    #form {
+        margin-bottom: 5em;
+    }
+
+    #banner-trick img {
+        height: 100%;
+    }
+
+
+
+    footer {
+        padding-inline: 1em;
+    }
+
+
+
 }

@@ -2,9 +2,9 @@
 
 namespace App\Repository;
 
-use App\Entity\Media;
 use App\Entity\Trick;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -22,57 +22,10 @@ class TrickRepository extends ServiceEntityRepository
         parent::__construct($registry, Trick::class);
     }
 
-
-    /**
-     * @return Trick[]
-     */
-    public function getTricks(): array
-    {
-        $this->getEntityManager()->getRepository(Trick::class);
-        return $this->findAll();
-    }
-
-    public function getEntityManager()
+    public function getEntityManager(): EntityManagerInterface
     {
         return parent::getEntityManager();
     }
 
-    public function getTrick(int $id): ?Trick
-    {
-        return $this->findOneBy(["id" => $id]);
-    }
 
-
-    public function createTrick(Trick $trick): int
-    {
-        $this->getEntityManager()->persist($trick);
-        $this->getEntityManager()->flush();
-        $tricks = $this->findAll();
-        $trick = end($tricks);
-        return $trick->getId();
-    }
-
-    public function updateTrick(int $id, Trick $trick): bool
-    {
-        $trickName = $trick->getNameUpdated();
-        $trickDescription = $trick->getDescription();
-        $trickGroup = $trick->getTrickGroup();
-        $trickNameFromDb = $this->getTrick($id)->getName();
-        $dataToUpdate = $this->getEntityManager()->getRepository(Trick::class)->findBy(["id" => $id]);
-
-        if ($trickName == $trickNameFromDb) {
-            foreach ($dataToUpdate as $record) {
-                $record->setDescription($trickDescription);
-                $record->setTrickGroup($trickGroup);
-            }
-        } else {
-            foreach ($dataToUpdate as $record) {
-                $record->setName($trickName);
-                $record->setDescription($trickDescription);
-                $record->setTrickGroup($trickGroup);
-            }
-        }
-        $this->getEntityManager()->flush();
-        return true;
-    }
 }

@@ -3,6 +3,7 @@
 :root{
     --black : black;
     --white:white;
+    --700:700;
 }
 * {
     margin:0;

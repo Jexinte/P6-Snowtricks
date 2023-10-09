@@ -9,36 +9,43 @@
 {% block content %}
     <header>
         <nav>
-            <a href="/" id="back-homepage"><i class="fa-solid fa-arrow-left-long"></i></a>
+            <a href="{{ path('homepage') }}" id="back-homepage"><i class="fa-solid fa-arrow-left-long"></i></a>
         </nav>
 
     </header>
     <div class="container-fluid" id="trick">
         <div class=" container-fluid" id="banner-trick">
-            {# Bannière du trick sélectionné #}
-            <img src="{{ medias is defined and medias[0].isBanner == 1 ? medias[0].mediaPath : '/assets/img/banner/banner_homepage.jpg' }}"
-                 alt="banner">
+            {% if banner is defined and banner.isBanner is defined or banner == 1 %}
+                <img src="{{ banner.mediaPath }}"
+                     alt="banner">
+            {% else %}
+                <img src="/assets/img/banner/banner-homepage.jpg"
+                     alt="banner">
+            {% endif %}
         </div>
         <div id="trick-content">
             <h1>{{ trick is defined ? trick.name : '' }}</h1>
+            <button class="btn btn-dark" id="see-medias">Afficher les médias</button>
             <div class="medias">
-                {# Pour le moment on va laisser comme ça ainsi lorsque j'aurai termné les dernières grosses fonctionnalités je reviendrai en arrière au fur et à mesure pour gérer ses détails #}
                 {% for media in medias %}
+                    {% if media.isBanner is null %}
 
-                    {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp" %}
-                        <div class="media-box">
-                            <img src="{{ media is defined ? media.mediaPath : '' }}" alt="test" width="200" height="200"
-                                 class="image">
-                        </div>
-                    {% elseif media.mediaType == "mp4" %}
-                        <div class="media-box">
-                            <embed autoplay="false" width="200" src="{{ media is defined ? media.mediaPath : '' }}"
-                                   type="video/{{ media.mediaType }}">
-                        </div>
-                    {% elseif media.mediaType == "web" %}
-                        <div class="media-box">
-                            <iframe width="200" src="{{ media.mediaPath }}"></iframe>
-                        </div>
+                        {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp" %}
+                            <div class="media-box">
+                                <img src="{{ media is defined ? media.mediaPath : '' }}" alt="test" width="200"
+                                     height="200"
+                                     class="image">
+                            </div>
+                        {% elseif media.mediaType == "mp4" %}
+                            <div class="media-box">
+                                <embed autoplay="false" width="200" src="{{ media is defined ? media.mediaPath : '' }}"
+                                       type="video/{{ media.mediaType }}">
+                            </div>
+                        {% elseif media.mediaType == "web" %}
+                            <div class="media-box">
+                                <iframe width="200" src="{{ media.mediaPath }}"></iframe>
+                            </div>
+                        {% endif %}
                     {% endif %}
 
                 {% endfor %}
@@ -51,17 +58,20 @@
                     {{ trick is defined ? trick.description : '' }}
                 </p>
                 <div class="trick-details">
-                    <p class="trick-date">{{ trick is defined ? trick_date : '' }} </p>
+                    {% if trick.updatedAt is defined and trick.updatedAt is not null and trick.updatedAt != trick.createdAt %}
+                        <p class="trick-date">Modifiée le {{ trick_date is defined ? trick_date : '' }} </p>
+                    {% else %}
+                        <p class="trick-date">{{ trick_date is defined ? trick_date : '' }} </p>
+                    {% endif %}
                     <p class="trick-group">{{ trick is defined ? trick.trickGroup }}</p>
                 </div>
 
                 <div class="trick-options">
-                    {% if user_connected is defined and user_connected == 1 %}
+                    {% if user_connected is defined and user_connected is not empty ? user_connected.roles[0]  : '' %}
 
-                    <a href="{{ path('update_trick_get',{'id':trick.id,'trickname':trick.name}) }}"
+                    <a href="{{ path('update_trick_get',{slug:trick.slug,id:trick.id}) }}"
                        class="options-button" id="update"><i class="fa-solid fa-pencil"></i></a>
-                    {#                        <a href="#" class="options-button"  id="delete"><i class="fa-solid fa-trash"></i></a> #}
-                    <form action="{{ path('delete_trick',{trickname:trick.name,id:trick.id}) }}" method="post">
+                    <form action="{{ path('delete_trick',{slug:trick.slug,id:trick.id}) }}" method="post">
                         <input type="hidden" name="_method" value="DELETE">
                         <button type="submit" class="options-button" id="delete"><i class="fa-solid fa-trash">
                             </i></button>
@@ -71,63 +81,71 @@
             </div>
         </div>
         <div id="form">
-            <h2 class="text-center">Ajouter un commentaire </h2>
-
-            <form action="/comment" method="post">
-                <input class="form-control" type="text" name="comment" id="comment" placeholder="John">
-                <input type="submit" class="btn text-white bg-black mb-3" name="submit" id="submit"
-                       value="Laisser un commentaire">
-                <p class="error-comment">{{ exceptions.content_exception is defined ? exceptions.content_exception : '' }}</p>
-                <p class="error-comment">{{ exceptions.content_wrong_format_exception is defined ? exceptions.content_wrong_format_exception : '' }}</p>
-            </form>
+            {{ form_start(form,{'action':path('add_comment',{id:trick.id})}) }} {{ form_end(form) }}
+            {% else %}
+                <h2 class="user-not-logged">Afin d'ajouter un commentaire,merci de vous <a href="/signin">connectez
+                        !</a>
+                </h2>
+            {% endif %}
         </div>
-        {% else %}
-            <h2 class="user-not-logged">Afin d'ajouter un commentaire,merci de vous <a href="/signin">connectez !</a>
-            </h2>
-        {% endif %}
 
         <div id="comments">
             <h2>Commentaires</h2>
             {% if comments is defined  and comments is not empty %}
 
-            {% for comment in  comments %}
-            <div class="user-box">
-                <img src="{{ comment.userProfileImage }}" alt="" width="200">
-                <h2>{{ comment.username }}</h2>
-                <p class="comment">{{ comment.content }}</p>
-            </div>
-        </div>
-        {% endfor %}
-        <ul class="pagination">
-            <li class="page-item {{  currentPage == 1 ? "disabled" : '' }}">
-            <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{currentPage - 1 }}" class="page-link">Précédent</a>
-            </li>
-            {% for page in 1..pages %}
-                <li class="page-item {{ currentPage == page ? "active" : ''}} ">
-                    <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{ page }} " class="page-link">{{ page }}</a>
-                </li>
-            {% endfor %}
-                <li class="page-item {{ currentPage == pages ? "disabled" : ''}}">
-                    <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{  currentPage + 1 }}" class="page-link">Suivant</a>
-                </li>
-        </ul>
-    {% else %}
-        <h2>Soyez le premier commentaire !</h2>
-        {% endif %}
+                {% for comment in  comments %}
+                    <div class="user-box">
+                        <img src="{{ comment.userProfileImage }}" alt="" width="200">
+                        <p>{{ comment.username }}, le {{ comment.date }}</p>
+                        <p class="comment">{{ comment.content }}</p>
+                    </div>
+                {% endfor %}
+                {% if totalComments > 10 %}
+                    <ul class="pagination">
+                        <li class="page-item {{ currentPage == 1 ? "disabled" : '' }}" id="previous">
 
+                            <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{ currentPage - 1 }}"
+                               class="page-link">Précédent</a>
+                        </li>
+                        {% for page in 1..pages %}
+                            <li class="page-item {{ currentPage == page ? "active" : '' }} page-number">
+                                <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{ page }} "
+                                   class="page-link">{{ page }}</a>
+                            </li>
+                        {% endfor %}
+                        <li class="page-item {{ currentPage == pages ? "disabled" : '' }} " id="next">
+                            <a href="/{{ trick.name }}/details/{{ trick.id }}?page={{ currentPage + 1 }}"
+                               class="page-link">Suivant</a>
+                        </li>
+                    </ul>
+                {% endif %}
+
+            {% else %}
+                <h2>Soyez le premier commentaire !</h2>
+            {% endif %}
+
+        </div>
     </div>
     <footer id="footer">
         <p class="text-center footer-paragraph">Copyright @ 2023</p>
         <nav id="nav-mobile">
-            <a href="/" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
-            <a href="#" class="mobile-link" id="bookmark"><i class="fa-solid fa-bookmark"></i></a>
-            {% if user_connected is defined and user_connected == 1 %}
-                <a href="/logout" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
+            <a href="{{ path('homepage') }}" class="mobile-link" id="homepage-link"><i
+                        class="fa-solid fa-house"></i></a>
+            <a href="{{ path('create_trick_get') }}" class="mobile-link" id="plus"><i class="fa-solid fa-plus"></i></a>
+            {% if user_connected is defined and user_connected is not empty ? user_connected.roles[0]  : '' %}
+                <a href="{{ path('logout') }}" class="mobile-link" id="log-out"><i
+                            class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
-                <a href="/signin" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
-                <a href="/signup" class="mobile-link" id="sign-up"><i class="fa-solid fa-user-plus"></i></a>
+                <a href="{{ path('login') }}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
+                <a href="{{ path('registration_get') }}" class="mobile-link" id="sign-up"><i
+                            class="fa-solid fa-user-plus"></i></a>
             {% endif %}
         </nav>
     </footer>
-    <script src="/assets/js/mediaAnimation.js"></script>
+
 {% endblock %}
+ {% block javascript %}
+ <script src="/assets/js/media-animation.js"></script>
+ <script src="/assets/js/delete-trick-on-display.js"></script>
+ <script src="/assets/js/display-medias.js"></script>
+ {% endblock %}

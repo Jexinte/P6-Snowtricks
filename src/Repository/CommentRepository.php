@@ -27,48 +27,36 @@ class CommentRepository extends ServiceEntityRepository
         return parent::getEntityManager();
     }
 
-    /**
-     * @param Comment $comment
-     * @return bool
-     */
-    public function saveComment(Comment $comment):bool
-    {
-        $this->getEntityManager()->persist($comment);
-        $this->getEntityManager()->flush();
-        return true;
-    }
 
     /**
      * @param int $id
      * @param UserRepository $userRepository
      * @return Comment[]
      */
-    public function getComments(int $id,UserRepository $userRepository): array
+    public function getComments(int $id, UserRepository $userRepository): array
     {
+        $comments = $this->findBy(["idTrick" => $id], );
 
-        $comments = $this->findBy(["idTrick" => $id],);
-
-        foreach($comments as $k => $object)
-        {
-            $comments[$k]->setUsername($userRepository->find(["id" => $object->getIdUser()])->getName());
+        foreach ($comments as $comment) {
+            $comment->setUsername($userRepository->find(["id" => $comment->getIdUser()])->getUsername());
         }
         return $comments;
-
     }
 
     /**
+     * @param int $id
      * @param int $firstPage
      * @param int $commentPerPage
      * @return Comment[]
      */
-    public function getCommentsPerPage(int $firstPage,int $commentPerPage):array
+    public function getCommentsPerPage(int $id, int $firstPage, int $commentPerPage): array
     {
-        $orderBy = ['dateCreation' => 'DESC'];
+        $orderBy = ['createdAt' => 'DESC'];
 
         $offset = $firstPage;
         $limit = $commentPerPage;
 
-        return $this->findBy([],$orderBy,$limit,$offset);
+        return $this->findBy(["idTrick" => $id], $orderBy, $limit, $offset);
     }
 
 }

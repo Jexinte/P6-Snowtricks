@@ -9,63 +9,65 @@
 {% block content %}
     <header>
         <nav>
-            <a href="/" id="back-homepage"><i class="fa-solid fa-arrow-left-long"></i></a>
+            <a href="{{ path('homepage') }}" id="back-homepage"><i class="fa-solid fa-arrow-left-long"></i></a>
         </nav>
 
     </header>
     <div class="container-fluid" id="trick">
         <div class=" container-fluid" id="banner-trick">
-            {# Bannière du trick sélectionné #}
-            <img src="{{ medias is defined and medias[0].isBanner == 1 ? medias[0].mediaPath : '/assets/img/banner/banner_homepage.jpg' }}" alt="banner">
-            <div class="options-box">
-                <a href="{{ path('update_trick_media_get',{'id':medias[0].id}) }}" class="options-media"  id="update"><i class="fa-solid fa-pencil"></i></a>
-                <a href="#" class="options-media"  id="delete"><i class="fa-solid fa-trash"></i></a>
-            </div>
+            {% if banner is defined and banner.isBanner is defined %}
+                <img src="{{ banner.mediaPath }}"
+                     alt="banner">
+                <div class="options-box">
+                    <a href="{{ path('update_trick_media_page',{'id':banner.id}) }}" class="options-media"
+                       id="update"><i
+                                class="fa-solid fa-pencil"></i></a>
+                    <a href="{{ path('delete_trick_media',{'id':banner.id}) }}" class="options-media delete-banner"
+                       id="delete"><i
+                                class="fa-solid fa-trash"></i></a>
+                </div>
+            {% else %}
+                <img src="/assets/img/banner/banner-homepage.jpg"
+                     alt="banner">
+            {% endif %}
         </div>
-        <div id="trick-content">
-            <h1>{{ trick is defined ? trick.name : '' }}</h1>
-            <div class="medias">
-                {# Pour le moment on va laisser comme ça ainsi lorsque j'aurai termné les dernières grosses fonctionnalités je reviendrai en arrière au fur et à mesure pour gérer ses détails #}
-                {% for media in medias %}
+        <button class="btn btn-dark" id="see-medias">Afficher les médias</button>
 
-                    {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp"  %}
-                        <div class="media-box">
-                            <img src="{{ media is defined ? media.mediaPath : '' }}" alt="test" width="200"  class="image">
+        <div id="trick-content">
+            <div class="medias">
+                {% for media in medias %}
+                <div class="media-box">
+
+                    {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp" %}
+                            <img src="{{ media is defined ? media.mediaPath : '' }}" alt="test" width="200"
+                                 class="image">
                             <div class="options-box">
-                                <a href="{{ path('update_trick_media_get',{'id':media.id}) }}" class="options-media"  id="update"><i class="fa-solid fa-pencil"></i></a>
-                                <form action="{{ path('delete_trick_media',{id:media.id}) }}" method="post">
-                                    <input type="hidden" name="_method" value="DELETE">
-                                    <button type="submit" class="options-media" id="delete"><i class="fa-solid fa-trash">
-                                        </i></button>
-                                </form>
+                                <a href="{{ path('update_trick_media_page',{'id':media.id}) }}" class="options-media"
+                                   id="update"><i class="fa-solid fa-pencil"></i></a>
+                                <a href="{{ path('delete_trick_media',{'id':media.id}) }}" class="options-media delete"
+                                   id="delete"><i class="fa-solid fa-trash"></i></a>
                             </div>
                         </div>
 
 
                     {% elseif media.mediaType == "mp4" %}
-                        <div class="media-box">
                             <embed autoplay="false" width="200" src="{{ media is defined ? media.mediaPath : '' }}"
                                    type="video/{{ media.mediaType }}">
                             <div class="options-box">
-                                <a href="{{ path('update_trick_media_get',{'id':media.id}) }}" class="options-media"  id="update"><i class="fa-solid fa-pencil"></i></a>
-                                <form action="{{ path('delete_trick_media',{id:media.id}) }}" method="post">
-                                    <input type="hidden" name="_method" value="DELETE">
-                                    <button type="submit" class="options-media" id="delete"><i class="fa-solid fa-trash">
-                                        </i></button>
-                                </form>
+                                <a href="{{ path('update_trick_media_page',{'id':media.id}) }}" class="options-media"
+                                   id="update"><i class="fa-solid fa-pencil"></i></a>
+                                <a href="{{ path('delete_trick_media',{'id':media.id}) }}" class="options-media delete"
+                                   id="delete"><i class="fa-solid fa-trash"></i></a>
                             </div>
                         </div>
 
                     {% elseif media.mediaType == "web" %}
-                        <div class="media-box">
-                            <iframe autoplay ="0" width="200" src="{{ media.mediaPath }}"></iframe>
+                            <iframe autoplay="0" width="200" src="{{ media.mediaPath }}"></iframe>
                             <div class="options-box">
-                                <a href="{{ path('update_trick_media_get',{'id':media.id}) }}" class="options-media"  id="update"><i class="fa-solid fa-pencil"></i></a>
-                               <form action="{{ path('delete_trick_media',{id:media.id}) }}" method="post">
-                                    <input type="hidden" name="_method" value="DELETE">
-                                    <button type="submit" class="options-media" id="delete"><i class="fa-solid fa-trash">
-                                        </i></button>
-                                </form>
+                                <a href="{{ path('update_trick_media_page',{'id':media.id}) }}" class="options-media"
+                                   id="update"><i class="fa-solid fa-pencil"></i></a>
+                                <a href="{{ path('delete_trick_media',{'id':media.id}) }}" class="options-media delete"
+                                   id="delete"><i class="fa-solid fa-trash"></i></a>
                             </div>
                         </div>
 
@@ -77,82 +79,37 @@
 
             <div class="about">
                 <div class="row">
-                <form class="pt-5" action="{{ path('update_trick_content_put',{'trickname':trick.name|lower,'id':trick.id}) }}"  method="post" >
-                {% if user_connected is defined and user_connected == 1 %}
-                    <div class="col-sm-12 col-md-12">
-                        <div class="mb-3 box">
-                            <label for="trick-name" class="form-label">Nom du trick</label>
-                            <input class="form-control" type="text" name="trick-name" id="trick-name" placeholder="Ollie Molie" value="{{ trick.name is defined ? trick.name : '' }}">
-                            <p class="text-danger" id="error-trick-name">
-                                {{ exceptions.name_update_exception is defined ? exceptions.name_update_exception : '' }}
-                            </p>
-                        </div>
-                    </div>
-
-                    {#         DESCRIPTION TRICK #}
-                    <div class="col-sm-12 col-md-12">
-                        <div class="mb-3 box">
-                            <label for="description">Description :</label>
-                            <textarea class="form-control" name="description" id="description" cols="30" rows="10" placeholder="Exprimez-vous !">{{ trick.description is defined ? trick.description : '' }}</textarea>
-                            <p class="text-danger" id="description-trick-name">
-                                {{ exceptions.description_exception is defined ? exceptions.description_exception : '' }}
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-sm-12 col-md-12">
-                        {# GROUP TRICK #}
-                        <div class="mb-3 box">
-                            <label for="group">Sélectionner un groupe</label>
-
-                            <select class="form-select" id="group" name="selected_options">
-
-                                <option  selected>{{ trick.trickGroup is defined ? trick.trickGroup : '' }}</option>
-                                <option value="Grabs">Grabs</option>
-                                <option value="Rotations">Rotations</option>
-                                <option value="Flips">Flips</option>
-                                <option value="Rotation désaxées">Rotation désaxées</option>
-                                <option value="Slides">Slides</option>
-                                <option value="One Foot Tricks">One Foot Tricks</option>
-                                <option value="Old School">Old School</option>
-                            </select>
-                            <p class="text-danger" id="error-group">
-                                {{ exceptions.group_exception is defined ?  exceptions.group_exception : '' }}
-                            </p>
-                        </div>
-                    </div>
-                    <input type="hidden" name="_method" value="PUT">
-                    <input class="btn btn-dark" id="submit" type="submit" value="Envoyer">
-                </form>
-{#                    SES COMMANDES SONT POUR LA MODIFICATION DU CONTENU DE L'ARTICLE AINSI IL FAUDRA AJOUTER PLUS TARD LES CHAMPS TEXTE AVEC LEUR VALEUR PREDEFINIS ET TOUT LE TRALALA#}
-{#                    <div class="trick-options">#}
-{#                        <form action="#" method="post" class="options-form">#}
-{#                            <button type="submit" class="options-button" name="update" id="update">#}
-{#                                <i class="fa-solid fa-pencil"></i>#}
-{#                            </button>#}
-{#                            <button type="submit" class="options-button" name="delete" id="delete"><i#}
-{#                                        class="fa-solid fa-trash"></i></button>#}
-{#                        </form>#}
-{#                        #}
-{#                    </div>#}
-                {% endif %}
+                    {% if user_connected is defined and user_connected is not empty ? user_connected.roles[0]  : '' %}
+                        {{ form_start(form,{'action':path('update_trick_content_put',{'slug':trick.slug,'id':trick.id})}) }}
+                        {{ form_end(form) }}
+                    {% endif %}
+                </div>
             </div>
         </div>
-    </div>
     </div>
 
 
     <footer id="footer">
         <p class="text-center footer-paragraph">Copyright @ 2023</p>
         <nav id="nav-mobile">
-            <a href="/" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
-            <a href="#" class="mobile-link" id="bookmark"><i class="fa-solid fa-bookmark"></i></a>
-            {% if user_connected is defined and user_connected == 1 %}
-                <a href="/logout" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
+            <a href="{{ path('homepage') }}" class="mobile-link" id="homepage-link"><i
+                        class="fa-solid fa-house"></i></a>
+            <a href="{{ path('create_trick_get') }}" class="mobile-link" id="plus"><i class="fa-solid fa-plus"></i></a>
+            {% if user_connected is defined and user_connected is not empty ? user_connected.roles[0]  : '' %}
+                <a href="{{ path('logout') }}" class="mobile-link" id="log-out"><i
+                            class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
-                <a href="/signin" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
-                <a href="/signup" class="mobile-link" id="sign-up"><i class="fa-solid fa-user-plus"></i></a>
+                <a href="{{ path('login') }}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
+                <a href="{{ path('registration_get') }}" class="mobile-link" id="sign-up"><i
+                            class="fa-solid fa-user-plus"></i></a>
             {% endif %}
         </nav>
     </footer>
-    <script src="/assets/js/mediaAnimation.js"></script>
+
 {% endblock %}
+    {% block javascript %}
+    <script src="/assets/js/media-animation.js"></script>
+    <script src="/assets/js/delete-media-on-update.js"></script>
+    <script src="/assets/js/delete.banner-media.on-update.js"></script>
+    <script src="/assets/js/display-medias.js"></script>
+    {% endblock %}

@@ -9,14 +9,14 @@
 {% block content %}
     <header>
         <nav>
-            <a href="/"><img src="/assets/img/logo/logo.jpg" alt="main logo" height="60"></a>
+            <a href="{{ path('homepage') }}"><img src="/assets/img/logo/logo.jpg" alt="main logo" height="60"></a>
             <ul>
-                {% if user_connected is defined and user_connected == 1 %}
+                {% if user_connected is defined and user_connected is not empty ? user_connected.roles[0]  : '' %}
                     <a href={{ path('create_trick_get') }}>Créer un trick</a>
-                    <a href="/logout">Déconnexion</a>
+                    <a href="{{ path('logout') }}">Déconnexion</a>
                 {% else %}
-                    <a href="/signin">Connexion</a>
-                    <a href="/signup">Inscription</a>
+                    <a href="{{ path('login') }}">Connexion</a>
+                    <a href="{{ path('registration_get') }}">Inscription</a>
                 {% endif %}
             </ul>
         </nav>
@@ -25,7 +25,7 @@
 
     <div class="container-fluid" id="homepage">
         <div class=" container-fluid" id="banner">
-            <img src="/assets/img/banner/banner_homepage.jpg" alt="banner">
+            <img src="/assets/img/banner/banner-homepage.jpg" alt="banner">
             <h1>Découvrez l'art de la glisse aérienne </h1>
             <button id="down-button"><i class="fa-solid fa-arrow-down-long"></i></button>
         </div>
@@ -33,35 +33,35 @@
         <div class="container-fluid" id="tricks-container">
             <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="tricks">
-                    {% if tricks is empty %}
-                        <h2 class="text-center">Aucun trick de disponible pour le moment !</h2>
-                    {% endif %}
                     {% for message in app.flashes('success') %}
-                        {#                        Mise en page à faire plus tard #}
                         <div class="flash-notice">
                             {{ message }}
                         </div>
                     {% endfor %}
-                    {% if tricks is defined %}
+                    {% if tricks is empty %}
+                        <h2 class="text-center">Aucun trick de disponible pour le moment !</h2>
+                    {% endif %}
+
                         {% for trick in tricks %}
                             <div class="trick">
                                 <div class="trick-banner">
-                                    {# banniere du trick #}
-                                    <img src="/assets/img/banner/banner_homepage.jpg" alt="" width="250px">
+                                    <img src="{{ trick.banner is defined  ? trick.banner : '/assets/img/banner/banner-homepage.jpg' }}"
+                                         height="200" alt="">
                                 </div>
                                 <div class="trick-options">
-                                    <a href="/{{ trick.slug }}/details/{{ trick.id }}"
+                                    <a href="{{ path('trick',{ slug:trick.slug,id:trick.id }) }}"
                                        class="trick-name">{{ trick.name }}</a>
                                     <div class="options">
-                                        {% if user_connected is defined and user_connected == 1 %}
+                                        {% if user_connected is defined and user_connected is not empty ? user_connected.roles[0]  : '' %}
 
-                                            <a href="{{ path('update_trick_get',{trickname:trick.slug,id:trick.id}) }}"
+                                            <a href="{{ path('update_trick_get',{slug:trick.slug,id:trick.id}) }}"
                                                class="update-trick">
                                                 <i class="fa-solid fa-pencil">
                                                 </i>
                                             </a>
 
-                                            <form action="{{ path('delete_trick',{trickname:trick.slug,id:trick.id}) }}" method="post">
+                                            <form action="{{ path('delete_trick',{slug:trick.slug,id:trick.id}) }}"
+                                                  method="post">
                                                 <input type="hidden" name="_method" value="DELETE">
                                                 <button type="submit" class="delete-trick"><i class="fa-solid fa-trash">
                                                     </i></button>
@@ -74,7 +74,6 @@
                                 </div>
                             </div>
                         {% endfor %}
-                    {% endif %}
                 </div>
             </div>
 
@@ -86,19 +85,26 @@
     <footer id="footer">
         <p class="text-center footer-paragraph">Copyright @ 2023</p>
         <nav id="nav-mobile">
-            <a href="/" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
-            <a href="#" class="mobile-link" id="bookmark"><i class="fa-solid fa-bookmark"></i></a>
-            {% if user_connected is defined and user_connected == 1 %}
-                <a href="/logout" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
+            <a href="{{ path('homepage') }}" class="mobile-link" id="homepage-link"><i
+                        class="fa-solid fa-house"></i></a>
+            {% if user_connected is defined and user_connected is not empty ? user_connected.roles[0]  : '' %}
+                <a href="{{ path('create_trick_get') }}" class="mobile-link" id="plus"><i class="fa-solid fa-plus"></i></a>
+                <a href="{{ path('logout') }}" class="mobile-link" id="log-out"><i
+                            class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
-                <a href="/signin" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
-                <a href="/signup" class="mobile-link" id="sign-up"><i class="fa-solid fa-user-plus"></i></a>
+                <a href="{{ path('login') }}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
+                <a href="{{ path('registration_get') }}" class="mobile-link" id="sign-up"><i
+                            class="fa-solid fa-user-plus"></i></a>
             {% endif %}
         </nav>
     </footer>
 
-    <script src="/assets/js/watchScrollBar.js">
-    </script>
-    <script src="/assets/js/deleteConfirm.js">
-    </script>
 {% endblock %}
+    {% block javascript %}
+    <script src="/assets/js/watch-scroll-bar.js">
+    </script>
+    <script src="/assets/js/delete-trick-homepage.js">
+    </script>
+    <script src="/assets/js/update-homepage-banner.js">
+    </script>
+    {% endblock %}

@@ -45,6 +45,17 @@ header {
     gap: 3em;
     flex-direction: column;
     justify-content: center;
+    min-height: 100vh;
+}
+
+#trick-content form{
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+}
+
+#trick-content #form_save{
+    width: 100%;
 }
 
 #trick-content .medias {
@@ -218,7 +229,10 @@ header {
 .about{
     margin-top: 7em;
 }
-#submit{
+#update_file_save{
+    width: 100%;
+}
+#update_embed_url_save{
     width: 100%;
 }
 
@@ -226,4 +240,8 @@ header {
     display: flex;
     flex-direction: column;
     gap: 1.5em;
+}
+
+footer{
+    padding-inline: 1em;
 }

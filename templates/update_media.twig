@@ -9,61 +9,40 @@
 {% block content %}
     <header>
         <nav>
-            <a href="/" id="back-homepage"><i class="fa-solid fa-arrow-left-long"></i></a>
+            <a href="{{ path('homepage') }}" id="back-homepage"><i class="fa-solid fa-arrow-left-long"></i></a>
         </nav>
 
     </header>
     <div class="container-fluid" id="trick">
         <div class="row">
-            <form class="pt-5" action="{{ path('update_trick_media_put',{'id':media.id}) }}" enctype="multipart/form-data" method="post">
-                <div id="trick-content">
-                    {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp" or media.mediaType == "mp4" or media.isBanner == 1 %}
-                        <h1 class="text-center">Modifier une image / vidéo</h1>
-                        <div class="col-sm-12 col-md-12">
-                            {# ONE FILE #}
-                            <div class="mb-3 box">
-                                <label for="inputGroupFile02">Sélectionner un fichier</label>
-                                <input type="file" name="file" class="form-control">
-                                <p class="text-danger" id="error-files">
-                                    {{ exceptions.update_file_exception is defined ?  exceptions.update_file_exception : '' }}
-                                </p>
-                            </div>
-                        </div>
+            <div id="trick-content">
+                {% if media.mediaType == "png" or media.mediaType == "jpg" or media.mediaType == "webp" or media.mediaType == "mp4" or media.isBanner == 1 %}
+                    <h1 class="text-center">Modifier une image / vidéo</h1>
+                    {{ form_start(form,{'action':path('update_trick_media_form',{'id':media.id})}) }}{{ form_end(form) }}
 
-                    {% elseif media.mediaType == "web" %}
-                        <h1 class="text-center">Modifier URL Dailymotion / Youtube</h1>
-                        {#      EMBED VIDEO  #}
-                        <div class="col-sm-12 col-md-12">
-                            <div class="mb-3 box">
-                                <label for="embed-url" class="form-label">Url Vidéo Dailymotion / Youtube</label>
-                                <input class="form-control" type="text" name="embed-url" id="embed-url"
-                                       placeholder="Insérer ici l'adresse url de votre vidéo youtube commencant par https...">
-                                <p class="text-danger" id="error-video">
-                                    {#                            {{ dump(exceptions is defined ? exceptions : '') }} #}
-                                    {{ exceptions.url_exception is defined ? exceptions.url_exception : '' }}
-                                </p>
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
-                <input type="hidden" name="_method" value="PUT">
-                <input class="btn btn-dark" type="submit" value="Envoyer" id="submit">
-            </form>
-                </div>
+                {% elseif media.mediaType == "web" %}
+                    <h1 class="text-center">Modifier URL Dailymotion / Youtube</h1>
+                    {{ form_start(form,{'action':path('update_trick_media_form',{'id':media.id})}) }} {{ form_end(form) }}
+                {% endif %}
+            </div>
         </div>
+    </div>
 
 
 
     <footer id="footer">
         <p class="text-center footer-paragraph">Copyright @ 2023</p>
         <nav id="nav-mobile">
-            <a href="/" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
-            <a href="#" class="mobile-link" id="bookmark"><i class="fa-solid fa-bookmark"></i></a>
-            {% if user_connected is defined and user_connected == 1 %}
-                <a href="/logout" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
+            <a href="{{ path('homepage') }}" class="mobile-link" id="homepage-link"><i
+                        class="fa-solid fa-house"></i></a>
+            {% if user_connected is defined and user_connected is not empty ? user_connected.roles[0]  : '' %}
+                <a href="{{ path('create_trick_get') }}" class="mobile-link" id="plus"><i class="fa-solid fa-plus"></i></a>
+                <a href="{{ path('logout') }}" class="mobile-link" id="log-out"><i
+                            class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
-                <a href="/signin" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
-                <a href="/signup" class="mobile-link" id="sign-up"><i class="fa-solid fa-user-plus"></i></a>
+                <a href="{{ path('login') }}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
+                <a href="{{ path('registration_get') }}" class="mobile-link" id="sign-up"><i
+                            class="fa-solid fa-user-plus"></i></a>
             {% endif %}
         </nav>
     </footer>

@@ -2,12 +2,13 @@
 
 namespace App\Entity;
 
+use AllowDynamicProperties;
 use App\Repository\CommentRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
+#[AllowDynamicProperties]
 class Comment
 {
     #[ORM\Id]
@@ -24,26 +25,28 @@ class Comment
     private ?string $userProfileImage = null;
 
     #[ORM\Column(type: 'date')]
-    private ?\DateTimeInterface $dateCreation = null;
-    #[Assert\NotBlank(
-        message: 'Ce champ ne peut être vide !',
-        groups: [
-            'content_exception',
+    private ?\DateTimeInterface $createdAt = null;
 
-        ]
-    )]
+
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:'Ce champ ne peut être vide !')]
     #[Assert\Regex(
         pattern: '/^[A-ZÀ-ÿ][A-ZÀ-ÿa-zÀ-ÿ0-9\s\-\_\!\@\#\$\%\&\'\(\)\*\+\,\.\:\/\;\=\?\[\]\^\`\{\|\}\~]{0,498}[A-ZÀ-ÿa-zÀ-ÿ0-9\s\-\_\!\@\#\$\%\&\'\(\)\*\+\,\.\:\/\;\=\?\[\]\^\`\{\|\}\~]$/',
         message: 'Un commentaire 
     doit commencer par une lettre majuscule
      et ne peut excéder 500 caractères',
         match: true,
-        groups: ['content_wrong_format_exception']
     )]
-    #[ORM\Column(length: 255)]
     private ?string $content = null;
 
-    public string $username;
+    private ?string $username = null;
+
+    #[ORM\ManyToOne(inversedBy: 'comment')]
+    #[ORM\JoinColumn(name:'id_trick', referencedColumnName: 'id', nullable: false)]
+    private ?Trick $trick = null;
+    #[ORM\ManyToOne(inversedBy: 'comment')]
+    #[ORM\JoinColumn(name:'id_user', referencedColumnName: 'id', nullable: false)]
+    private ?User $user = null;
     public function getId(): ?int
     {
         return $this->id;
@@ -73,17 +76,7 @@ class Comment
         return $this;
     }
 
-    public function getDateCreation(): ?\DateTimeInterface
-    {
-        return $this->dateCreation;
-    }
 
-    public function setDateCreation(\DateTimeInterface $dateCreation): static
-    {
-        $this->dateCreation = $dateCreation;
-
-        return $this;
-    }
 
     public function getContent(): ?string
     {
@@ -113,11 +106,53 @@ class Comment
         $this->idTrick = $idTrick;
     }
 
-    public function setUsername(string $username): void
+    public function setUsername(?string $username): void
     {
         $this->username = $username;
-    }  public function getUsername():string
+    }  public function getUsername(): string
     {
+
         return $this->username;
+    }
+
+    /**
+     * @return Trick|null
+     */
+    public function getTrick(): ?Trick
+    {
+        return $this->trick;
+    }
+
+
+    /**
+     * @param Trick|null $trick
+     */
+    public function setTrick(?Trick $trick): void
+    {
+        $this->trick = $trick;
+    }
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+    public function setUser(?User $user): void
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTimeInterface|null $createdAt
+     */
+    public function setCreatedAt(?\DateTimeInterface $createdAt): void
+    {
+        $this->createdAt = $createdAt;
     }
 }

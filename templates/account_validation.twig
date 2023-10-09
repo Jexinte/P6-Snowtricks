@@ -1,7 +1,7 @@
 {% extends 'layout.twig' %}
 
 {% block title %}
-    <title>Validation de compte | {{ parent ()}}  </title>
+    <title>Validation de compte | {{ parent () }}  </title>
 {% endblock %}
 
 {% block css_page %}
@@ -16,13 +16,16 @@
 
     <div class="container-fluid" id="validation">
         {% if token_authenticated is defined and token_authenticated == 1 %}
-        <div class="bg-success box">
-            <p>Votre compte a été validé avec succès , vous pouvez dès à présent vous <a href="/signin">connectez !</a> </p>
-        </div>
-            {% else %}
-                <div class="bg-danger box">
-                    <p>Nous sommes désolés, la validation de votre compte n'a pas abouti. Il se peut que le lien de validation ait expiré ou qu'une erreur inattendue se soit produite. Veuillez vous <a href="/signup">réinscrire pour créer un nouveau compte.</a></p>
-                </div>
+            <div class="bg-success box">
+                <p>Votre compte a été validé avec succès , vous pouvez dès à présent vous <a href="{{ path('login') }}">connectez
+                        !</a></p>
+            </div>
+        {% else %}
+            <div class="bg-danger box">
+                <p>Nous sommes désolés, la validation de votre compte n'a pas abouti. Il se peut que le lien de
+                    validation ait expiré ou qu'une erreur inattendue se soit produite. Veuillez vous <a href="{{ path('registration_get') }}">réinscrire
+                        pour créer un nouveau compte.</a></p>
+            </div>
         {% endif %}
     </div>
 {% endblock %}

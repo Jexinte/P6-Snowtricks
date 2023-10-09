@@ -5,330 +5,128 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Enumeration\UserStatus;
 use App\Enumeration\CodeStatus;
+use App\Form\Type\ForgotPassword;
+use App\Form\Type\ResetPassword;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-
+use App\Form\Type\SignUp;
+use App\Form\Type\Login;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class UserController extends AbstractController
 {
-
-
-    public string $template = "";
-    /**
-     * @var array <string,int>
-     */
-    public array $parameters = [];
-    public ?int $code = null;
-
-    public function __construct(private readonly UserRepository $userRepository)
+    #[Route(path: '/signup', name: 'registration_get', methods: ["GET"])]
+    public function signUpPage(): Response
     {
+        $userConnected = $this->getUser() ?: '';
+        $form = $this->createForm(SignUp::class);
+        $parameters["user_connected"] = $userConnected;
+        $parameters["form"] = $form;
+        return new Response($this->render("sign_up.twig", $parameters));
     }
 
-    #[Route(path: '/signup', methods: ["GET"])]
-    public function signUpPage(Request $request): Response
-    {
-        $userConnected = $request->getSession()->get('user_connected');
-        $this->template = "sign_up.twig";
-        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        return new Response($this->render($this->template, $this->parameters));
-    }
-
-    #[Route(path: '/signin', methods: ["GET"])]
-    public function signInPage(Request $request): Response
-    {
-        $userConnected = $request->getSession()->get('user_connected');
-        $this->template = "sign_in.twig";
-        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        return new Response($this->render($this->template, $this->parameters));
-    }
-
-    #[Route(path: '/forgot-password', methods: ["GET"])]
-    public function forgotPasswordPage(Request $request): Response
-    {
-        $userConnected = $request->getSession()->get('user_connected');
-        $this->template = "forgot_password.twig";
-        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        return new Response($this->render($this->template, $this->parameters));
-    }
-
-    #[Route(path: '/reset-password/token/{id}', methods: ["GET"])]
-    public function resetPasswordPage(Request $request, string $id = null): Response|RedirectResponse
-    {
-        $tokenInSession = $request->getSession()->get('token');
-        $userConnected = $request->getSession()->get('user_connected');
-        if (!is_null($id) && $id == $tokenInSession) {
-            $this->template = "reset_password.twig";
-            $this->parameters["token"] = $id;
-            $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-            return new Response($this->render($this->template, $this->parameters));
-        }
-        throw $this->createNotFoundException();
-    }
-
-
-    #[Route(path: '/signup/registration', methods: ['POST'])]
+    #[Route(path: '/signup/registration', name: 'registration', methods: ['POST'])]
     public function signUpValidator(
-        ValidatorInterface $validator,
         Request $request,
         UserRepository $userRepository,
         MailerInterface $mailer,
+        UserPasswordHasherInterface $passwordHasher
     ): ?Response {
-        $this->template = "sign_up.twig";
-        $user = new User();
-        $numberOfErrors = 0;
-        $result = "";
-        $user->setName($request->request->get("username"));
-        $user->setEmail($request->request->get("email"));
-        $user->setPassword($request->request->get("password"));
-        $file = $request->files->all()['file'];
+        $form = $this->createForm(SignUp::class);
+        $form->handleRequest($request);
 
-        if (!is_null($file)) {
-            $user->setFile($file);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user = $form->getData();
+            $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
+            $user->setPassword($hashedPassword);
+            $fileExt = explode('.', $user->getFile()->getClientOriginalName());
+            $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
+            $imgPath = "/assets/img/$filename";
+            $user->setProfileImage($imgPath);
+            $user->setStatus(UserStatus::ACCOUNT_NOT_ACTIVATE);
+            $tmp = $user->getFile()->getPathname();
+            $dir = "../public/assets/img";
+            move_uploaded_file($tmp, "$dir/$filename");
+            $user->setRoles(['ROLE_USER']);
+            $userRepository->getEntityManager()->persist($user);
+            $userRepository->getEntityManager()->flush();
+            $user->setCreated(true);
+            $this->sendMailToUser($mailer, $user, $request);
+            return $this->redirectToRoute("homepage");
         }
+        $userConnected = $this->getUser() ?: '';
+        $parameters["user_connected"] = $userConnected;
 
-        $groups = [
-            "username_exception",
-            "email_exception",
-            "file_exception",
-            "password_exception"
-        ];
-
-        $groupsViolations = [];
-
-        foreach ($groups as $group) {
-            $errors = $validator->validate($user, null, $group);
-            if (count($errors) >= 1) {
-                $numberOfErrors++;
-            }
-            foreach ($errors as $error) {
-                $groupsViolations[$group] = $error->getMessage();
-            }
-        }
-
-        if ($numberOfErrors == 0) {
-            $passwordFromForm = $request->request->get('password');
-            $user->setPassword(password_hash($passwordFromForm, PASSWORD_DEFAULT));
-            $result = $userRepository->createUser($user);
-            if (is_null($result)) {
-                $user->setCreated(true);
-                $this->sendMailToUser($mailer, $user);
-                return $this->redirectToRoute("homepage");
-            }
-        }
-        $userConnected = $request->getSession()->get('user_connected');
-        $this->parameters["message_db"] = $result;
-        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        $this->parameters["exceptions"] = $groupsViolations;
-        $this->code = CodeStatus::CLIENT;
-        return new Response($this->render($this->template, $this->parameters), $this->code);
+        $parameters["form"] = $form;
+        return new Response($this->render("sign_up.twig", $parameters), CodeStatus::CLIENT);
     }
 
-
-    public function getToken(Request $request): ?string
+    #[Route(path: '/signin', name: 'login', methods: ['GET', 'POST'])]
+    public function signIn(AuthenticationUtils $authenticationUtils): Response
     {
-        $cookie = $request->cookies->get("token");
-        if (!empty($cookie)) {
-            return $cookie;
+        $form = $this->createForm(Login::class);
+        $error = $authenticationUtils->getLastAuthenticationError();
+        $parameters["errorLogs"] = $error;
+        $parameters["form"] = $form;
+        if ($error) {
+            $field = $form->get('username');
+            $error = new FormError(
+                'Oops ! Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations de connexion !'
+            );
+            $field->addError($error);
+            return new Response($this->render("sign_in.twig", $parameters), CodeStatus::CLIENT);
         }
-        return null;
+
+
+        return new Response($this->render("sign_in.twig", $parameters));
     }
 
-    public function setToken(): void
+    #[Route(path: '/forgot-password', name: 'forgot_password_get', methods: ["GET"])]
+    public function forgotPasswordPage(): Response
     {
-        $session = new Session();
-        if (!$session->isStarted()) {
-            $response = new Response();
-            $response->headers->setCookie(new Cookie("token", bin2hex(random_bytes(20))));
-            $session->set("token", current($response->headers->getCookies())->getValue());
-            $response->send();
-        }
+        $userConnected = $this->getUser() ?: '';
+        $form = $this->createForm(ForgotPassword::class);
+        $parameters["user_connected"] = $userConnected;
+        $parameters["form"] = $form;
+        return new Response($this->render("forgot_password.twig", $parameters));
     }
 
-    public function setSessionData(string $name, mixed $value): void
-    {
-        $session = new Session();
-        if (!$session->isStarted()) {
-            $session->set($name, $value);
-        }
-    }
-
-    public function destroySessionData(string $name): void
-    {
-        $session = new Session();
-        if (!$session->isStarted()) {
-            $session->remove($name);
-        }
-    }
-
-
-    public function sendMailToUser(MailerInterface $mailer, User $user): void
-    {
-        if ($user->isCreated()) {
-            $this->setToken();
-            $this->setSessionData("username", $user->getName());
-            $email = (new Email())
-                ->from("snowtricks@gmail.com")
-                ->to($user->getEmail())
-                ->subject('Confirmation d\'inscription')
-                ->text(
-                    body: "Bonjour " . $user->getName() . ",\n
-Nous vous remercions de vous être inscrit(e) sur notre plateforme. Avant de pouvoir accéder à toutes les fonctionnalités, nous vous prions de bien vouloir valider votre compte en cliquant sur le lien ci-dessous :\n 
-http://127.0.0.1:8000/signup/account-validation\n
-Si vous ne pouvez pas cliquer sur le lien, veuillez copier et coller l'URL dans la barre d'adresse de votre navigateur.\n
-L'équipe Snowtricks
-"
-                );
-            $mailer->send($email);
-        }
-    }
-
-    #[Route(path: '/signup/account-validation', methods: ["GET"])]
-    public function checkToken(Request $request): ?Response
-    {
-        $cookie = $this->getToken($request);
-        $tokenInSession = $request->getSession()->get('token');
-        $response = new Response();
-        $this->template = "account_validation.twig";
-        if (!is_null($cookie) && $cookie == $tokenInSession) {
-            $userStatusUpdated = $this->userRepository->updateUserStatus($request);
-            if ($userStatusUpdated) {
-                $this->destroySessionData("token");
-                $response->headers->clearCookie("token");
-                $response->send();
-                $this->parameters["token_authenticated"] = 1;
-                return new Response(
-                    $this->render(
-                        $this
-                            ->template,
-                        $this->parameters
-                    )
-                );
-            }
-        }
-        $userConnected = $request->getSession()->get('user_connected');
-        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        $this->code = CodeStatus::CLIENT;
-        return new Response(
-            $this->render(
-                $this
-                    ->template,
-                $this->parameters
-            ), $this->code
-        );
-    }
-
-    #[Route(path: '/signin/validation', methods: ["POST"])]
-    public function signInValidator(
-        ValidatorInterface $validator,
-        Request $request,
-        UserRepository $userRepository
-    ): ?Response {
-        $this->template = "sign_in.twig";
-        $this->parameters = [];
-        $user = new User();
-        $numberOfErrors = 0;
-        $user->setName($request->request->get("username"));
-        $user->setPassword($request->request->get("password"));
-        $groups = [
-            "username_exception_sign_in",
-            "password_exception_sign_in"
-        ];
-        $groupsViolations = [];
-        foreach ($groups as $group) {
-            $errors = $validator->validate($user, null, $group);
-            if (count($errors) >= 1) {
-                $numberOfErrors++;
-            }
-            foreach ($errors as $error) {
-                $groupsViolations[$group] = $error->getMessage();
-            }
-        }
-        $result = $userRepository->login($user, $request);
-
-        if ($numberOfErrors == 0) {
-            switch (true) {
-                case array_key_exists("password_failed", $result) || array_key_exists("username_failed", $result):
-                    $this->parameters["message_db"] = $result;
-                    break;
-                case  array_key_exists("connected", $result):
-                    $this->setSessionData("user_id", $result["user_id"]);
-                    $this->setSessionData("user_connected", $result["connected"]);
-                    $this->setSessionData("profile_image", $result["profile_image"]);
-                    $this->setToken();
-                    return $this->redirectToRoute('homepage');
-
-                case array_key_exists("not_activate", $result):
-                    $this->parameters["not_activate"] = "L'accès à votre compte est en attente d'activation. Pour toute demande, notre support est à votre disposition.";
-                    break;
-            }
-        }
-        $this->parameters["exceptions"] = $groupsViolations;
-        $this->code = CodeStatus::CLIENT;
-        return new Response($this->render($this->template, $this->parameters), $this->code);
-    }
-
-    #[Route(path: '/logout', methods: ["GET"])]
-    public function logout(Request $request): ?RedirectResponse
-    {
-        $this->template = "homepage.twig";
-        $userConnected = $request->getSession()->get('user_connected');
-        if (!$userConnected) {
-            $this->createNotFoundException();
-        }
-        $request->getSession()->clear();
-
-        return $this->redirectToRoute('homepage');
-
-    }
-
-    #[Route(path: '/reset-password/', methods: ["POST"])]
+    #[Route(path: '/reset-password/', name: 'send_reset_password_link', methods: ["POST"])]
     public function sendPasswordResetLink(
         MailerInterface $mailer,
         Request $request,
         UserRepository $userRepository,
-        ValidatorInterface $validator
     ): Response {
-        $this->template = "forgot_password.twig";
-        $user = new User();
-        $user->setName($request->request->get('username'));
-        $numberOfErrors = 0;
-        $errorUsername = "";
-        $groups = [
-            "username_exception_forgot_password",
-        ];
-        $groupsViolations = [];
-        foreach ($groups as $group) {
-            $errors = $validator->validate($user, null, $group);
-            if (count($errors) >= 1) {
-                $numberOfErrors++;
-            }
-            foreach ($errors as $error) {
-                $groupsViolations[$group] = $error->getMessage();
-            }
-        }
+        $form = $this->createForm(ForgotPassword::class);
+        $form->handleRequest($request);
+        $code = CodeStatus::CLIENT;
 
-        if ($numberOfErrors == 0) {
-            $result = $userRepository->checkUser($user);
-            if ($result) {
+        if ($form->isValid() && $form->isSubmitted()) {
+            $user = $form->getData();
+            $userFound = current($userRepository->findBy(["username" => $user->getUsername()]));
+
+            if ($userFound) {
                 $this->setToken();
-                $token = $request->getSession()->get("token");;
-                $this->setSessionData("ask_reset_password", UserStatus::ASK_RESET_PASSWORD);
+                $token = $request->getSession()->get("token");
+                ;
+                $request->getSession()->set("ask_reset_password", true);
 
                 $email = (new Email())
                     ->from("snowtricks@gmail.com")
-                    ->to($result->getEmail())
+                    ->to($userFound->getEmail())
                     ->subject('Réinitialisation de votre mot de passe')
                     ->text(
-                        body: "Bonjour " . $user->getName() . ",\n
+                        body: "Bonjour " . $user->getUsername() . ",\n
 Nous avons bien reçu votre demande de réinitialisation de mot de passe pour votre compte. Voici les étapes à suivre :\n
 
 Cliquez sur le lien ci-dessous pour accéder à la page de réinitialisation : \n
@@ -344,79 +142,143 @@ L'équipe Snowtricks
 "
                     );
                 $mailer->send($email);
-                $this->parameters["mail_send"] = 1;
-                $this->parameters["token"] = $token;
-                $this->code = CodeStatus::REQUEST_SUCCEED;
+                $parameters["mail_send"] = 1;
+                $parameters["token"] = $token;
+                $code = CodeStatus::REQUEST_SUCCEED;
             } else {
-                $errorUsername = "Oops! Le nom d'utilisateur " . $user->getName() . " n'existe pas !";
-                $this->code = CodeStatus::CLIENT;
-                $this->parameters["errorUsername"] = $errorUsername;
+                $error = new FormError('Oops ! Identifiant incorrect. Veuillez vérifier vos informations !');
+                $form->get('username')->addError($error);
             }
-        } else {
-            $this->parameters["exceptions"] = $groupsViolations;
         }
 
-        $userConnected = $request->getSession()->get('user_connected');
-        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        return new Response($this->render($this->template, $this->parameters), $this->code);
+        $userConnected = $this->getUser() ?: '';
+        $parameters["user_connected"] = $userConnected;
+        $parameters["form"] = $form;
+        return new Response($this->render("forgot_password.twig", $parameters), $code);
     }
 
+    #[Route(path: '/reset-password/token/{id}', methods: ["GET"])]
+    public function resetPasswordPage(Request $request, string $id = null): Response|RedirectResponse
+    {
+        $tokenInSession = $request->getSession()->get('token');
+        $userConnected = $this->getUser() ?: '';
+        if (!is_null($id) && $id == $tokenInSession) {
+            $form = $this->createForm(ResetPassword::class);
+            $parameters["token"] = $id;
+            $parameters["form"] = $form;
+            $parameters["user_connected"] = $userConnected;
+            return new Response($this->render("reset_password.twig", $parameters));
+        }
+        throw $this->createAccessDeniedException();
+    }
 
-    #[Route(path: '/reset-password/token/{id}', methods: ["POST"])]
+    #[Route(path: '/reset-password/token/{id}', name: 'reset_password_with_token', methods: ["POST"])]
     public function resetPassword(
         Request $request,
         string $id,
-        ValidatorInterface $validator,
         UserRepository $userRepository
     ): Response {
-        $groupsViolations = [];
         $resetPasswordkAsk = $request->getSession()->get('ask_reset_password');
-        if ($resetPasswordkAsk) {
-            $this->template = "reset_password.twig";
-            $numberOfErrors = 0;
+        $form = $this->createForm(ResetPassword::class);
+        $form->handleRequest($request);
+        if ($form->isValid() && $form->isSubmitted() && $resetPasswordkAsk) {
             $response = new Response();
-            $user = new User();
-            $user->setName($request->request->get("username"));
-            $user->setOldPassword($request->request->get("old-password"));
-            $user->setPassword($request->request->get("password"));
-
-            $groups = [
-                "username_exception_reset_password",
-                "password_exception_old_reset_password",
-                "password_exception_new_reset_password",
-                "password_exception_wrong_format"
-            ];
-            foreach ($groups as $group) {
-                $errors = $validator->validate($user, null, $group);
-                if (count($errors) >= 1) {
-                    $numberOfErrors++;
-                }
-                foreach ($errors as $error) {
-                    $groupsViolations[$group] = $error->getMessage();
-                }
-            }
-
-            if ($numberOfErrors == 0) {
-                $result = $userRepository->checkPasswordReset($user);
-                switch (true) {
-                    case is_null($result):
-                        $response->headers->clearCookie("token");
-                        $response->send();
-                        $this->destroySessionData('ask_reset_password');
-                        return $this->redirectToRoute("homepage");
-                    case array_key_exists("password", $result) || array_key_exists("username", $result) :
-                        $this->code = CodeStatus::CLIENT;
-                        $this->parameters["failed"] = $result;
-                }
-            } else {
-                $this->code = CodeStatus::CLIENT;
+            $user = $form->getData();
+            $userEntity = $userRepository->checkPasswordReset($user);
+            switch (true) {
+                case $userEntity->getCredentialsValid():
+                    $response->headers->clearCookie("token");
+                    $response->send();
+                    $request->getSession()->remove('ask_reset_password');
+                    return $this->redirectToRoute("homepage");
+                case !$user->getPasswordCorrect() && !is_null($user->getPasswordCorrect()):
+                    $error = new FormError('Oops ! Il semble que le mot de passe saisi est incorrect !');
+                    $form->get('oldPassword')->addError($error);
+                    break;
+                default:
+                    $error = new FormError(
+                        'Oops ! Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations de connexion !'
+                    );
+                    $form->get('username')->addError($error);
             }
         }
-        $userConnected = $request->getSession()->get('user_connected');
-        $this->parameters["token"] = $id;
-        $this->parameters["user_connected"] = !empty($userConnected) ? $userConnected : '';
-        $this->parameters["exceptions"] = $groupsViolations;
-        return new Response($this->render($this->template, $this->parameters), $this->code);
+        $userConnected = $this->getUser() ?: '';
+        $parameters["token"] = $id;
+        $parameters["form"] = $form;
+        $parameters["user_connected"] = $userConnected;
+        return new Response($this->render("reset_password.twig", $parameters), CodeStatus::CLIENT);
     }
 
+
+    private function getToken(Request $request): ?string
+    {
+        $cookie = $request->cookies->get("token");
+        if (!empty($cookie)) {
+            return $cookie;
+        }
+        return null;
+    }
+
+    private function setToken(): void
+    {
+        $session = new Session();
+        $response = new Response();
+        $response->headers->setCookie(new Cookie("token", bin2hex(random_bytes(20))));
+        $session->set("token", current($response->headers->getCookies())->getValue());
+        $response->send();
+    }
+
+
+    public function sendMailToUser(MailerInterface $mailer, User $user, Request $request): void
+    {
+        if ($user->isCreated()) {
+            $this->setToken();
+            $request->getSession()->set("username", $user->getUsername());
+            $email = (new Email())
+                ->from("snowtricks@gmail.com")
+                ->to($user->getEmail())
+                ->subject('Confirmation d\'inscription')
+                ->text(
+                    body: "Bonjour " . $user->getUsername() . ",\n
+Nous vous remercions de vous être inscrit(e) sur notre plateforme. Avant de pouvoir accéder à toutes les fonctionnalités, nous vous prions de bien vouloir valider votre compte en cliquant sur le lien ci-dessous :\n 
+http://127.0.0.1:8000/signup/account-validation\n
+Si vous ne pouvez pas cliquer sur le lien, veuillez copier et coller l'URL dans la barre d'adresse de votre navigateur.\n
+L'équipe Snowtricks
+"
+                );
+            $mailer->send($email);
+        }
+    }
+
+    #[Route(path: '/signup/account-validation', methods: ["GET"])]
+    public function checkToken(Request $request, UserRepository $userRepository): ?Response
+    {
+        $cookie = $this->getToken($request);
+        $tokenInSession = $request->getSession()->get('token');
+        $response = new Response();
+        if (!is_null($cookie) && $cookie == $tokenInSession) {
+            $userStatusUpdated = $userRepository->updateUserStatus($request);
+            if ($userStatusUpdated) {
+                $request->getSession()->remove("token");
+                $response->headers->clearCookie("token");
+                $response->send();
+                $parameters["token_authenticated"] = 1;
+                return new Response(
+                    $this->render(
+                        "account_validation.twig",
+                        $parameters
+                    )
+                );
+            }
+        }
+        $userConnected = $this->getUser() ?: '';
+        $parameters["user_connected"] = $userConnected;
+        return new Response(
+            $this->render(
+                "account_validation.twig",
+                $parameters
+            ),
+            CodeStatus::CLIENT
+        );
+    }
 }

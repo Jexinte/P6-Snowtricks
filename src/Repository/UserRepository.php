@@ -24,47 +24,16 @@ class UserRepository extends ServiceEntityRepository
     }
 
 
-    /**
-     * @return string[]|null
-     * @throws \Exception
-     */
-    public function createUser(User $user): ?array
+    public function getEntityManager()
     {
-        $entityManager = $this->getEntityManager();
-        $usernameNotAvailable = $this->findOneBy(["name" => $user->getName()]);
-        $emailNotAvailable = $this->findOneBy(["email" => $user->getEmail()]);
-        switch (true) {
-            case $usernameNotAvailable:
-                return [
-                    'username_unavailable' => 'Le nom utilisateur ' . $usernameNotAvailable->getName(
-                        ) . ' n\'est pas disponible',
-                ];
-
-            case $emailNotAvailable:
-                return [
-                    'email_unavailable' => "L'adresse email " . $emailNotAvailable->getEmail() . " n'est pas disponible"
-                ];
-            default:
-                $fileExt = explode('.', $user->getFile()->getClientOriginalName());
-                $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
-                $imgPath = "/assets/img/$filename";
-                $user->setProfileImage($imgPath);
-                $user->setStatus(UserStatus::ACCOUNT_NOT_ACTIVATE);
-                $tmp = $user->getFile()->getPathname();
-                $dir = "../public/assets/img";
-                move_uploaded_file($tmp, "$dir/$filename");
-                $entityManager->persist($user);
-                $entityManager->flush();
-        }
-
-        return null;
+        return parent::getEntityManager();
     }
 
     public function updateUserStatus(Request $request): bool
     {
         $usernameInSession = $request->getSession()->get('username');
         $entityManager = $this->getEntityManager();
-        $dataToUpdate = $entityManager->getRepository(User::class)->findBy(["name" => $usernameInSession]);
+        $dataToUpdate = $entityManager->getRepository(User::class)->findBy(["username" => $usernameInSession]);
         foreach ($dataToUpdate as $record) {
             $record->setStatus(UserStatus::ACCOUNT_ACTIVATE);
         }
@@ -74,75 +43,29 @@ class UserRepository extends ServiceEntityRepository
     }
 
 
-    /**
-     * @param User $user
-     * @param Request $request
-     * @return array<string|int|true|false|null>
-     */
-    public function login(User $user, Request $request): ?array
+
+
+    public function checkPasswordReset(User $user): User
     {
-        $usernameFromForm = $user->getName();
-        $passwordFromForm = $user->getPassword();
-
-
-        $userInDb = current($this->findBy(["name" => $usernameFromForm]));
-        switch (true) {
-            case !$userInDb:
-                return ["username_failed" => "Oops ! Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations de connexion !"];
-            case $userInDb->getName() == $usernameFromForm &&
-                password_verify(
-                    $passwordFromForm,
-                    $userInDb->getPassword()
-                ):
-                if ($userInDb->getStatus() == UserStatus::ACCOUNT_ACTIVATE) {
-                    return [
-                        "connected" => UserStatus::CONNECTED,
-                        "user_id" => $userInDb->getId(),
-                        "profile_image" => $userInDb->getProfileImage()
-                    ];
-                }
-                return ["not_activate" => UserStatus::ACCOUNT_NOT_ACTIVATE];
-
-            default:
-                return ["password_failed" => "Oops ! Il semblerait que le mot de passe saisi est incorrect !"];
-        }
-    }
-
-    public function checkUser(User $user): ?User
-    {
-        $userMatch = $this->findOneBy(["name" => $user->getName()]);
-        if ($userMatch) {
-            return $userMatch;
-        }
-        return null;
-    }
-
-
-    /**
-     * @param User $user
-     * @return string[]|null
-     */
-    public function checkPasswordReset(User $user): ?array
-    {
-        $userDataFromDb = $this->checkUser($user);
-
+        $userDataFromDb = current($this->findBy(["username" => $user->getUsername()]));
         $oldPasswordFromForm = $user->getOldPassword();
         $newPasswordFromForm = $user->getPassword();
-        if (!is_null($userDataFromDb)) {
+        if (is_object($userDataFromDb)) {
             if (password_verify($oldPasswordFromForm, $userDataFromDb->getPassword())) {
-                $entityManager = $this->getEntityManager();
-                $dataToUpdate = $entityManager->getRepository(User::class)->findBy(
-                    ["name" => $userDataFromDb->getName()]
+                $dataToUpdate = $this->getEntityManager()->getRepository(User::class)->findBy(
+                    ["username" => $userDataFromDb->getUsername()]
                 );
                 foreach ($dataToUpdate as $record) {
                     $record->setPassword(password_hash($newPasswordFromForm, PASSWORD_DEFAULT));
                 }
-                $entityManager->flush();
-                return null;
+                $this->getEntityManager()->flush();
+                $user->isCredentialsValid(true);
+            } else {
+                $user->isPasswordCorrect(false);
             }
-            return ["password" => "Oops ! Il semble que le mot de passe saisi est incorrect !"];
+        } else {
+            $user->isCredentialsValid(false);
         }
-
-        return ["username" => "Oops ! Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations de connexion !"];
+        return $user;
     }
 }
