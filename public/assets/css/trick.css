@@ -303,8 +303,9 @@ header {
 
     #banner-trick img {
         min-height: 0;
-        height: 500px;
+        height: 800px;
         transition: all 700ms ease-in-out ;
+        object-fit: cover;
     }
 
     #trick {
