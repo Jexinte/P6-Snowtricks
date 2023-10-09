@@ -21,11 +21,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Trick;
 
-
 class TrickController extends AbstractController
 {
-
-
     #[Route('/{slug}/details/{id}', name: 'trick', methods: ["GET"])]
     public function getTrickPage(
         Trick $trick,
@@ -35,9 +32,9 @@ class TrickController extends AbstractController
         IntlDateFormatter $dateFormatter,
         Request $request
     ): Response {
-        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
-        $id = $trick->getId();
+        $userConnected = $this->getUser() ?: '';
         $form = $this->createForm(AddComment::class);
+        $id = $trick->getId();
         $medias = $mediaRepository->findBy(["idTrick" => $id, "isBanner" => null]);
         $mainBannerOfTrick = current($mediaRepository->findBy(["idTrick" => $id, "isBanner" => true]));
         $trickComments = $commentRepository->getComments($id, $userRepository);
@@ -73,8 +70,7 @@ class TrickController extends AbstractController
     #[Route('/create-trick', name: 'create_trick_get', methods: ["GET"])]
     public function createTrickPage(): Response
     {
-        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
-
+        $userConnected = $this->getUser() ?: '';
         $form = $this->createForm(CreateTrick::class);
         $form->add('mediaForm', CreateTrickMedia::class);
         $parameters["user_connected"] = $userConnected;
@@ -90,10 +86,9 @@ class TrickController extends AbstractController
         MediaRepository $mediaRepository,
         DateTime $dateTime
     ): Response {
-        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
+        $userConnected = $this->getUser() ?: '';
         $form = $this->createForm(CreateTrick::class);
         $form->add('mediaForm', CreateTrickMedia::class);
-
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $trick = $form->getData();
@@ -200,7 +195,7 @@ class TrickController extends AbstractController
         MediaRepository $mediaRepository,
         IntlDateFormatter $dateFormatter
     ): Response {
-        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
+        $userConnected = $this->getUser() ?: '';
 
         $form = $this->createForm(UpdateTrickContent::class, $trick);
         $medias = $mediaRepository->findBy(["idTrick" => $trick->getId(), "isBanner" => null]);
@@ -238,7 +233,7 @@ class TrickController extends AbstractController
             return $this->redirectToRoute('homepage');
         }
 
-        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
+        $userConnected = $this->getUser() ?: '';
         $parameters["user_connected"] = $userConnected;
         $parameters["medias"] = $media;
         $parameters["form"] = $form;

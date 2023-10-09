@@ -36,6 +36,11 @@ img {
 p{
     font-weight: var(--700);
     text-align: center;
+    width: 80%;
+    margin: 0 auto;
+    font-size: 1.5em;
+    margin-bottom: 2em;
+    line-height: 2.3em;
 }
 @media (max-width:992px) {
     #error img{

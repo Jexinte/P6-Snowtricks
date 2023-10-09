@@ -6,6 +6,8 @@ use App\Repository\MediaRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\File;
+
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
 class Media
 {
@@ -22,7 +24,7 @@ class Media
 
     #[ORM\Column(length: 255)]
     private ?string $mediaType = null;
-    #[ORM\Column(length: 255,nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?bool $isBanner = null;
 
 
@@ -30,32 +32,47 @@ class Media
      * @var array<string>
      */
 
-
+    #[Assert\All(
+        new File(
+            maxSize: '3000K',
+            extensions: ['jpg', 'png', 'webp'],
+            extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !',
+        )
+    )]
     private array $images;
     /**
      * @var array<string>
      */
 
 
+    #[Assert\All(
+        new File(
+            maxSize: '3000K',
+            extensions: ['mp4'],
+            extensionsMessage: 'Seuls les fichiers ayant pour extension mp4 sont acceptés !',
+        )
+    )]
     private array $videos;
 
-
+    #[Assert\Regex(
+        pattern: '/<iframe[^>]+src="([^"]+)"/i',
+        message: "Oops ! Il semblerait que le format de votre url n'est pas bon, merci de vérifier ce qu'il en est",
+        match: true,
+    )]
     private ?string $embedUrl = null;
 
 
-#[Assert\File(
-    maxSize: '3000K',
-    extensions: ['jpg', 'png', 'webp', 'mp4'],
-    extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png ,webp et mp4 sont acceptés !',
-    groups: ['update_trick','createTrick']
-)]
+    #[Assert\NotBlank(message:'Veuillez sélectionner un fichier !')]
+    #[Assert\File(
+
+    )]
     private ?UploadedFile $bannerFile;
 
 
     private ?UploadedFile $updatedFile = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
-    #[ORM\JoinColumn(name:'id_trick',referencedColumnName: 'id',nullable: false)]
+    #[ORM\JoinColumn(name:'id_trick', referencedColumnName: 'id', nullable: false)]
     private ?Trick $trick = null;
 
     public function getId(): ?int
@@ -164,18 +181,13 @@ class Media
     {
         $this->embedUrl = $embedUrl;
     }
-//
-//    /**
-//     * @return UploadedFile|null
-//     */
-    public function getBannerFile():UploadedFile
+
+    public function getBannerFile(): UploadedFile
     {
         return $this->bannerFile;
     }
 
-//    /**
-//     * @param UploadedFile|null $bannerFile
-//     */
+
     public function setBannerFile(UploadedFile $bannerFile): void
     {
         $this->bannerFile = $bannerFile;

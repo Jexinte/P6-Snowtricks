@@ -11,8 +11,6 @@ use App\Enumeration\CodeStatus;
 
 class ErrorController extends AbstractController
 {
-
-
     public function errorExceptions(\Throwable $exception): ?RedirectResponse
     {
         return match (true) {
@@ -20,6 +18,14 @@ class ErrorController extends AbstractController
             default => $this->redirectToRoute("server_down"),
         };
     }
+
+
+    #[Route('/error/401', name: 'unauthorized', methods: ["GET"])]
+    public function error401(): Response
+    {
+        return new Response($this->render('/bundles/TwigBundle/Exception/error401.html.twig'), CodeStatus::UNAUTHORIZED);
+    }
+
 
     #[Route('/error/404', name: 'ressource_not_found', methods: ["GET"])]
     public function error404(): Response

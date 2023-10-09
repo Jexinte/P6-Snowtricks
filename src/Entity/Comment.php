@@ -2,11 +2,13 @@
 
 namespace App\Entity;
 
+use AllowDynamicProperties;
 use App\Repository\CommentRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
+#[AllowDynamicProperties]
 class Comment
 {
     #[ORM\Id]
@@ -40,11 +42,11 @@ class Comment
     private ?string $username = null;
 
     #[ORM\ManyToOne(inversedBy: 'comment')]
-    #[ORM\JoinColumn(name:'id_trick',referencedColumnName: 'id',nullable: false)]
+    #[ORM\JoinColumn(name:'id_trick', referencedColumnName: 'id', nullable: false)]
     private ?Trick $trick = null;
     #[ORM\ManyToOne(inversedBy: 'comment')]
-    #[ORM\JoinColumn(name:'id_user',referencedColumnName: 'id',nullable: false)]
-private ?User $user = null;
+    #[ORM\JoinColumn(name:'id_user', referencedColumnName: 'id', nullable: false)]
+    private ?User $user = null;
     public function getId(): ?int
     {
         return $this->id;
@@ -107,7 +109,7 @@ private ?User $user = null;
     public function setUsername(?string $username): void
     {
         $this->username = $username;
-    }  public function getUsername():string
+    }  public function getUsername(): string
     {
 
         return $this->username;

@@ -34,7 +34,10 @@ class UpdateTrickContent extends AbstractType
                     "One Foot Tricks" => "One Foot Tricks",
                     "Old School" => "Old School"
                 ]
-            ])->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']]
+            ])->add(
+                'save',
+                SubmitType::class,
+                ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']]
             )->setMethod("PUT");
     }
 

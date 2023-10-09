@@ -45,7 +45,9 @@ form .box {
 #banner-trick img {
     width: 100%;
 }
-
+#banner-trick{
+    margin-bottom: 2em;
+}
 #trick .col-form-label{
     display: none;
 }
@@ -73,9 +75,7 @@ form .box {
         height: 100%;
     }
 
-    #banner-trick {
-        height: 600px;
-    }
+
 
     footer {
         padding-inline: 1em;

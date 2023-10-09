@@ -13,12 +13,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MediaController extends AbstractController
 {
-
-
     #[Route('/update-trick-media/{id}', name: 'update_trick_media_page', methods: ["GET"])]
     public function updateTrickMediaPage(Media $media): Response
     {
-        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
+        $userConnected = $this->getUser() ?: '';
 
         $form = $media->getMediaType() == "web" ? $this->createForm(UpdateEmbedUrl::class) : $this->createForm(
             UpdateFile::class
@@ -55,10 +53,10 @@ class MediaController extends AbstractController
                     $urlCleaned = $matches[1];
                     $media->setEmbedUrl($urlCleaned);
                     $this->updateEmbedUrl($media, $mediaRepository);
-                    $this->addFlash("success", "Le lien a bien été mis à jour !");
+                    $this->addFlash("success", "Votre lien vidéo a bien été mis à jour !");
                     return $this->redirectToRoute('homepage');
                 default:
-                    $this->addFlash("success", "Votre fichier a bien été mis à jour !");
+                    $this->addFlash("success", "Votre média a bien été mis à jour !");
                     return $this->redirectToRoute('homepage');
             }
         }
@@ -115,7 +113,7 @@ class MediaController extends AbstractController
         }
         $mediaRepository->getEntityManager()->remove($media);
         $mediaRepository->getEntityManager()->flush();
-        $this->addFlash("success", "La suppression du média a bien été prise en compte !");
+        $this->addFlash("success", "La suppression de votre média a bien été prise en compte !");
         return $this->redirectToRoute('homepage');
     }
 }

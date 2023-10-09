@@ -52,6 +52,7 @@ header {
     gap: 8em;
     margin-block: 4em;
     justify-content: center;
+    padding-bottom: 4em;
 }
 
 #trick-content .media-box {
@@ -108,7 +109,6 @@ header {
 
 #banner-trick img {
     width: 100%;
-    min-height: 100vh;
 }
 
 #comments {
@@ -228,9 +228,7 @@ header {
     gap: 2em;
 }
 
-.about{
-    margin-top: 7em;
-}
+
 
 #submit
 {
@@ -273,6 +271,7 @@ footer{
 {
     #see-medias{
         display: block;
+        margin-inline: 1em;
     }
     #trick-content .media-box {
         width: 300px;
@@ -296,5 +295,41 @@ footer{
 
     #trick-content{
         margin-bottom: 3em;
+    }
+    #banner-trick{
+        height: 600px;
+        min-height: 0;
+        transition: all 700ms ease-in-out ;
+    }
+
+
+
+    #trick-content form {
+        width: 70%;
+        margin: 4em  auto 0;
+    }
+    #banner-trick img {
+        min-height: 0;
+        height: 800px;
+        transition: all 700ms ease-in-out ;
+        object-fit: cover;
+    }
+    #trick {
+        width: 100%;
+        margin-top: -2em;
+        transition: all 700ms ease-in-out ;
+    }
+
+    .about .row {
+        margin-inline: 0;
+    }
+}
+
+@media screen and (max-width: 455px)
+{
+    #banner-trick img {
+        height: 550px;
+        transition: all 700ms ease-in-out;
+        padding: 6em 1em;
     }
 }

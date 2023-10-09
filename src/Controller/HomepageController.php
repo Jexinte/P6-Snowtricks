@@ -10,50 +10,28 @@ use Symfony\Component\HttpFoundation\Response;
 
 class HomepageController extends AbstractController
 {
-
-
     #[Route(path: '/', name: 'homepage', methods: ["GET"])]
     public function homepage(
         TrickRepository $trickRepository,
         MediaRepository $mediaRepository,
     ): Response {
         $parameters = [];
-        $userConnected = !is_null($this->getUser()) ? current($this->getUser()->getRoles()) : '';
-        $parameters["user_connected"] = $userConnected;
+        $userConnected = $this->getUser() ?: '';
         $tricks = $trickRepository->findAll();
-        $result = [];
+
         $banners = $mediaRepository->findBy(["isBanner" => true]);
-        foreach ($tricks as $k => $trick) {
-            if(!empty($banners))
-            {
-                foreach($banners as $banner){
-                    if($banner->getIdTrick() == $trick->getId())
-                    {
-                        $result[$k] = [
-                        "name" => $trick->getName(),
-                        "id" => $trick->getId(),
-                        "slug" => $trick->getSlug(),
-                        "main_banner" => $banner->getMediaPath()
-                    ];
-                    }
-                    else {
-                        $result[$k] = [
-                            "name" => $trick->getName(),
-                            "id" => $trick->getId(),
-                            "slug" => $trick->getSlug(),
-                        ];
-                    }
+
+        foreach($tricks as $trick) {
+            foreach($banners as $banner) {
+                if($trick->getId() == $banner->getIdTrick()) {
+                    $trick->banner = $banner->getMediaPath();
                 }
             }
-            else {
-                $result[$k] = [
-                    "name" => $trick->getName(),
-                    "id" => $trick->getId(),
-                    "slug" => $trick->getSlug(),
-                ];
-            }
         }
-        $parameters["tricks"] = $result;
+
+
+        $parameters["tricks"] = $tricks;
+        $parameters["user_connected"] = $userConnected;
         return new Response($this->render("homepage.twig", $parameters));
     }
 

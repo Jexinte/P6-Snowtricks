@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Form\Type;
+
 use App\Entity\User;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -14,15 +15,15 @@ class ResetPassword extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('username',TextType::class,options:[
+        $builder->add('username', TextType::class, options:[
             'label' => 'Utilisateur',
             'required' => false,
             'attr' => ['placeholder' => 'John']
         ])
-            ->add('oldPassword',PasswordType::class,options:[
+            ->add('oldPassword', PasswordType::class, options:[
             'label' => 'Ancien mot de passe',
             'required' => false,
-        ])      ->add('password',PasswordType::class,options:[
+        ])      ->add('password', PasswordType::class, options:[
             'label' => 'Nouveau mot de passe',
             'required' => false,
         ])

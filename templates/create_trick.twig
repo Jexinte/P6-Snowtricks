@@ -20,7 +20,7 @@
     </header>
     <div class="container-fluid" id="trick">
         <div class=" container-fluid" id="banner-trick">
-            <img src="/assets/img/banner/banner_homepage.jpg" alt="banner">
+            <img src="/assets/img/banner/banner-homepage.jpg" alt="banner">
         </div>
 
         <div class="container-fluid" id="form">
@@ -36,7 +36,7 @@
         <p class="text-center footer-paragraph">Copyright @ 2023</p>
         <nav id="nav-mobile">
             <a href="{{ path('homepage') }}" class="mobile-link" id="homepage-link"><i class="fa-solid fa-house"></i></a>
-            {% if user_connected is defined and user_connected == "ROLE_USER" %}
+            {% if user_connected is defined and user_connected is not empty ? user_connected.roles[0]  : '' %}
                 <a href="{{ path('logout') }}" class="mobile-link" id="log-out"><i class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
                 <a href="{{ path('login') }}" class="mobile-link" id="log-in"><i class="fa-solid fa-key"></i></a>
@@ -44,4 +44,7 @@
             {% endif %}
         </nav>
     </footer>
+{% endblock %}
+{% block javascript %}
+<script src="/assets/js/update-createtrick-banner.js"></script>
 {% endblock %}

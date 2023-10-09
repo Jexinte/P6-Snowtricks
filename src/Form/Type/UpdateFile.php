@@ -20,7 +20,7 @@ class UpdateFile extends AbstractType
             ->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']])
             ->setMethod('PUT');
     }
-        public function configureOptions(OptionsResolver $resolver): void
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Media::class,
@@ -35,4 +35,4 @@ class UpdateFile extends AbstractType
         ]);
     }
 
-    }
+}

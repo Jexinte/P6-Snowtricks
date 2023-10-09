@@ -12,13 +12,14 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-
-
 class SignUp extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add("username", TextType::class, options: [
+        $builder->add(
+            "username",
+            TextType::class,
+            options: [
             'label' => 'Utilisateur',
             'required' => false,
         ]
@@ -56,4 +57,3 @@ class SignUp extends AbstractType
         ]);
     }
 }
-
