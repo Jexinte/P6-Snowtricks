@@ -310,7 +310,7 @@ footer{
     }
     #banner-trick img {
         min-height: 0;
-        height: 800px;
+        height: 600px;
         transition: all 700ms ease-in-out ;
         object-fit: cover;
     }

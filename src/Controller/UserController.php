@@ -51,11 +51,11 @@ class UserController extends AbstractController
             $user->setPassword($hashedPassword);
             $fileExt = explode('.', $user->getFile()->getClientOriginalName());
             $filename = str_replace("/", "", base64_encode(random_bytes(9))) . '.' . $fileExt[1];
-            $imgPath = "/assets/img/$filename";
+            $imgPath = "/assets/img/user-profile/$filename";
             $user->setProfileImage($imgPath);
             $user->setStatus(UserStatus::ACCOUNT_NOT_ACTIVATE);
             $tmp = $user->getFile()->getPathname();
-            $dir = "../public/assets/img";
+            $dir = "../public/assets/img/user-profile/";
             move_uploaded_file($tmp, "$dir/$filename");
             $user->setRoles(['ROLE_USER']);
             $userRepository->getEntityManager()->persist($user);
