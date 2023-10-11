@@ -1,3 +1,4 @@
+![banner](public%2Fassets%2Fimg%2Fbanner%2Fbanner-homepage.jpg)
 # Description
 
 The aim of the project is to create a community site where users can create tricks, exchange information about their tricks and, if they have an account, modify the content of their tricks.
