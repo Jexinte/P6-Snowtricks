@@ -34,12 +34,13 @@ Once everything is set up go in the `env` file and insert this line below :
 MAILER_DSN="smtp://emailname@gmail.com:applicationpassword@smtp.gmail.com:587?verify_peer=false"
 ###< symfony/mailer ###
 ```
+Put your email and password application and everything should be running fine.
 
 WARNING : If you not add it you will not be able to register a user , ask a reset link etc...
 
 # Database & User
 
-Create a database called `snowtricks` and insert the `snowtricks.sql` file store in config folder in phpmyadmin
+Create a database called `snowtricks` in phpmyadmin and insert the `snowtricks.sql` file store in config folder 
 
 
 # PHPMyAdmin && Composer Version
