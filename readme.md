@@ -9,6 +9,8 @@ The aim of the project is to create a community site where users can create tric
 1 - Clone the repo
 
 2 - Use the package manager [composer](https://getcomposer.org/doc/00-intro.md) to install packages.
+
+3 - When composer ask you to create "grump.yaml" file say no
 ```
 composer install
 ```
