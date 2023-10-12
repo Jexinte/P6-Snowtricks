@@ -76,8 +76,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $created;
     #[Assert\File(
         maxSize: '3000K',
+        groups: ['signUp'],
         extensions: ['jpg', 'png', 'webp'],
-        extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !',
+        extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
     )]
     #[Assert\NotBlank(message: 'Veuillez sélectionner un fichier !', groups: ['signUp'])]
     private UploadedFile $file;

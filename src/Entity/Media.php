@@ -64,7 +64,9 @@ class Media
 
     #[Assert\NotBlank(message:'Veuillez sélectionner un fichier !')]
     #[Assert\File(
-
+        maxSize: '3000K',
+        extensions: ['jpg', 'png', 'webp'],
+        extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
     )]
     private ?UploadedFile $bannerFile;
 
