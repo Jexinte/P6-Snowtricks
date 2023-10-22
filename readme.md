@@ -18,17 +18,11 @@ composer install
 
 # Configure your GMAIL SMTP
 
-An SMTP is used for the homepage form contact and when a user send a comment it will warn you that you have to handle them through the admin panel so you have to configure it so just follow the steps below or you can follow this tutorial too if you want [How to configure SMTP GMAIL](https://www.youtube.com/watch?v=yuOK6D7deTo) :
-
-Update the content of the following file `stmp_credentials_example.json` here how to do it :
-
 - Log in to your account [GMAIL](https://gmail.com)
-- Go to your profile && select the `Security` option`
-- Select the `Two-Step Verification` && `App Passwords`
+- Go to your profile & select the `Security` option`
+- Select the `Two-Step Verification` & `App Passwords`
 - On `Select an application` choose `Other` and write whatever you want
-- Click on `Generate` && You'll get a password copy it and replace `password application` in the `smtp_credentials_example.json` file  by the generate one
-- Replace `youremail@example.com` by your own gmail address
-- Replace `smtp` by `smtp.gmail.com` && remove the word `example` from `smtp_credentials_example.json`
+- Click on `Generate` & You'll get a password copy it 
 
 
 Once everything is set up go in the `env` file and insert this line below :
@@ -37,7 +31,7 @@ Once everything is set up go in the `env` file and insert this line below :
 MAILER_DSN="smtp://emailname@gmail.com:applicationpassword@smtp.gmail.com:587?verify_peer=false"
 ###< symfony/mailer ###
 ```
-Put your email and password application and everything should be running fine.
+Replace `emailname@gmail.com` by yours and do the same for `applicationpassword`.
 
 WARNING : If you not add it you will not be able to register a user , ask a reset link etc...
 
@@ -45,8 +39,7 @@ WARNING : If you not add it you will not be able to register a user , ask a rese
 
 Create a database called `snowtricks` in phpmyadmin and insert the `snowtricks.sql` file store in config folder 
 
-
-# PHPMyAdmin && Composer Version
+# PHPMyAdmin & Composer Version
 
 ### phpMyAdmin Version 5.2.1
 ### Composer Version 2.6.5
