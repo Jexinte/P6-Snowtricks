@@ -8,13 +8,12 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\Regex;
 
 class UpdateEmbedUrl extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add("embedUrl", TextType::class, options: [
+        $builder->add("embedUrlUpdated", TextType::class, options: [
             'label' => 'Url Vidéo Dailymotion / Youtube',
             'required' => false,
 
@@ -27,6 +26,7 @@ class UpdateEmbedUrl extends AbstractType
         $resolver->setDefaults([
             'data_class' => Media::class,
 
+            'validation_groups' => 'updateTrickUrl',
 
             'csrf_protection' => true,
 

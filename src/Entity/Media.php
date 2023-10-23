@@ -60,6 +60,13 @@ class Media
         match: true,
     )]
     private ?string $embedUrl = null;
+    #[Assert\Regex(
+        pattern: '/<iframe[^>]+src="([^"]+)"/i',
+        message: "Oops ! Il semblerait que le format de votre url n'est pas bon, merci de vérifier ce qu'il en est",
+        match: true,
+        groups: ['updateTrickUrl']
+    )]
+    private ?string $embedUrlUpdated = null;
 
 
     #[Assert\NotBlank(message:'Veuillez sélectionner un fichier !')]
@@ -71,7 +78,20 @@ class Media
     private ?UploadedFile $bannerFile;
 
 
+    #[Assert\File(
+        maxSize: '3000K',
+        groups: ['updateTrickFileThatIsNotBanner'],
+        extensions: ['jpg', 'png', 'webp','mp4'],
+        extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
+    )]
     private ?UploadedFile $updatedFile = null;
+    #[Assert\File(
+        maxSize: '3000K',
+        groups: ['updateBannerFile'],
+        extensions: ['jpg', 'png', 'webp'],
+        extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
+    )]
+    private ?UploadedFile $updatedBannerFile = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
     #[ORM\JoinColumn(name:'id_trick', referencedColumnName: 'id', nullable: false)]
@@ -242,6 +262,38 @@ class Media
         $this->trick = $trick;
 
         return $this;
+    }
+
+    /**
+     * @return UploadedFile|null
+     */
+    public function getUpdatedBannerFile(): ?UploadedFile
+    {
+        return $this->updatedBannerFile;
+    }
+
+    /**
+     * @param UploadedFile|null $updatedBannerFile
+     */
+    public function setUpdatedBannerFile(?UploadedFile $updatedBannerFile): void
+    {
+        $this->updatedBannerFile = $updatedBannerFile;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmbedUrlUpdated(): ?string
+    {
+        return $this->embedUrlUpdated;
+    }
+
+    /**
+     * @param string|null $embedUrlUpdated
+     */
+    public function setEmbedUrlUpdated(?string $embedUrlUpdated): void
+    {
+        $this->embedUrlUpdated = $embedUrlUpdated;
     }
 
 

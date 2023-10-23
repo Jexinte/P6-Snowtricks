@@ -9,11 +9,11 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class UpdateFile extends AbstractType
+class UpdateBannerFile extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add("updatedFile", FileType::class, options: [
+        $builder->add("updatedBannerFile", FileType::class, options: [
             'label' => 'Sélectionner un fichier',
             'required' => false,
         ])
@@ -25,7 +25,7 @@ class UpdateFile extends AbstractType
         $resolver->setDefaults([
             'data_class' => Media::class,
 
-            'validation_groups' => 'updateTrickFileThatIsNotBanner',
+            'validation_groups' => 'updateBannerFile',
 
             'csrf_protection' => true,
 

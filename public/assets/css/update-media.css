@@ -118,6 +118,10 @@ header {
     padding-top: 1.8em;
 }
 
+#trick-content button {
+    width: 100%;
+}
+
 #banner-trick img {
     width: 100%;
     min-height: 100vh;
