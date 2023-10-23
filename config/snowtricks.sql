@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mer. 11 oct. 2023 à 11:20
+-- Généré le : lun. 23 oct. 2023 à 17:47
 -- Version du serveur : 10.4.28-MariaDB
 -- Version de PHP : 8.2.4
 
@@ -35,6 +35,22 @@ CREATE TABLE `comment` (
   `content` varchar(255) NOT NULL,
   `id_trick` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `comment`
+--
+
+INSERT INTO `comment` (`id`, `id_user`, `user_profile_image`, `created_at`, `content`, `id_trick`) VALUES
+(1, 2, '/assets/img/user-profile/9wlgcd6OmiUp.jpg\r\n', '2023-10-23', 'Commentaire 1', 299),
+(2, 2, '/assets/img/user-profile/9wlgcd6OmiUp.jpg\r\n', '2023-10-23', 'Commentaire 2', 299),
+(3, 2, '/assets/img/user-profile/9wlgcd6OmiUp.jpg\r\n', '2023-10-23', 'Commentaire 3', 299),
+(4, 2, '/assets/img/user-profile/9wlgcd6OmiUp.jpg\r\n', '2023-10-23', 'Commentaire 4', 299),
+(5, 2, '/assets/img/user-profile/9wlgcd6OmiUp.jpg\r\n', '2023-10-23', 'Commentaire 5', 299),
+(6, 2, '/assets/img/user-profile/9wlgcd6OmiUp.jpg\r\n', '2023-10-23', 'Commentaire 6', 299),
+(7, 2, '/assets/img/user-profile/9wlgcd6OmiUp.jpg\r\n', '2023-10-23', 'Commentaire 7', 299),
+(8, 2, '/assets/img/user-profile/9wlgcd6OmiUp.jpg\r\n', '2023-10-23', 'Commentaire 8', 299),
+(9, 2, '/assets/img/user-profile/9wlgcd6OmiUp.jpg\r\n', '2023-10-23', 'Commentaire 9', 299),
+(10, 2, '/assets/img/user-profile/9wlgcd6OmiUp.jpg\r\n', '2023-10-23', 'Commentaire 10', 299);
 
 -- --------------------------------------------------------
 
@@ -87,7 +103,7 @@ CREATE TABLE `trick` (
 --
 
 INSERT INTO `trick` (`id`, `name`, `description`, `trick_group`, `created_at`, `updated_at`, `slug`) VALUES
-(298, 'Indy', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nibh enim, vehicula eu tortor nec, luctus varius justo. Ut bibendum fermentum neque ut rhoncus. Sed finibus non turpis ac porttitor. Proin quis consequat eros. Nulla ipsum purus, mollis eu nisl ', 'Grabs', '2023-10-07 16:42:02', NULL, 'indy'),
+(298, 'Indy', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nibh enim, vehicula eu tortor nec, luctus varius justo. Ut bibendum fermentum neque ut rhoncus. Sed finibus non turpis ac porttitor. Proin quis consequat eros. Nulla ipsum purus, mollis eu nisl', 'Slides', '2023-10-07 16:42:02', NULL, 'indy'),
 (299, 'Big foot', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nibh enim, vehicula eu tortor nec, luctus varius justo. Ut bibendum fermentum neque ut rhoncus. Sed finibus non turpis ac porttitor. Proin quis consequat eros. Nulla ipsum purus, mollis eu nisl ', 'Rotations', '2023-10-07 16:45:07', NULL, 'big-foot'),
 (300, 'Trois six', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nibh enim, vehicula eu tortor nec, luctus varius justo. Ut bibendum fermentum neque ut rhoncus. Sed finibus non turpis ac porttitor. Proin quis consequat eros. Nulla ipsum purus, mollis eu nisl ', 'Rotations', '2023-10-07 16:54:00', NULL, 'trois-six'),
 (301, 'Cinq quatre', 'Maecenas sed libero dapibus, volutpat magna vel, porttitor velit. Praesent consectetur efficitur magna, sed auctor est porttitor a. Maecenas aliquet mi lectus, ac suscipit diam eleifend vel. Vestibulum iaculis nulla eget sollicitudin efficitur. Duis vitae', 'Rotations', '2023-10-07 16:55:14', NULL, 'cinq-quatre'),
@@ -113,6 +129,13 @@ CREATE TABLE `user` (
   `email` varchar(255) NOT NULL,
   `roles` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '(DC2Type:json)' CHECK (json_valid(`roles`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `user`
+--
+
+INSERT INTO `user` (`id`, `username`, `profile_image`, `password`, `status`, `email`, `roles`) VALUES
+(2, 'Test', '/assets/img/user-profile/9wlgcd6OmiUp.jpg', '$2y$10$2O8jtbc34u9VnNnDW6yED.ZJhWH1zFRtrtKOdk6BZRE88UyYGs3r.', 1, 'trains78@live.fr', '[\"ROLE_USER\"]');
 
 --
 -- Index pour les tables déchargées
@@ -154,25 +177,25 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT pour la table `comment`
 --
 ALTER TABLE `comment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT pour la table `media`
 --
 ALTER TABLE `media`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=485;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=563;
 
 --
 -- AUTO_INCREMENT pour la table `trick`
 --
 ALTER TABLE `trick`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=312;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=327;
 
 --
 -- AUTO_INCREMENT pour la table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Contraintes pour les tables déchargées
