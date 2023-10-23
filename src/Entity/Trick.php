@@ -28,7 +28,6 @@ class Trick
         pattern: "/^[A-ZÀ-ÿ][A-Za-zÀ-ÿ, .'\-\n]*$/u",
         message: 'Oops! Le format de votre saisie est incorrect, le nom du trick doit commencer par une lettre majuscule',
         match: true,
-        groups: ['updateTrickContent']
     )]
     private ?string $name = null;
 
@@ -38,7 +37,6 @@ class Trick
         pattern: "/^[A-ZÀ-ÿ][A-Za-zÀ-ÿ, .'\-\n]*$/u",
         message: 'Oops! Le format de votre saisie est incorrect, votre description doit commencer par une lettre majuscule',
         match: true,
-        groups: ['updateTrickContent']
     )]
     private ?string $description = null;
 
