@@ -112,7 +112,6 @@ class TrickController extends AbstractController
         return new Response($this->render("trick.twig", $parameters));
     }
 
-    //TODO REPRENDRE ICI
 
     /**
      * Summary of createTrickPage
