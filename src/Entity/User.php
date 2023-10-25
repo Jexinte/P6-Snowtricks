@@ -122,7 +122,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Summary of __construct
      */
-    public function construct()
+    public function __construct()
     {
         $this->comment = new ArrayCollection();
     }
