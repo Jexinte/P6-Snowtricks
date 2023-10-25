@@ -184,7 +184,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $roles = $this->roles;
         $roles[] = 'ROLEUSER';
-        return arrayunique($roles);
+        return array_unique($roles);
     }
 
     /**
@@ -340,7 +340,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function isCreated(): ?bool
     {
-        if (!isnull($this->created)) {
+        if (!is_null($this->created)) {
             return $this->created;
         }
         return null;
