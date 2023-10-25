@@ -194,7 +194,7 @@ class UserController extends AbstractController
             );
 
             if ($userFound) {
-                $this->_setToken();
+                $this->setToken();
                 $token = $request->getSession()->get("token");;
                 $request->getSession()->set("ask_reset_password", true);
 
@@ -319,13 +319,13 @@ L'équipe Snowtricks
 
 
     /**
-     * Summary of _getToken
+     * Summary of getToken
      *
      * @param Request $request Object
      *
      * @return string|null
      */
-    private function _getToken(Request $request): ?string
+    private function getToken(Request $request): ?string
     {
         $cookie = $request->cookies->get("token");
         if (!empty($cookie)) {
@@ -335,13 +335,13 @@ L'équipe Snowtricks
     }
 
     /**
-     * Summary of _setToken
+     * Summary of setToken
      *
      * @return void
      *
      * @throws \Exception
      */
-    private function _setToken(): void
+    private function setToken(): void
     {
         $session = new Session();
         $response = new Response();
@@ -371,7 +371,7 @@ L'équipe Snowtricks
         MailerInterface $mailer, User $user, Request $request
     ): void {
         if ($user->isCreated()) {
-            $this->_setToken();
+            $this->setToken();
             $request->getSession()->set("username", $user->getUsername());
             $email = (new Email())
                 ->from("snowtricks@gmail.com")
@@ -400,7 +400,7 @@ L'équipe Snowtricks
     #[Route(path: '/signup/account-validation', methods: ["GET"])]
     public function checkToken(Request $request, UserRepository $userRepository
     ): ?Response {
-        $cookie = $this->_getToken($request);
+        $cookie = $this->getToken($request);
         $tokenInSession = $request->getSession()->get('token');
         $response = new Response();
         if (!is_null($cookie) && $cookie == $tokenInSession) {
