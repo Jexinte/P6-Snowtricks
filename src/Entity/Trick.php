@@ -42,7 +42,7 @@ class Trick
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $_id = null;
+    private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message:'Ce champ ne peut être vide !')]
@@ -51,7 +51,7 @@ class Trick
         message: 'Oops! Le format de votre saisie est incorrect, le nom du trick doit commencer par une lettre majuscule',
         match: true,
     )]
-    private ?string $_name = null;
+    private ?string $name = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message:'Ce champ ne peut être vide !')]
@@ -60,42 +60,42 @@ class Trick
         message: 'Oops! Le format de votre saisie est incorrect, votre description doit commencer par une lettre majuscule',
         match: true,
     )]
-    private ?string $_description = null;
+    private ?string $description = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message:'Ce champ ne peut être vide !')]
-    private ?string $_trickGroup = null;
+    private ?string $trickGroup = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $_created_at = null;
+    private ?\DateTimeInterface $created_at = null;
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $_updated_at = null;
+    private ?\DateTimeInterface $updated_at = null;
 
 
 
 
     #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Media::class, cascade: ['persist', 'remove'])]
-    private Collection $_media;
+    private Collection $media;
 
     #[Assert\Type(type:Media::class)]
     #[Assert\Valid]
-    private mixed $_mediaForm;
+    private mixed $mediaForm;
     #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Comment::class, cascade: ['persist', 'remove'])]
-    private Collection $_comment;
+    private Collection $comment;
 
     /**
      * Summary of __construct
      */
     public function __construct()
     {
-        $this->_media = new ArrayCollection();
-        $this->_comment = new ArrayCollection();
+        $this->media = new ArrayCollection();
+        $this->comment = new ArrayCollection();
 
     }
 
     #[ORM\Column(length: 128)]
     #[Gedmo\Slug(fields:['name'])]
-    private string $_slug;
+    private string $slug;
 
     /**
      * Summary of getId
@@ -104,7 +104,7 @@ class Trick
      */
     public function getId(): ?int
     {
-        return $this->_id;
+        return $this->id;
     }
 
     /**
@@ -114,7 +114,7 @@ class Trick
      */
     public function getName(): ?string
     {
-        return $this->_name;
+        return $this->name;
     }
 
     /**
@@ -126,7 +126,7 @@ class Trick
      */
     public function setName(string $name): static
     {
-        $this->_name = $name;
+        $this->name = $name;
 
         return $this;
     }
@@ -138,7 +138,7 @@ class Trick
      */
     public function getDescription(): ?string
     {
-        return $this->_description;
+        return $this->description;
     }
 
     /**
@@ -150,7 +150,7 @@ class Trick
      */
     public function setDescription(string $description): static
     {
-        $this->_description = $description;
+        $this->description = $description;
 
         return $this;
     }
@@ -162,7 +162,7 @@ class Trick
      */
     public function getTrickGroup(): ?string
     {
-        return $this->_trickGroup;
+        return $this->trickGroup;
     }
 
     /**
@@ -174,7 +174,7 @@ class Trick
      */
     public function setTrickGroup(string $trickGroup): static
     {
-        $this->_trickGroup = $trickGroup;
+        $this->trickGroup = $trickGroup;
 
         return $this;
     }
@@ -188,7 +188,7 @@ class Trick
      */
     public function getMedia(): Collection
     {
-        return $this->_media;
+        return $this->media;
     }
 
     /**
@@ -200,8 +200,8 @@ class Trick
      */
     public function addMedia(Media $media): static
     {
-        if (!$this->_media->contains($media)) {
-            $this->_media->add($media);
+        if (!$this->media->contains($media)) {
+            $this->media->add($media);
             $media->setTrick($this);
         }
 
@@ -215,7 +215,7 @@ class Trick
      */
     public function getComment(): Collection
     {
-        return $this->_comment;
+        return $this->comment;
     }
 
     /**
@@ -227,8 +227,8 @@ class Trick
      */
     public function addComment(Comment $comment): static
     {
-        if (!$this->_comment->contains($comment)) {
-            $this->_comment->add($comment);
+        if (!$this->comment->contains($comment)) {
+            $this->comment->add($comment);
             $comment->setTrick($this);
         }
 
@@ -243,7 +243,7 @@ class Trick
      */
     public function getMediaForm()
     {
-        return $this->_mediaForm;
+        return $this->mediaForm;
     }
 
     /**
@@ -255,7 +255,7 @@ class Trick
      */
     public function setMediaForm($mediaForm): void
     {
-        $this->_mediaForm = $mediaForm;
+        $this->mediaForm = $mediaForm;
     }
 
 
@@ -267,7 +267,7 @@ class Trick
      */
     public function getCreatedAt(): ?\DateTimeInterface
     {
-        return $this->_created_at;
+        return $this->created_at;
     }
 
     /**
@@ -279,7 +279,7 @@ class Trick
      */
     public function setCreatedAt(?\DateTimeInterface $created_at): void
     {
-        $this->_created_at = $created_at;
+        $this->created_at = $created_at;
     }
 
     /**
@@ -289,7 +289,7 @@ class Trick
      */
     public function getUpdatedAt(): ?\DateTimeInterface
     {
-        return $this->_updated_at;
+        return $this->updated_at;
     }
 
     /**
@@ -301,7 +301,7 @@ class Trick
      */
     public function setUpdatedAt(?\DateTimeInterface $updated_at): void
     {
-        $this->_updated_at = $updated_at;
+        $this->updated_at = $updated_at;
     }
 
     /**
@@ -311,7 +311,7 @@ class Trick
      */
     public function getSlug(): string
     {
-        return $this->_slug;
+        return $this->slug;
     }
 
 

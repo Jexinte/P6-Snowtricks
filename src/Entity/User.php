@@ -42,7 +42,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $_id = null;
+    private ?int $id = null;
 
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
@@ -55,11 +55,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         groups: ['signUp'],
     )]
     #[ORM\Column(length: 255, unique: true)]
-    private ?string $_username = null;
+    private ?string $username = null;
 
 
     #[ORM\Column(length: 255)]
-    private ?string $_profileImage;
+    private ?string $profileImage;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(
@@ -67,12 +67,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         groups: ['signUp'],
     )]
     #[Assert\Regex(
-        pattern: '/^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$/',
+        pattern: '/^[a-z0-9.-]+@[a-z0-9.-]{2,}\.[a-z]{2,4}$/',
         message: 'Oops! Le format de votre saisie est incorrect,merci de suivre le format requis : nomadressemail@domaine.extension',
         match: true,
         groups: ['signUp'],
     )]
-    private ?string $_email = null;
+    private ?string $email = null;
 
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
@@ -85,15 +85,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         groups: ['signUp', 'resetPassword'],
     )]
     #[ORM\Column(length: 255)]
-    private ?string $_password = null;
+    private ?string $password = null;
 
     #[ORM\Column(length: 1)]
-    private ?bool $_status = null;
+    private ?bool $status = null;
 
 
     #[ORM\Column(type: 'json')]
-    private array $_roles = [];
-    private ?bool $_created;
+    private array $roles = [];
+    private ?bool $created;
     #[Assert\File(
         maxSize: '3000K',
         groups: ['signUp'],
@@ -101,30 +101,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
     )]
     #[Assert\NotBlank(message: 'Veuillez sélectionner un fichier !', groups: ['signUp'])]
-    private UploadedFile $_file;
+    private UploadedFile $file;
 
-    private ?int $_userId = null;
+    private ?int $userId = null;
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
         groups: ['resetPassword'],
     )]
-    private string $_oldPassword;
+    private string $oldPassword;
 
-    private ?bool $_credentialsValid = null;
+    private ?bool $credentialsValid = null;
 
-    private ?bool $_nameExist = null;
-    private ?bool $_passwordIsCorrect = null;
-    private ?bool $_accountIsActivate = null;
+    private ?bool $nameExist = null;
+    private ?bool $passwordIsCorrect = null;
+    private ?bool $accountIsActivate = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Comment::class, cascade: ['persist'])]
-    private Collection $_comment;
+    private Collection $comment;
 
     /**
-     * Summary of __construct
+     * Summary of construct
      */
-    public function __construct()
+    public function construct()
     {
-        $this->_comment = new ArrayCollection();
+        $this->comment = new ArrayCollection();
     }
 
     /**
@@ -134,7 +134,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getId(): ?int
     {
-        return $this->_id;
+        return $this->id;
     }
 
     /**
@@ -144,7 +144,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUsername(): ?string
     {
-        return $this->_username;
+        return $this->username;
     }
 
     /**
@@ -156,7 +156,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function setUsername(string $username): static
     {
-        $this->_username = $username;
+        $this->username = $username;
 
         return $this;
     }
@@ -170,7 +170,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string)$this->_username;
+        return (string)$this->username;
     }
 
     /**
@@ -182,9 +182,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-        $roles = $this->_roles;
-        $roles[] = 'ROLE_USER';
-        return array_unique($roles);
+        $roles = $this->roles;
+        $roles[] = 'ROLEUSER';
+        return arrayunique($roles);
     }
 
     /**
@@ -196,7 +196,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function setRoles(array $roles): self
     {
-        $this->_roles = $roles;
+        $this->roles = $roles;
 
         return $this;
     }
@@ -219,7 +219,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getProfileImage(): ?string
     {
-        return $this->_profileImage;
+        return $this->profileImage;
     }
 
     /**
@@ -231,7 +231,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function setProfileImage(string $profileImage): static
     {
-        $this->_profileImage = $profileImage;
+        $this->profileImage = $profileImage;
 
         return $this;
     }
@@ -243,7 +243,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getFile(): ?UploadedFile
     {
-        return $this->_file;
+        return $this->file;
     }
 
     /**
@@ -255,7 +255,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function setFile(UploadedFile $file): static
     {
-        $this->_file = $file;
+        $this->file = $file;
 
         return $this;
     }
@@ -267,7 +267,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getEmail(): ?string
     {
-        return $this->_email;
+        return $this->email;
     }
 
     /**
@@ -279,7 +279,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function setEmail(string $email): static
     {
-        $this->_email = $email;
+        $this->email = $email;
 
         return $this;
     }
@@ -292,7 +292,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getPassword(): ?string
     {
-        return $this->_password;
+        return $this->password;
     }
 
     /**
@@ -304,7 +304,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function setPassword(string $password): static
     {
-        $this->_password = $password;
+        $this->password = $password;
 
         return $this;
     }
@@ -317,7 +317,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getStatus(): ?bool
     {
-        return $this->_status;
+        return $this->status;
     }
 
     /**
@@ -329,7 +329,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function setStatus(bool $status): static
     {
-        $this->_status = $status;
+        $this->status = $status;
         return $this;
     }
 
@@ -340,8 +340,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function isCreated(): ?bool
     {
-        if (!is_null($this->_created)) {
-            return $this->_created;
+        if (!isnull($this->created)) {
+            return $this->created;
         }
         return null;
     }
@@ -355,7 +355,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function setCreated(bool $created): void
     {
-        $this->_created = $created;
+        $this->created = $created;
     }
 
     /**
@@ -365,7 +365,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getOldPassword(): string
     {
-        return $this->_oldPassword;
+        return $this->oldPassword;
     }
 
     /**
@@ -377,7 +377,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function setOldPassword(string $oldPassword): void
     {
-        $this->_oldPassword = $oldPassword;
+        $this->oldPassword = $oldPassword;
     }
 
     /**
@@ -387,7 +387,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getCredentialsValid(): ?bool
     {
-        return $this->_credentialsValid;
+        return $this->credentialsValid;
     }
 
     /**
@@ -399,7 +399,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function isCredentialsValid(?bool $credentialsValid): void
     {
-        $this->_credentialsValid = $credentialsValid;
+        $this->credentialsValid = $credentialsValid;
     }
 
     /**
@@ -409,7 +409,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUsernameExist(): ?bool
     {
-        return $this->_nameExist;
+        return $this->nameExist;
     }
 
     /**
@@ -421,7 +421,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function isNameExist(?bool $nameExist): void
     {
-        $this->_nameExist = $nameExist;
+        $this->nameExist = $nameExist;
     }
 
 
@@ -434,7 +434,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function isPasswordCorrect(?bool $passwordIsCorrect): void
     {
-        $this->_passwordIsCorrect = $passwordIsCorrect;
+        $this->passwordIsCorrect = $passwordIsCorrect;
     }
 
     /**
@@ -444,7 +444,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getPasswordCorrect(): ?bool
     {
-        return $this->_passwordIsCorrect;
+        return $this->passwordIsCorrect;
     }
 
     /**
@@ -454,7 +454,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getAccountIsActivate(): ?bool
     {
-        return $this->_accountIsActivate;
+        return $this->accountIsActivate;
     }
 
     /**
@@ -466,7 +466,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function isAccountActivate(?bool $accountIsActivate): void
     {
-        $this->_accountIsActivate = $accountIsActivate;
+        $this->accountIsActivate = $accountIsActivate;
     }
 
     /**
@@ -476,7 +476,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserId(): ?int
     {
-        return $this->_userId;
+        return $this->userId;
     }
 
     /**
@@ -488,7 +488,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function setUserId(?int $userId): void
     {
-        $this->_userId = $userId;
+        $this->userId = $userId;
     }
 
     /**
@@ -498,7 +498,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getComment(): Collection
     {
-        return $this->_comment;
+        return $this->comment;
     }
 
     /**
@@ -510,8 +510,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function addComment(Comment $comment): static
     {
-        if (!$this->_comment->contains($comment)) {
-            $this->_comment->add($comment);
+        if (!$this->comment->contains($comment)) {
+            $this->comment->add($comment);
             $comment->setUser($this);
         }
 

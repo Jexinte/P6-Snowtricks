@@ -36,18 +36,18 @@ class Media
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $_id = null;
+    private ?int $id = null;
 
     #[ORM\Column]
-    private ?int $_idTrick = null;
+    private ?int $idTrick = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $_mediaPath = null;
+    private ?string $mediaPath = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $_mediaType = null;
+    private ?string $mediaType = null;
     #[ORM\Column(length: 255, nullable: true)]
-    private ?bool $_isBanner = null;
+    private ?bool $isBanner = null;
 
 
     #[Assert\All(
@@ -57,7 +57,7 @@ class Media
             extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !',
         )
     )]
-    private array $_images;
+    private array $images;
 
 
     #[Assert\All(
@@ -67,21 +67,21 @@ class Media
             extensionsMessage: 'Seuls les fichiers ayant pour extension mp4 sont acceptés !',
         )
     )]
-    private array $_videos;
+    private array $videos;
 
     #[Assert\Regex(
         pattern: '/<iframe[^>]+src="([^"]+)"/i',
         message: "Oops ! Il semblerait que le format de votre url n'est pas bon, merci de vérifier ce qu'il en est",
         match: true,
     )]
-    private ?string $_embedUrl = null;
+    private ?string $embedUrl = null;
     #[Assert\Regex(
         pattern: '/<iframe[^>]+src="([^"]+)"/i',
         message: "Oops ! Il semblerait que le format de votre url n'est pas bon, merci de vérifier ce qu'il en est",
         match: true,
         groups: ['updateTrickUrl']
     )]
-    private ?string $_embedUrlUpdated = null;
+    private ?string $embedUrlUpdated = null;
 
 
     #[Assert\NotBlank(message: 'Veuillez sélectionner un fichier !')]
@@ -90,7 +90,7 @@ class Media
         extensions: ['jpg', 'png', 'webp'],
         extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
     )]
-    private ?UploadedFile $_bannerFile;
+    private ?UploadedFile $bannerFile;
 
 
     #[Assert\File(
@@ -99,18 +99,18 @@ class Media
         extensions: ['jpg', 'png', 'webp', 'mp4'],
         extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
     )]
-    private ?UploadedFile $_updatedFile = null;
+    private ?UploadedFile $updatedFile = null;
     #[Assert\File(
         maxSize: '3000K',
         groups: ['updateBannerFile'],
         extensions: ['jpg', 'png', 'webp'],
         extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
     )]
-    private ?UploadedFile $_updatedBannerFile = null;
+    private ?UploadedFile $updatedBannerFile = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
     #[ORM\JoinColumn(name: 'id_trick', referencedColumnName: 'id', nullable: false)]
-    private ?Trick $_trick = null;
+    private ?Trick $trick = null;
 
     /**
      * Summary of getId
@@ -119,7 +119,7 @@ class Media
      */
     public function getId(): ?int
     {
-        return $this->_id;
+        return $this->id;
     }
 
     /**
@@ -129,7 +129,7 @@ class Media
      */
     public function getIdTrick(): ?int
     {
-        return $this->_idTrick;
+        return $this->idTrick;
     }
 
     /**
@@ -141,7 +141,7 @@ class Media
      */
     public function setIdTrick(int $idTrick): static
     {
-        $this->_idTrick = $idTrick;
+        $this->idTrick = $idTrick;
 
         return $this;
     }
@@ -153,7 +153,7 @@ class Media
      */
     public function getMediaPath(): ?string
     {
-        return $this->_mediaPath;
+        return $this->mediaPath;
     }
 
     /**
@@ -165,7 +165,7 @@ class Media
      */
     public function setMediaPath(string $mediaPath): static
     {
-        $this->_mediaPath = $mediaPath;
+        $this->mediaPath = $mediaPath;
 
         return $this;
     }
@@ -177,7 +177,7 @@ class Media
      */
     public function getMediaType(): ?string
     {
-        return $this->_mediaType;
+        return $this->mediaType;
     }
 
     /**
@@ -189,7 +189,7 @@ class Media
      */
     public function setMediaType(string $mediaType): static
     {
-        $this->_mediaType = $mediaType;
+        $this->mediaType = $mediaType;
 
         return $this;
     }
@@ -202,7 +202,7 @@ class Media
      */
     public function getVideos(): array
     {
-        return $this->_videos;
+        return $this->videos;
     }
 
 
@@ -215,7 +215,7 @@ class Media
      */
     public function setVideos(array $videos): void
     {
-        $this->_videos = $videos;
+        $this->videos = $videos;
     }
 
     /**
@@ -225,7 +225,7 @@ class Media
      */
     public function getIsBanner(): ?bool
     {
-        return $this->_isBanner;
+        return $this->isBanner;
     }
 
     /**
@@ -237,7 +237,7 @@ class Media
      */
     public function setIsBanner(?bool $isBanner = null): void
     {
-        $this->_isBanner = $isBanner;
+        $this->isBanner = $isBanner;
     }
 
     /**
@@ -247,7 +247,7 @@ class Media
      */
     public function getEmbedUrl(): ?string
     {
-        return $this->_embedUrl;
+        return $this->embedUrl;
     }
 
     /**
@@ -259,7 +259,7 @@ class Media
      */
     public function setEmbedUrl(?string $embedUrl): void
     {
-        $this->_embedUrl = $embedUrl;
+        $this->embedUrl = $embedUrl;
     }
 
     /**
@@ -269,7 +269,7 @@ class Media
      */
     public function getBannerFile(): UploadedFile
     {
-        return $this->_bannerFile;
+        return $this->bannerFile;
     }
 
 
@@ -282,7 +282,7 @@ class Media
      */
     public function setBannerFile(UploadedFile $bannerFile): void
     {
-        $this->_bannerFile = $bannerFile;
+        $this->bannerFile = $bannerFile;
     }
 
 
@@ -293,7 +293,7 @@ class Media
      */
     public function getUpdatedFile(): ?UploadedFile
     {
-        return $this->_updatedFile;
+        return $this->updatedFile;
     }
 
     /**
@@ -305,7 +305,7 @@ class Media
      */
     public function setUpdatedFile(?UploadedFile $updatedFile): void
     {
-        $this->_updatedFile = $updatedFile;
+        $this->updatedFile = $updatedFile;
     }
 
 
@@ -316,7 +316,7 @@ class Media
      */
     public function getImages(): array
     {
-        return $this->_images;
+        return $this->images;
     }
 
 
@@ -329,7 +329,7 @@ class Media
      */
     public function setImages(array $images): void
     {
-        $this->_images = $images;
+        $this->images = $images;
     }
 
     /**
@@ -339,7 +339,7 @@ class Media
      */
     public function getTrick(): ?Trick
     {
-        return $this->_trick;
+        return $this->trick;
     }
 
     /**
@@ -351,7 +351,7 @@ class Media
      */
     public function setTrick(?Trick $trick): static
     {
-        $this->_trick = $trick;
+        $this->trick = $trick;
 
         return $this;
     }
@@ -363,7 +363,7 @@ class Media
      */
     public function getUpdatedBannerFile(): ?UploadedFile
     {
-        return $this->_updatedBannerFile;
+        return $this->updatedBannerFile;
     }
 
     /**
@@ -375,7 +375,7 @@ class Media
      */
     public function setUpdatedBannerFile(?UploadedFile $updatedBannerFile): void
     {
-        $this->_updatedBannerFile = $updatedBannerFile;
+        $this->updatedBannerFile = $updatedBannerFile;
     }
 
     /**
@@ -385,7 +385,7 @@ class Media
      */
     public function getEmbedUrlUpdated(): ?string
     {
-        return $this->_embedUrlUpdated;
+        return $this->embedUrlUpdated;
     }
 
     /**
@@ -397,7 +397,7 @@ class Media
      */
     public function setEmbedUrlUpdated(?string $embedUrlUpdated): void
     {
-        $this->_embedUrlUpdated = $embedUrlUpdated;
+        $this->embedUrlUpdated = $embedUrlUpdated;
     }
 
 

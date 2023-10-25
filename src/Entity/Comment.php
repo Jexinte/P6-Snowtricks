@@ -37,39 +37,39 @@ class Comment
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $_id = null;
+    private ?int $id = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $_idUser = null;
+    private ?int $idUser = null;
     #[ORM\Column(nullable: true)]
-    private ?int $_idTrick = null;
+    private ?int $idTrick = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $_userProfileImage = null;
+    private ?string $userProfileImage = null;
 
     #[ORM\Column(type: 'date')]
-    private ?\DateTimeInterface $_createdAt = null;
+    private ?\DateTimeInterface $createdAt = null;
 
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Ce champ ne peut être vide !')]
     #[Assert\Regex(
-        pattern: '/^[A-ZÀ-ÿ][A-ZÀ-ÿa-zÀ-ÿ0-9\s\-\_\!\@\#\$\%\&\'\(\)\*\+\,\.\:\/\;\=\?\[\]\^\`\{\|\}\~]{0,498}[A-ZÀ-ÿa-zÀ-ÿ0-9\s\-\_\!\@\#\$\%\&\'\(\)\*\+\,\.\:\/\;\=\?\[\]\^\`\{\|\}\~]$/',
+        pattern: '/^[A-ZÀ-ÿ][A-ZÀ-ÿa-zÀ-ÿ0-9\s\-\\!\@\#\$\%\&\'\(\)\*\+\,\.\:\/\;\=\?\[\]\^\`\{\|\}\~]{0,498}[A-ZÀ-ÿa-zÀ-ÿ0-9\s\-\\!\@\#\$\%\&\'\(\)\*\+\,\.\:\/\;\=\?\[\]\^\`\{\|\}\~]$/',
         message: 'Un commentaire 
     doit commencer par une lettre majuscule
      et ne peut excéder 500 caractères',
         match: true,
     )]
-    private ?string $_content = null;
+    private ?string $content = null;
 
-    private ?string $_username = null;
+    private ?string $username = null;
 
     #[ORM\ManyToOne(inversedBy: 'comment')]
     #[ORM\JoinColumn(name: 'id_trick', referencedColumnName: 'id', nullable: false)]
-    private ?Trick $_trick = null;
+    private ?Trick $trick = null;
     #[ORM\ManyToOne(inversedBy: 'comment')]
     #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id', nullable: false)]
-    private ?User $_user = null;
+    private ?User $user = null;
 
     /**
      * Summary of getId
@@ -78,7 +78,7 @@ class Comment
      */
     public function getId(): ?int
     {
-        return $this->_id;
+        return $this->id;
     }
 
     /**
@@ -88,7 +88,7 @@ class Comment
      */
     public function getIdUser(): ?int
     {
-        return $this->_idUser;
+        return $this->idUser;
     }
 
     /**
@@ -100,7 +100,7 @@ class Comment
      */
     public function setIdUser(?int $idUser): static
     {
-        $this->_idUser = $idUser;
+        $this->idUser = $idUser;
 
         return $this;
     }
@@ -112,7 +112,7 @@ class Comment
      */
     public function getUserProfileImage(): ?string
     {
-        return $this->_userProfileImage;
+        return $this->userProfileImage;
     }
 
     /**
@@ -124,7 +124,7 @@ class Comment
      */
     public function setUserProfileImage(string $userProfileImage): static
     {
-        $this->_userProfileImage = $userProfileImage;
+        $this->userProfileImage = $userProfileImage;
 
         return $this;
     }
@@ -137,7 +137,7 @@ class Comment
      */
     public function getContent(): ?string
     {
-        return $this->_content;
+        return $this->content;
     }
 
     /**
@@ -149,7 +149,7 @@ class Comment
      */
     public function setContent(string $content): static
     {
-        $this->_content = $content;
+        $this->content = $content;
 
         return $this;
     }
@@ -161,7 +161,7 @@ class Comment
      */
     public function getIdTrick(): ?int
     {
-        return $this->_idTrick;
+        return $this->idTrick;
     }
 
     /**
@@ -173,7 +173,7 @@ class Comment
      */
     public function setIdTrick(?int $idTrick): void
     {
-        $this->_idTrick = $idTrick;
+        $this->idTrick = $idTrick;
     }
 
     /**
@@ -185,7 +185,7 @@ class Comment
      */
     public function setUsername(?string $username): void
     {
-        $this->_username = $username;
+        $this->username = $username;
     }
 
     /**
@@ -195,7 +195,7 @@ class Comment
      */
     public function getUsername(): string
     {
-        return $this->_username;
+        return $this->username;
     }
 
     /**
@@ -205,7 +205,7 @@ class Comment
      */
     public function getTrick(): ?Trick
     {
-        return $this->_trick;
+        return $this->trick;
     }
 
 
@@ -218,7 +218,7 @@ class Comment
      */
     public function setTrick(?Trick $trick): void
     {
-        $this->_trick = $trick;
+        $this->trick = $trick;
     }
 
     /**
@@ -228,7 +228,7 @@ class Comment
      */
     public function getUser(): ?User
     {
-        return $this->_user;
+        return $this->user;
     }
 
     /**
@@ -240,7 +240,7 @@ class Comment
      */
     public function setUser(?User $user): void
     {
-        $this->_user = $user;
+        $this->user = $user;
     }
 
     /**
@@ -250,7 +250,7 @@ class Comment
      */
     public function getCreatedAt(): ?\DateTimeInterface
     {
-        return $this->_createdAt;
+        return $this->createdAt;
     }
 
     /**
@@ -262,6 +262,6 @@ class Comment
      */
     public function setCreatedAt(?\DateTimeInterface $createdAt): void
     {
-        $this->_createdAt = $createdAt;
+        $this->createdAt = $createdAt;
     }
 }
