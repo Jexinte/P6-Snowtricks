@@ -16,7 +16,6 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Enumeration\UserStatus;
-use App\Enumeration\CodeStatus;
 use App\Form\Type\ForgotPassword;
 use App\Form\Type\ResetPassword;
 use App\Repository\UserRepository;
@@ -118,7 +117,7 @@ class UserController extends AbstractController
         $parameters["form"] = $form;
         return new Response(
             $this->render("sign_up.twig", $parameters),
-            CodeStatus::CLIENT
+            RESPONSE::HTTP_BAD_REQUEST
         );
     }
 
@@ -144,7 +143,7 @@ class UserController extends AbstractController
             $field->addError($error);
             return new Response(
                 $this->render("sign_in.twig", $parameters),
-                CodeStatus::CLIENT
+                RESPONSE::HTTP_BAD_REQUEST
             );
         }
 
@@ -186,7 +185,7 @@ class UserController extends AbstractController
     ): Response {
         $form = $this->createForm(ForgotPassword::class);
         $form->handleRequest($request);
-        $code = CodeStatus::CLIENT;
+        $code = Response::HTTP_BAD_REQUEST;
 
         if ($form->isValid() && $form->isSubmitted()) {
             $user = $form->getData();
@@ -222,7 +221,7 @@ L'équipe Snowtricks
                 $mailer->send($email);
                 $parameters["mail_send"] = 1;
                 $parameters["token"] = $token;
-                $code = CodeStatus::REQUEST_SUCCEED;
+                $code = RESPONSE::HTTP_OK;
             } else {
                 $error = new FormError(
                     'Oops ! Identifiant incorrect. Veuillez vérifier vos informations !'
@@ -314,7 +313,7 @@ L'équipe Snowtricks
         $parameters["user_connected"] = $userConnected;
         return new Response(
             $this->render("reset_password.twig", $parameters),
-            CodeStatus::CLIENT
+            RESPONSE::HTTP_BAD_REQUEST
         );
     }
 
@@ -426,7 +425,7 @@ L'équipe Snowtricks
                 "account_validation.twig",
                 $parameters
             ),
-            CodeStatus::CLIENT
+            Response::HTTP_BAD_REQUEST
         );
     }
 }

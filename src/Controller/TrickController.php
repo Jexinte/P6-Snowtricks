@@ -14,7 +14,6 @@
 namespace App\Controller;
 
 use App\Entity\Media;
-use App\Enumeration\CodeStatus;
 use App\Form\Type\AddComment;
 use App\Form\Type\CreateTrick;
 use App\Form\Type\CreateTrickMedia;
@@ -185,7 +184,7 @@ class TrickController extends AbstractController
         $parameters["form"] = $form;
         return new Response(
             $this->render("create_trick.twig", $parameters),
-            CodeStatus::CLIENT
+            Response::HTTP_BAD_REQUEST
         );
     }
 

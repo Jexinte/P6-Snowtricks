@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Enumeration\CodeStatus;
 
 /**
  * Handle display of error templates
@@ -57,7 +56,7 @@ class ErrorController extends AbstractController
     #[Route('/error/401', name: 'unauthorized', methods: ["GET"])]
     public function error401(): Response
     {
-        return new Response($this->render('/bundles/TwigBundle/Exception/error401.html.twig'), CodeStatus::UNAUTHORIZED);
+        return new Response($this->render('/bundles/TwigBundle/Exception/error401.html.twig'), Response::HTTP_UNAUTHORIZED);
     }
 
     /**
@@ -70,7 +69,7 @@ class ErrorController extends AbstractController
     {
         return new Response(
             $this->render('/bundles/TwigBundle/Exception/error404.html.twig'),
-            CodeStatus::RESSOURCE_NOT_FOUND
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -82,7 +81,7 @@ class ErrorController extends AbstractController
     #[Route('/error/500', name: 'server_down', methods: ["GET"])]
     public function error500(): Response
     {
-        return new Response($this->render('/bundles/TwigBundle/Exception/error.html.twig'), CodeStatus::SERVER);
+        return new Response($this->render('/bundles/TwigBundle/Exception/error.html.twig'), Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
 

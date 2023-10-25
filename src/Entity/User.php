@@ -120,7 +120,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $comment;
 
     /**
-     * Summary of construct
+     * Summary of __construct
      */
     public function construct()
     {
