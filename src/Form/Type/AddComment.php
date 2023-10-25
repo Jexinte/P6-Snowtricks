@@ -15,16 +15,19 @@ class AddComment extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add("content", TextType::class, options: [
+        $builder->add(
+            "content", TextType::class, options: [
             'label' => "Ajouter un commentaire",
             'required' => false,
             "attr" => ["placeholder" => "Exprimez-vous !"]
-        ])->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']]);
+            ]
+        )->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(
+            [
             'data_class' => Comment::class,
 
             'csrf_protection' => true,
@@ -32,6 +35,7 @@ class AddComment extends AbstractType
             'csrf_field_name' => '_token',
 
             'csrf_token_id' => 'add_comment',
-        ]);
+            ]
+        );
     }
 }

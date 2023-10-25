@@ -14,17 +14,19 @@ class Login extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add("username", TextType::class, options: [
+        $builder->add(
+            "username", TextType::class, options: [
             'label' => 'Utilisateur',
             'required' => false,
-        ])
+            ]
+        )
             ->add(
                 'password',
                 PasswordType::class,
                 options: [
                 'label' => 'Mot de passe',
                 'required' => false,
-            ]
+                ]
             )->setAction('post')
 
             ->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']]);
@@ -32,7 +34,8 @@ class Login extends AbstractType
     }
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(
+            [
             'data_class'      => User::class,
 
             'validation_groups' => 'login',
@@ -42,6 +45,7 @@ class Login extends AbstractType
             'csrf_field_name' => '_token',
 
             'csrf_token_id'   => 'login',
-        ]);
+            ]
+        );
     }
 }

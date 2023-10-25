@@ -10,11 +10,21 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
 
 class AuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
+    /**
+     *
+     * @param UrlGeneratorInterface $urlGenerator
+     */
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
     ) {
     }
 
+    /**
+     *
+     * @param  Request                      $request
+     * @param  AuthenticationException|null $authException
+     * @return RedirectResponse
+     */
     public function start(Request $request, AuthenticationException $authException = null): RedirectResponse
     {
         return new RedirectResponse($this->urlGenerator->generate('unauthorized'));

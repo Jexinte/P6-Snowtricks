@@ -1,5 +1,15 @@
 <?php
-
+/**
+ * Handle user properties
+ *
+ * PHP version 8
+ *
+ * @category Entity
+ * @package  User
+ * @author   Yokke <mdembelepro@gmail.com>
+ * @license  ISC License
+ * @link     https://github.com/Jexinte/P6-Snowtricks
+ */
 namespace App\Entity;
 
 use App\Repository\UserRepository;
@@ -15,12 +25,24 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[UniqueEntity(fields: 'username', message: 'Oops ! Le nom d\'utilisateur n\'est pas disponible, veuillez en définir un autre !', groups: ['signUp'])]
 #[UniqueEntity(fields: 'email', message: 'Oops ! L\'adresse email n\'est pas disponible, veuillez en définir un autre !', groups: ['signUp'])]
+
+/**
+ * Handle user properties
+ *
+ * PHP version 8
+ *
+ * @category Entity
+ * @package  User
+ * @author   Yokke <mdembelepro@gmail.com>
+ * @license  ISC License
+ * @link     https://github.com/Jexinte/P6-Snowtricks
+ */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private ?int $_id = null;
 
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
@@ -33,11 +55,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         groups: ['signUp'],
     )]
     #[ORM\Column(length: 255, unique: true)]
-    private ?string $username = null;
+    private ?string $_username = null;
 
 
     #[ORM\Column(length: 255)]
-    private ?string $profileImage;
+    private ?string $_profileImage;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(
@@ -50,7 +72,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         match: true,
         groups: ['signUp'],
     )]
-    private ?string $email = null;
+    private ?string $_email = null;
 
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
@@ -63,17 +85,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         groups: ['signUp', 'resetPassword'],
     )]
     #[ORM\Column(length: 255)]
-    private ?string $password = null;
+    private ?string $_password = null;
 
     #[ORM\Column(length: 1)]
-    private ?bool $status = null;
+    private ?bool $_status = null;
 
-    /**
-     * @var array<string>
-     */
+
     #[ORM\Column(type: 'json')]
-    private array $roles = [];
-    private ?bool $created;
+    private array $_roles = [];
+    private ?bool $_created;
     #[Assert\File(
         maxSize: '3000K',
         groups: ['signUp'],
@@ -81,255 +101,417 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
     )]
     #[Assert\NotBlank(message: 'Veuillez sélectionner un fichier !', groups: ['signUp'])]
-    private UploadedFile $file;
+    private UploadedFile $_file;
 
-    private ?int $userId = null;
+    private ?int $_userId = null;
     #[Assert\NotBlank(
         message: 'Ce champ ne peut être vide !',
         groups: ['resetPassword'],
     )]
-    private string $oldPassword;
+    private string $_oldPassword;
 
-    private ?bool $credentialsValid = null;
+    private ?bool $_credentialsValid = null;
 
-    private ?bool $nameExist = null;
-    private ?bool $passwordIsCorrect = null;
-    private ?bool $accountIsActivate = null;
+    private ?bool $_nameExist = null;
+    private ?bool $_passwordIsCorrect = null;
+    private ?bool $_accountIsActivate = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Comment::class, cascade: ['persist'])]
-    private Collection $comment;
+    private Collection $_comment;
 
+    /**
+     * Summary of __construct
+     */
     public function __construct()
     {
-        $this->comment = new ArrayCollection();
+        $this->_comment = new ArrayCollection();
     }
 
+    /**
+     * Summary of getId
+     *
+     * @return int|null
+     */
     public function getId(): ?int
     {
-        return $this->id;
+        return $this->_id;
     }
 
+    /**
+     * Summary of getUsername
+     *
+     * @return string|null
+     */
     public function getUsername(): ?string
     {
-        return $this->username;
+        return $this->_username;
     }
 
+    /**
+     * Summary of setUsername
+     *
+     * @param string $username string
+     *
+     * @return $this
+     */
     public function setUsername(string $username): static
     {
-        $this->username = $username;
+        $this->_username = $username;
 
         return $this;
     }
 
     /**
+     * Summary of getUserIdentifier
+     *
      * @see UserInterface
+     *
+     * @return string
      */
     public function getUserIdentifier(): string
     {
-        return (string)$this->username;
+        return (string)$this->_username;
     }
 
     /**
+     * Summary of getRoles
+     *
      * @see UserInterface
+     *
+     * @return array
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
+        $roles = $this->_roles;
         $roles[] = 'ROLE_USER';
         return array_unique($roles);
     }
 
     /**
-     * @param array<string> $roles
+     * Summary of setRoles
+     *
+     * @param array<string> $roles array
+     *
      * @return $this
      */
     public function setRoles(array $roles): self
     {
-        $this->roles = $roles;
+        $this->_roles = $roles;
 
         return $this;
     }
 
     /**
+     * Summary of eraseCredentials
+     *
      * @see UserInterface
+     *
+     * @return void
      */
     public function eraseCredentials(): void
     {
     }
 
+    /**
+     * Summary of getProfileImage
+     *
+     * @return string|null
+     */
     public function getProfileImage(): ?string
     {
-        return $this->profileImage;
+        return $this->_profileImage;
     }
 
+    /**
+     * Summary of setProfileImage
+     *
+     * @param string $profileImage string
+     *
+     * @return $this
+     */
     public function setProfileImage(string $profileImage): static
     {
-        $this->profileImage = $profileImage;
-
-        return $this;
-    }
-
-    public function getFile(): ?UploadedFile
-    {
-        return $this->file;
-    }
-
-    public function setFile(UploadedFile $file): static
-    {
-        $this->file = $file;
-
-        return $this;
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): static
-    {
-        $this->email = $email;
+        $this->_profileImage = $profileImage;
 
         return $this;
     }
 
     /**
-     * @see PasswordAuthenticatedUserInterface
+     * Summary of getFile
+     *
+     * @return UploadedFile|null
+     */
+    public function getFile(): ?UploadedFile
+    {
+        return $this->_file;
+    }
+
+    /**
+     * Summary of setFile
+     *
+     * @param UploadedFile $file Object
+     *
+     * @return $this
+     */
+    public function setFile(UploadedFile $file): static
+    {
+        $this->_file = $file;
+
+        return $this;
+    }
+
+    /**
+     * Summary of getEmail
+     *
+     * @return string|null
+     */
+    public function getEmail(): ?string
+    {
+        return $this->_email;
+    }
+
+    /**
+     * Summary of setEmail
+     *
+     * @param string $email string
+     *
+     * @return $this
+     */
+    public function setEmail(string $email): static
+    {
+        $this->_email = $email;
+
+        return $this;
+    }
+
+    /**
+     * Summary of getPassword
+     *
+     * @return string|null
+     * @see    PasswordAuthenticatedUserInterface
      */
     public function getPassword(): ?string
     {
-        return $this->password;
+        return $this->_password;
     }
 
+    /**
+     * Summary of setPassword
+     *
+     * @param string $password string
+     *
+     * @return $this
+     */
     public function setPassword(string $password): static
     {
-        $this->password = $password;
+        $this->_password = $password;
 
         return $this;
     }
 
 
+    /**
+     * Summary of getStatus
+     *
+     * @return bool|null
+     */
     public function getStatus(): ?bool
     {
-        return $this->status;
+        return $this->_status;
     }
 
+    /**
+     * Summary of setStatus
+     *
+     * @param bool $status bool
+     *
+     * @return $this
+     */
     public function setStatus(bool $status): static
     {
-        $this->status = $status;
+        $this->_status = $status;
         return $this;
     }
 
+    /**
+     * Summary of isCreated
+     *
+     * @return bool|null
+     */
     public function isCreated(): ?bool
     {
-        if (!is_null($this->created)) {
-            return $this->created;
+        if (!is_null($this->_created)) {
+            return $this->_created;
         }
         return null;
     }
 
+    /**
+     * Summary of setCreated
+     *
+     * @param bool $created bool
+     *
+     * @return void
+     */
     public function setCreated(bool $created): void
     {
-        $this->created = $created;
-    }
-
-    public function getOldPassword(): string
-    {
-        return $this->oldPassword;
-    }
-
-    public function setOldPassword(string $oldPassword): void
-    {
-        $this->oldPassword = $oldPassword;
+        $this->_created = $created;
     }
 
     /**
+     * Summary of getOldPassword
+     *
+     * @return string
+     */
+    public function getOldPassword(): string
+    {
+        return $this->_oldPassword;
+    }
+
+    /**
+     * Summary of setOldPassword
+     *
+     * @param string $oldPassword string
+     *
+     * @return void
+     */
+    public function setOldPassword(string $oldPassword): void
+    {
+        $this->_oldPassword = $oldPassword;
+    }
+
+    /**
+     * Summary of getCredentialsValid
+     *
      * @return bool|null
      */
     public function getCredentialsValid(): ?bool
     {
-        return $this->credentialsValid;
+        return $this->_credentialsValid;
     }
 
     /**
-     * @param bool|null $credentialsValid
+     * Summary of isCredentialsValid
+     *
+     * @param bool|null $credentialsValid ?bool
+     *
+     * @return void
      */
     public function isCredentialsValid(?bool $credentialsValid): void
     {
-        $this->credentialsValid = $credentialsValid;
+        $this->_credentialsValid = $credentialsValid;
     }
 
     /**
+     * Summary of getUsernameExist
+     *
      * @return bool|null
      */
     public function getUsernameExist(): ?bool
     {
-        return $this->nameExist;
+        return $this->_nameExist;
     }
 
     /**
-     * @param bool|null $nameExist
+     * Summary of isNameExist
+     *
+     * @param bool|null $nameExist ?bool
+     *
+     * @return void
      */
     public function isNameExist(?bool $nameExist): void
     {
-        $this->nameExist = $nameExist;
+        $this->_nameExist = $nameExist;
     }
 
 
     /**
-     * @param bool|null $passwordIsCorrect
+     * Summary of isPasswordCorrect
+     *
+     * @param bool|null $passwordIsCorrect ?bool
+     *
+     * @return void
      */
     public function isPasswordCorrect(?bool $passwordIsCorrect): void
     {
-        $this->passwordIsCorrect = $passwordIsCorrect;
-    }
-
-    public function getPasswordCorrect(): ?bool
-    {
-        return $this->passwordIsCorrect;
+        $this->_passwordIsCorrect = $passwordIsCorrect;
     }
 
     /**
+     * Summary of getPasswordCorrect
+     *
+     * @return bool|null
+     */
+    public function getPasswordCorrect(): ?bool
+    {
+        return $this->_passwordIsCorrect;
+    }
+
+    /**
+     * Summary of getAccountIsActivate
+     *
      * @return bool|null
      */
     public function getAccountIsActivate(): ?bool
     {
-        return $this->accountIsActivate;
+        return $this->_accountIsActivate;
     }
 
     /**
-     * @param bool|null $accountIsActivate
+     * Summary of isAccountActivate
+     *
+     * @param bool|null $accountIsActivate ?bool
+     *
+     * @return void
      */
     public function isAccountActivate(?bool $accountIsActivate): void
     {
-        $this->accountIsActivate = $accountIsActivate;
+        $this->_accountIsActivate = $accountIsActivate;
     }
 
     /**
-     * @return int
+     * Summary of getUserId
+     *
+     * @return int|null
      */
     public function getUserId(): ?int
     {
-        return $this->userId;
+        return $this->_userId;
     }
 
     /**
-     * @param int $userId
+     * Summary of setUserId
+     *
+     * @param int|null $userId int
+     *
+     * @return void
      */
     public function setUserId(?int $userId): void
     {
-        $this->userId = $userId;
+        $this->_userId = $userId;
     }
 
+    /**
+     * Summary of getComment
+     *
+     * @return Collection
+     */
     public function getComment(): Collection
     {
-        return $this->comment;
+        return $this->_comment;
     }
 
+    /**
+     * Summary of addComment
+     *
+     * @param Comment $comment Object
+     * 
+     * @return $this
+     */
     public function addComment(Comment $comment): static
     {
-        if (!$this->comment->contains($comment)) {
-            $this->comment->add($comment);
+        if (!$this->_comment->contains($comment)) {
+            $this->_comment->add($comment);
             $comment->setUser($this);
         }
 

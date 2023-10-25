@@ -13,26 +13,30 @@ class ForgotPassword extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('username', TextType::class, options:[
+        $builder->add(
+            'username', TextType::class, options:[
             'label' => 'Utilisateur',
             'required' => false,
 
             'attr' => ['placeholder' => 'John']
-        ])->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']])
+            ]
+        )->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']])
             ->setMethod('POST');
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-           'data_class' => User::class,
-           'validation_groups' => 'forgotPassword',
+        $resolver->setDefaults(
+            [
+            'data_class' => User::class,
+            'validation_groups' => 'forgotPassword',
 
             'csrf_protection' => true,
 
             'csrf_field_name' => '_token',
 
             'csrf_token_id'   => 'reset_password_with_link',
-        ]);
+            ]
+        );
     }
 }

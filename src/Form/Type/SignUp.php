@@ -22,29 +22,36 @@ class SignUp extends AbstractType
             options: [
             'label' => 'Utilisateur',
             'required' => false,
-        ]
+            ]
         )
-            ->add("file", FileType::class, options: [
+            ->add(
+                "file", FileType::class, options: [
                 'label' => 'Image de profil',
                 'required' => false,
 
-            ])
-            ->add('email', EmailType::class, options: [
+                ]
+            )
+            ->add(
+                'email', EmailType::class, options: [
                 'label' => 'Email',
                 'required' => false,
-            ])
-            ->add('password', PasswordType::class, options: [
+                ]
+            )
+            ->add(
+                'password', PasswordType::class, options: [
                 'label' => 'Mot de passe',
                 'required' => false,
 
-            ])
+                ]
+            )
             ->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']])
             ->setAction("/signup/registration")->setMethod('POST');
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(
+            [
             'data_class' => User::class,
 
             'validation_groups' => 'signUp',
@@ -54,6 +61,7 @@ class SignUp extends AbstractType
             'csrf_field_name' => '_token',
 
             'csrf_token_id' => 'sign_up',
-        ]);
+            ]
+        );
     }
 }

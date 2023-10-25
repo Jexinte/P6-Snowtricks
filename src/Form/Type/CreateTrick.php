@@ -15,17 +15,22 @@ class CreateTrick extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add("name", TextType::class, options: [
+        $builder->add(
+            "name", TextType::class, options: [
             'label' => 'Nom du trick',
             'required' => false,
             "attr" => ["placeholder" => "Ollie Mollie"],
-        ])
-            ->add("description", TextareaType::class, options: [
+            ]
+        )
+            ->add(
+                "description", TextareaType::class, options: [
                 'label' => 'Description',
                 'required' => false,
                 "attr" => ["placeholder" => "Exprimez-vous!"]
-            ])
-            ->add("trickGroup", ChoiceType::class, options: [
+                ]
+            )
+            ->add(
+                "trickGroup", ChoiceType::class, options: [
                 'label' => 'Sélectionner un groupe',
                 'required' => false,
                 'choices' => [
@@ -38,20 +43,20 @@ class CreateTrick extends AbstractType
                     'Old School' => 'Old School',
                 ],
 
-            ])
-
-
-        ;
+                ]
+            );
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(
+            [
             'data_class' => Trick::class,
             'csrf_protection' => true,
             'csrf_field_name' => 'token',
             'csrf_token_id' => 'create_trick_text',
-        ]);
+            ]
+        );
     }
 
 

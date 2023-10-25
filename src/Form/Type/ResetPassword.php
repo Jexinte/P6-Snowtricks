@@ -15,18 +15,24 @@ class ResetPassword extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('username', TextType::class, options:[
+        $builder->add(
+            'username', TextType::class, options:[
             'label' => 'Utilisateur',
             'required' => false,
             'attr' => ['placeholder' => 'John']
-        ])
-            ->add('oldPassword', PasswordType::class, options:[
-            'label' => 'Ancien mot de passe',
-            'required' => false,
-        ])      ->add('password', PasswordType::class, options:[
-            'label' => 'Nouveau mot de passe',
-            'required' => false,
-        ])
+            ]
+        )
+            ->add(
+                'oldPassword', PasswordType::class, options:[
+                'label' => 'Ancien mot de passe',
+                'required' => false,
+                ]
+            )      ->add(
+                'password', PasswordType::class, options:[
+                    'label' => 'Nouveau mot de passe',
+                    'required' => false,
+                    ]
+            )
 
             ->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']])
             ->setMethod('POST');
@@ -34,7 +40,8 @@ class ResetPassword extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(
+            [
             'data_class' => User::class,
             'validation_groups' => 'resetPassword',
             'csrf_protection' => true,
@@ -42,6 +49,7 @@ class ResetPassword extends AbstractType
             'csrf_field_name' => '_token',
 
             'csrf_token_id'   => 'reset_password',
-        ]);
+            ]
+        );
     }
 }

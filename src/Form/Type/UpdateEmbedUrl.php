@@ -13,17 +13,20 @@ class UpdateEmbedUrl extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add("embedUrlUpdated", TextType::class, options: [
+        $builder->add(
+            "embedUrlUpdated", TextType::class, options: [
             'label' => 'Url Vidéo Dailymotion / Youtube',
             'required' => false,
 
-        ])
+            ]
+        )
             ->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']])
             ->setMethod('PUT');
     }
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(
+            [
             'data_class' => Media::class,
 
             'validation_groups' => 'updateTrickUrl',
@@ -33,7 +36,8 @@ class UpdateEmbedUrl extends AbstractType
             'csrf_field_name' => '_token',
 
             'csrf_token_id' => 'update_media',
-        ]);
+            ]
+        );
     }
 
 }

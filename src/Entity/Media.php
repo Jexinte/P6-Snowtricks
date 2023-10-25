@@ -1,4 +1,15 @@
 <?php
+/**
+ * Handle media properties
+ *
+ * PHP version 8
+ *
+ * @category Entity
+ * @package  Media
+ * @author   Yokke <mdembelepro@gmail.com>
+ * @license  ISC License
+ * @link     https://github.com/Jexinte/P6-Snowtricks
+ */
 
 namespace App\Entity;
 
@@ -8,29 +19,36 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\File;
 
+/**
+ * Handle media properties
+ *
+ * PHP version 8
+ *
+ * @category Entity
+ * @package  Media
+ * @author   Yokke <mdembelepro@gmail.com>
+ * @license  ISC License
+ * @link     https://github.com/Jexinte/P6-Snowtricks
+ */
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
 class Media
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private ?int $_id = null;
 
     #[ORM\Column]
-    private ?int $idTrick = null;
+    private ?int $_idTrick = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $mediaPath = null;
+    private ?string $_mediaPath = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $mediaType = null;
+    private ?string $_mediaType = null;
     #[ORM\Column(length: 255, nullable: true)]
-    private ?bool $isBanner = null;
+    private ?bool $_isBanner = null;
 
-
-    /**
-     * @var array<string>
-     */
 
     #[Assert\All(
         new File(
@@ -39,10 +57,7 @@ class Media
             extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !',
         )
     )]
-    private array $images;
-    /**
-     * @var array<string>
-     */
+    private array $_images;
 
 
     #[Assert\All(
@@ -52,248 +67,337 @@ class Media
             extensionsMessage: 'Seuls les fichiers ayant pour extension mp4 sont acceptés !',
         )
     )]
-    private array $videos;
+    private array $_videos;
 
     #[Assert\Regex(
         pattern: '/<iframe[^>]+src="([^"]+)"/i',
         message: "Oops ! Il semblerait que le format de votre url n'est pas bon, merci de vérifier ce qu'il en est",
         match: true,
     )]
-    private ?string $embedUrl = null;
+    private ?string $_embedUrl = null;
     #[Assert\Regex(
         pattern: '/<iframe[^>]+src="([^"]+)"/i',
         message: "Oops ! Il semblerait que le format de votre url n'est pas bon, merci de vérifier ce qu'il en est",
         match: true,
         groups: ['updateTrickUrl']
     )]
-    private ?string $embedUrlUpdated = null;
+    private ?string $_embedUrlUpdated = null;
 
 
-    #[Assert\NotBlank(message:'Veuillez sélectionner un fichier !')]
+    #[Assert\NotBlank(message: 'Veuillez sélectionner un fichier !')]
     #[Assert\File(
         maxSize: '3000K',
         extensions: ['jpg', 'png', 'webp'],
         extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
     )]
-    private ?UploadedFile $bannerFile;
+    private ?UploadedFile $_bannerFile;
 
 
     #[Assert\File(
         maxSize: '3000K',
         groups: ['updateTrickFileThatIsNotBanner'],
-        extensions: ['jpg', 'png', 'webp','mp4'],
+        extensions: ['jpg', 'png', 'webp', 'mp4'],
         extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
     )]
-    private ?UploadedFile $updatedFile = null;
+    private ?UploadedFile $_updatedFile = null;
     #[Assert\File(
         maxSize: '3000K',
         groups: ['updateBannerFile'],
         extensions: ['jpg', 'png', 'webp'],
         extensionsMessage: 'Seuls les fichiers ayant pour extensions : jpg , png et webp sont acceptés !'
     )]
-    private ?UploadedFile $updatedBannerFile = null;
+    private ?UploadedFile $_updatedBannerFile = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
-    #[ORM\JoinColumn(name:'id_trick', referencedColumnName: 'id', nullable: false)]
-    private ?Trick $trick = null;
+    #[ORM\JoinColumn(name: 'id_trick', referencedColumnName: 'id', nullable: false)]
+    private ?Trick $_trick = null;
 
+    /**
+     * Summary of getId
+     *
+     * @return int|null
+     */
     public function getId(): ?int
     {
-        return $this->id;
-    }
-
-    public function getIdTrick(): ?int
-    {
-        return $this->idTrick;
+        return $this->_id;
     }
 
     /**
-     * @param int $idTrick
+     * Summary of getIdTrick
+     *
+     * @return int|null
+     */
+    public function getIdTrick(): ?int
+    {
+        return $this->_idTrick;
+    }
+
+    /**
+     * Summary of setIdTrick
+     *
+     * @param int $idTrick int
+     *
      * @return $this
      */
     public function setIdTrick(int $idTrick): static
     {
-        $this->idTrick = $idTrick;
+        $this->_idTrick = $idTrick;
 
         return $this;
     }
 
+    /**
+     * Summary of getMediaPath
+     *
+     * @return string|null
+     */
     public function getMediaPath(): ?string
     {
-        return $this->mediaPath;
+        return $this->_mediaPath;
     }
 
     /**
-     * @param string $mediaPath
+     * Summary of setMediaPath
+     *
+     * @param string $mediaPath string
+     *
      * @return $this
      */
     public function setMediaPath(string $mediaPath): static
     {
-        $this->mediaPath = $mediaPath;
+        $this->_mediaPath = $mediaPath;
 
         return $this;
     }
 
+    /**
+     * Summary of getMediaType
+     *
+     * @return string|null
+     */
     public function getMediaType(): ?string
     {
-        return $this->mediaType;
+        return $this->_mediaType;
     }
 
     /**
-     * @param string $mediaType
+     * Summary of setMediaType
+     *
+     * @param string $mediaType string
+     *
      * @return $this
      */
     public function setMediaType(string $mediaType): static
     {
-        $this->mediaType = $mediaType;
+        $this->_mediaType = $mediaType;
 
         return $this;
     }
 
 
-
-
-
     /**
+     * Summary of getVideos
+     *
      * @return array<string>
      */
     public function getVideos(): array
     {
-        return $this->videos;
+        return $this->_videos;
     }
 
 
     /**
-     * @param array<string> $videos
+     * Summary of getVideos
+     *
+     * @param array<string> $videos array
+     *
      * @return void
      */
     public function setVideos(array $videos): void
     {
-        $this->videos = $videos;
+        $this->_videos = $videos;
     }
 
     /**
+     * Summary of getIsBanner
+     *
      * @return bool|null
      */
     public function getIsBanner(): ?bool
     {
-        return $this->isBanner;
+        return $this->_isBanner;
     }
 
     /**
-     * @param bool|null $isBanner
+     * Summary of setIsBanner
+     *
+     * @param bool|null $isBanner ?bool
+     *
+     * @return void
      */
     public function setIsBanner(?bool $isBanner = null): void
     {
-        $this->isBanner = $isBanner;
+        $this->_isBanner = $isBanner;
     }
 
     /**
+     * Summary of getEmbedUrl
+     *
      * @return string|null
      */
     public function getEmbedUrl(): ?string
     {
-        return $this->embedUrl;
+        return $this->_embedUrl;
     }
 
     /**
-     * @param string|null $embedUrl
+     * Summary of setEmbedUrl
+     *
+     * @param string|null $embedUrl ?string
+     *
+     * @return void
      */
     public function setEmbedUrl(?string $embedUrl): void
     {
-        $this->embedUrl = $embedUrl;
+        $this->_embedUrl = $embedUrl;
     }
 
+    /**
+     * Summary of getBannerFile
+     *
+     * @return UploadedFile
+     */
     public function getBannerFile(): UploadedFile
     {
-        return $this->bannerFile;
+        return $this->_bannerFile;
     }
-
-
-    public function setBannerFile(UploadedFile $bannerFile): void
-    {
-        $this->bannerFile = $bannerFile;
-    }
-
 
 
     /**
+     * Summary of setBannerFile
+     *
+     * @param UploadedFile $bannerFile Object
+     *
+     * @return void
+     */
+    public function setBannerFile(UploadedFile $bannerFile): void
+    {
+        $this->_bannerFile = $bannerFile;
+    }
+
+
+    /**
+     * Summary of getUpdatedFile
+     *
      * @return UploadedFile|null
      */
     public function getUpdatedFile(): ?UploadedFile
     {
-        return $this->updatedFile;
+        return $this->_updatedFile;
     }
 
     /**
-     * @param UploadedFile|null $updatedFile
+     * Summary of setUpdatedFile
+     *
+     * @param UploadedFile|null $updatedFile Object
+     * 
+     * @return void
      */
     public function setUpdatedFile(?UploadedFile $updatedFile): void
     {
-        $this->updatedFile = $updatedFile;
+        $this->_updatedFile = $updatedFile;
     }
 
 
     /**
+     * Summary of getImages
+     *
      * @return string[]
      */
     public function getImages(): array
     {
-        return $this->images;
+        return $this->_images;
     }
 
 
     /**
-     * @param array<string> $images
+     * Summary of setImages
+     *
+     * @param array<string> $images array
+     *
      * @return void
      */
     public function setImages(array $images): void
     {
-        $this->images = $images;
+        $this->_images = $images;
     }
 
+    /**
+     * Summary of getTrick
+     *
+     * @return Trick|null
+     */
     public function getTrick(): ?Trick
     {
-        return $this->trick;
+        return $this->_trick;
     }
 
+    /**
+     * Summary of setTrick
+     *
+     * @param Trick|null $trick Object
+     *
+     * @return $this
+     */
     public function setTrick(?Trick $trick): static
     {
-        $this->trick = $trick;
+        $this->_trick = $trick;
 
         return $this;
     }
 
     /**
+     * Summary of getUpdatedBannerFile
+     *
      * @return UploadedFile|null
      */
     public function getUpdatedBannerFile(): ?UploadedFile
     {
-        return $this->updatedBannerFile;
+        return $this->_updatedBannerFile;
     }
 
     /**
-     * @param UploadedFile|null $updatedBannerFile
+     * Summary of setUpdatedBannerFile
+     *
+     * @param UploadedFile|null $updatedBannerFile Object
+     *
+     * @return void
      */
     public function setUpdatedBannerFile(?UploadedFile $updatedBannerFile): void
     {
-        $this->updatedBannerFile = $updatedBannerFile;
+        $this->_updatedBannerFile = $updatedBannerFile;
     }
 
     /**
+     * Summary of getEmbedUrlUpdated
+     *
      * @return string|null
      */
     public function getEmbedUrlUpdated(): ?string
     {
-        return $this->embedUrlUpdated;
+        return $this->_embedUrlUpdated;
     }
 
     /**
-     * @param string|null $embedUrlUpdated
+     * Summary of setEmbedUrlUpdated
+     *
+     * @param string|null $embedUrlUpdated Object
+     *
+     * @return void
      */
     public function setEmbedUrlUpdated(?string $embedUrlUpdated): void
     {
-        $this->embedUrlUpdated = $embedUrlUpdated;
+        $this->_embedUrlUpdated = $embedUrlUpdated;
     }
 
 

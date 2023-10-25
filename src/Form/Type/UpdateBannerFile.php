@@ -13,16 +13,19 @@ class UpdateBannerFile extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add("updatedBannerFile", FileType::class, options: [
+        $builder->add(
+            "updatedBannerFile", FileType::class, options: [
             'label' => 'Sélectionner un fichier',
             'required' => false,
-        ])
+            ]
+        )
             ->add('save', SubmitType::class, ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']])
             ->setMethod('PUT');
     }
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(
+            [
             'data_class' => Media::class,
 
             'validation_groups' => 'updateBannerFile',
@@ -32,7 +35,8 @@ class UpdateBannerFile extends AbstractType
             'csrf_field_name' => '_token',
 
             'csrf_token_id' => 'update_media',
-        ]);
+            ]
+        );
     }
 
 }

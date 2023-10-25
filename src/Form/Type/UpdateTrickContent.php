@@ -15,15 +15,20 @@ class UpdateTrickContent extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add("name", TextType::class, options: [
+        $builder->add(
+            "name", TextType::class, options: [
             'label' => 'Nom du trick',
             'required' => false,
-        ])
-            ->add('description', TextareaType::class, options: [
+            ]
+        )
+            ->add(
+                'description', TextareaType::class, options: [
                 'label' => 'Description',
                 'required' => false,
-            ])
-            ->add('trickGroup', ChoiceType::class, options: [
+                ]
+            )
+            ->add(
+                'trickGroup', ChoiceType::class, options: [
                 'label' => 'Sélectionner un groupe',
                 "choices" => [
                     "Grabs" => "Grabs",
@@ -34,7 +39,8 @@ class UpdateTrickContent extends AbstractType
                     "One Foot Tricks" => "One Foot Tricks",
                     "Old School" => "Old School"
                 ]
-            ])->add(
+                ]
+            )->add(
                 'save',
                 SubmitType::class,
                 ['label' => 'Envoyer', 'attr' => ['class' => 'btn btn-dark']]
@@ -43,7 +49,8 @@ class UpdateTrickContent extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(
+            [
             'data_class' => Trick::class,
 
             'csrf_protection' => true,
@@ -51,7 +58,8 @@ class UpdateTrickContent extends AbstractType
             'csrf_field_name' => '_token',
 
             'csrf_token_id' => 'update_trick_content',
-        ]);
+            ]
+        );
     }
 
 }
