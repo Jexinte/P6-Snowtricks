@@ -47,13 +47,13 @@ class UpdateTrickContent extends AbstractType
         $builder->add(
             "name", TextType::class, options: [
             'label' => 'Nom du trick',
-            'required' => false,
+            'required' => true,
             ]
         )
             ->add(
                 'description', TextareaType::class, options: [
                 'label' => 'Description',
-                'required' => false,
+                'required' => true,
                 ]
             )
             ->add(
@@ -67,7 +67,7 @@ class UpdateTrickContent extends AbstractType
                     "Slides" => "Slides",
                     "One Foot Tricks" => "One Foot Tricks",
                     "Old School" => "Old School"
-                ]
+                ],
                 ]
             )->add(
                 'save',
