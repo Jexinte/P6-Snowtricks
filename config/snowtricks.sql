@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : lun. 23 oct. 2023 à 17:47
+-- Généré le : jeu. 26 oct. 2023 à 11:52
 -- Version du serveur : 10.4.28-MariaDB
 -- Version de PHP : 8.2.4
 
@@ -135,7 +135,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `username`, `profile_image`, `password`, `status`, `email`, `roles`) VALUES
-(2, 'Test', '/assets/img/user-profile/9wlgcd6OmiUp.jpg', '$2y$10$2O8jtbc34u9VnNnDW6yED.ZJhWH1zFRtrtKOdk6BZRE88UyYGs3r.', 1, 'trains78@live.fr', '[\"ROLE_USER\"]');
+(2, 'Test', '/assets/img/user-profile/IDsASalJat1W.jpg', '$2y$10$AQLk4BEagJ5ZFbjmqbeYxuws4vsRSZrpv44LHJvC45gEg62CFYPUO', 1, 'toto@live.fr', '[\"ROLE_USER\"]');
 
 --
 -- Index pour les tables déchargées
@@ -177,25 +177,25 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT pour la table `comment`
 --
 ALTER TABLE `comment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT pour la table `media`
 --
 ALTER TABLE `media`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=563;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=635;
 
 --
 -- AUTO_INCREMENT pour la table `trick`
 --
 ALTER TABLE `trick`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=327;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=337;
 
 --
 -- AUTO_INCREMENT pour la table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- Contraintes pour les tables déchargées
