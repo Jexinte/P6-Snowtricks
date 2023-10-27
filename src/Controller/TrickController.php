@@ -13,10 +13,10 @@
 
 namespace App\Controller;
 
-use App\Entity\Media;
 use App\Form\Type\AddComment;
 use App\Form\Type\CreateTrick;
 use App\Form\Type\CreateTrickMedia;
+use App\Service\FileGenerator;
 use App\Form\Type\UpdateTrickContent;
 use App\Repository\CommentRepository;
 use App\Repository\MediaRepository;
@@ -143,6 +143,7 @@ class TrickController extends AbstractController
     #[Route('/create-trick', name: 'create_trick_post', methods: ["POST"])]
     public function createTrick(
         Request $request,
+        FileGenerator $fileGenerator,
         TrickRepository $trickRepository,
         MediaRepository $mediaRepository,
         DateTime $dateTime
@@ -165,10 +166,10 @@ class TrickController extends AbstractController
                 $media->setEmbedUrl($urlCleaned);
             }
 
-            $this->createTrickSaveBanner($media, $trick, $mediaRepository);
-            $this->createTrickSaveEmbedUrl($media, $trick, $mediaRepository);
-            $this->createTrickSaveImages($media, $trick, $mediaRepository);
-            $this->createTrickSaveVideos($media, $trick, $mediaRepository);
+            $fileGenerator->saveBanner($media, $trick, $mediaRepository);
+            $fileGenerator->saveEmbedUrl($media, $trick, $mediaRepository);
+            $fileGenerator->saveImages($media, $trick, $mediaRepository);
+            $fileGenerator->saveVideos($media, $trick, $mediaRepository);
 
             $trickRepository->getEntityManager()->persist($trick);
             $trickRepository->getEntityManager()->flush();
@@ -187,136 +188,7 @@ class TrickController extends AbstractController
         );
     }
 
-    /**
-     * Summary of createTrickSaveBanner
-     * 
-     * @param Media           $media           Object
-     * @param Trick           $trick           Object
-     * @param MediaRepository $mediaRepository Object
-     * 
-     * @return void
-     * 
-     * @throws \Exception
-     */
-    public function createTrickSaveBanner(
-        Media $media, Trick $trick, MediaRepository $mediaRepository
-    ): void {
-        $dirImagesBanner = "../public/assets/img/banner";
-        $bannerFile = $media->getBannerFile();
-        $fileExt = explode('.', $bannerFile->getClientOriginalName());
-        $filename = str_replace(
-            "/",
-            "",
-            base64_encode(random_bytes(9))
-        ) . '.' . $fileExt[1];
-        $imgBannerPath = "/assets/img/banner/$filename";
-        $tmp = $bannerFile->getPathname();
-        move_uploaded_file($tmp, "$dirImagesBanner/$filename");
-        $media->setMediaPath($imgBannerPath);
-        $media->setMediaType($fileExt[1]);
-        $media->setIsBanner(true);
-        $trick->addMedia($media);
-        $mediaRepository->getEntityManager()->persist($media);
-    }
 
-    /**
-     * Summary of createTrickSaveEmbedUrl
-     *
-     * @param Media           $media           Object
-     * @param Trick           $trick           Object
-     * @param MediaRepository $mediaRepository Object
-     *
-     * @return void
-     */
-    public function createTrickSaveEmbedUrl(
-        Media $media, Trick $trick, MediaRepository $mediaRepository
-    ): void {
-        $embedUrl = $media->getEmbedUrl();
-
-        if (!empty($embedUrl)) {
-            $newMedia = new Media();
-            $newMedia->setMediaPath($embedUrl);
-            $newMedia->setMediaType("web");
-            $newMedia->setIsBanner();
-            $trick->addMedia($newMedia);
-            $mediaRepository->getEntityManager()->persist($newMedia);
-        }
-    }
-
-    /**
-     * Summary of createTrickSaveImages
-     *
-     * @param Media           $media           Object
-     * @param Trick           $trick           Object
-     * @param MediaRepository $mediaRepository Object
-     *
-     * @return void
-     *
-     * @throws \Exception
-     */
-    public function createTrickSaveImages(
-        Media $media, Trick $trick, MediaRepository $mediaRepository
-    ): void {
-        $images = $media->getImages();
-        $dirImages = "../public/assets/img";
-        if (!empty($media->getImages())) {
-            foreach ($images as $image) {
-                $newMedia = new Media();
-                $fileExt = explode('.', $image->getClientOriginalName());
-                $filename = str_replace(
-                    "/",
-                    "",
-                    base64_encode(random_bytes(9))
-                ) . '.' . $fileExt[1];
-                $imgPath = "/assets/img/$filename";
-                $tmp = $image->getPathname();
-                $newMedia->setMediaPath($imgPath);
-                $newMedia->setMediaType($fileExt[1]);
-                $newMedia->setIsBanner(null);
-                move_uploaded_file($tmp, "$dirImages/$filename");
-                $trick->addMedia($newMedia);
-                $mediaRepository->getEntityManager()->persist($newMedia);
-            }
-        }
-    }
-
-    /**
-     * Summary of createTricksaveVideos
-     *
-     * @param Media           $media           Object
-     * @param Trick           $trick           Object
-     * @param MediaRepository $mediaRepository Object
-     *
-     * @return void
-     *
-     * @throws \Exception
-     */
-    public function createTrickSaveVideos(
-        Media $media, Trick $trick, MediaRepository $mediaRepository
-    ): void {
-        $videos = $media->getVideos();
-        $dirVideos = "../public/assets/videos";
-
-        if (!empty($media->getVideos())) {
-            foreach ($videos as $video) {
-                $newMedia = new Media();
-                $fileExt = explode('.', $video->getClientOriginalName());
-                $filename = str_replace(
-                    "/",
-                    "",
-                    base64_encode(random_bytes(9))
-                ) . '.' . $fileExt[1];
-                $videoPath = "/assets/videos/$filename";
-                $tmp = $video->getPathname();
-                $newMedia->setMediaPath($videoPath);
-                $newMedia->setMediaType($fileExt[1]);
-                $newMedia->setIsBanner();
-                move_uploaded_file($tmp, "$dirVideos/$filename");
-                $trick->addMedia($newMedia);
-                $mediaRepository->getEntityManager()->persist($newMedia);
-            }
-        }
-    }
 
     /**
      * Summary of updateTrickPage
