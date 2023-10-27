@@ -131,11 +131,12 @@ class TrickController extends AbstractController
 
 
     /**
-     * Sumamry of createTrick
+     * Summary of createTrick
      *
      * @param Request         $request         Object
      * @param TrickRepository $trickRepository Object
      * @param MediaRepository $mediaRepository Object
+     * @param FileGenerator   $fileGenerator   Object
      * @param DateTime        $dateTime        Object
      * 
      * @return Response
