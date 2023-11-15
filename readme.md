@@ -12,7 +12,10 @@ The aim of the project is to create a community site where users can create tric
 ```
 composer install
 ```
-
+If Symfony report you that you're limited to the 'en' locale for IntlDateFormatter use this command :
+```
+composer require symfony/intl
+```
 3 - When composer ask you to create "grump.yaml" file say no
 
 
